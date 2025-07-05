@@ -1,23 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, LogOut, Sparkles } from 'lucide-react';
+import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3 } from 'lucide-react';
 import { CategorySection } from '@/components/CategorySection';
 import { ProgressBar } from '@/components/ProgressBar';
-import { Auth } from '@/components/Auth';
 import { PremadeListsModal } from '@/components/PremadeListsModal';
+import { TripSelector, Trip } from '@/components/TripSelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface PackingItem {
-  id: string;
-  name: string;
-  packed: boolean;
-  category: string;
-}
+import { PackingItemType } from '@/components/PackingItem';
 
 interface Category {
   id: string;
@@ -35,44 +27,60 @@ const defaultCategories: Category[] = [
 ];
 
 const Index = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
-  const [items, setItems] = useState<PackingItem[]>([]);
-  const [tripName, setTripName] = useState('My Amazing Trip');
-  const [isEditingTrip, setIsEditingTrip] = useState(false);
-  const [tempTripName, setTempTripName] = useState(tripName);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [currentTripId, setCurrentTripId] = useState<string | null>(null);
+  const [items, setItems] = useState<PackingItemType[]>([]);
   const [darkMode, setDarkMode] = useState(false);
   const [showCompleted, setShowCompleted] = useState(true);
   const [showPremadeLists, setShowPremadeLists] = useState(false);
-  const [currentTripId, setCurrentTripId] = useState<string | null>(null);
+  const [checklistMode, setChecklistMode] = useState(false);
   const { toast } = useToast();
 
-  // Load data from localStorage on mount (fallback for offline)
+  // Load data from localStorage on mount
   useEffect(() => {
-    const savedItems = localStorage.getItem('packingItems');
-    const savedTripName = localStorage.getItem('tripName');
+    const savedTrips = localStorage.getItem('trips');
+    const savedCurrentTripId = localStorage.getItem('currentTripId');
     const savedDarkMode = localStorage.getItem('darkMode');
 
-    if (savedItems) setItems(JSON.parse(savedItems));
-    if (savedTripName) setTripName(savedTripName);
+    if (savedTrips) {
+      const parsedTrips = JSON.parse(savedTrips).map((trip: any) => ({
+        ...trip,
+        startDate: trip.startDate ? new Date(trip.startDate) : undefined,
+        endDate: trip.endDate ? new Date(trip.endDate) : undefined,
+        created: new Date(trip.created),
+      }));
+      setTrips(parsedTrips);
+    }
+    
+    if (savedCurrentTripId) {
+      setCurrentTripId(savedCurrentTripId);
+      const savedItems = localStorage.getItem(`items_${savedCurrentTripId}`);
+      if (savedItems) setItems(JSON.parse(savedItems));
+    }
+    
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
   }, []);
 
-  // Create default trip for authenticated users
+  // Save trips to localStorage
   useEffect(() => {
-    if (user && !currentTripId) {
-      createDefaultTrip();
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }, [trips]);
+
+  // Save current trip ID
+  useEffect(() => {
+    if (currentTripId) {
+      localStorage.setItem('currentTripId', currentTripId);
     }
-  }, [user]);
+  }, [currentTripId]);
 
-  // Save data to localStorage whenever state changes (offline support)
+  // Save items for current trip
   useEffect(() => {
-    localStorage.setItem('packingItems', JSON.stringify(items));
-  }, [items]);
+    if (currentTripId) {
+      localStorage.setItem(`items_${currentTripId}`, JSON.stringify(items));
+    }
+  }, [items, currentTripId]);
 
-  useEffect(() => {
-    localStorage.setItem('tripName', tripName);
-  }, [tripName]);
-
+  // Handle dark mode
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
     if (darkMode) {
@@ -82,49 +90,106 @@ const Index = () => {
     }
   }, [darkMode]);
 
-  const createDefaultTrip = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('trips')
-        .insert({
-          name: tripName,
-          user_id: user!.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      setCurrentTripId(data.id);
-    } catch (error: any) {
-      console.error('Error creating trip:', error);
+  // Create default trip if none exist
+  useEffect(() => {
+    if (trips.length === 0) {
+      const defaultTrip: Trip = {
+        id: Date.now().toString(),
+        name: 'My Amazing Trip',
+        created: new Date(),
+      };
+      setTrips([defaultTrip]);
+      setCurrentTripId(defaultTrip.id);
     }
+  }, [trips.length]);
+
+  // Auto-suggest quantities based on trip duration
+  const suggestQuantity = (itemName: string, category: string): number => {
+    const currentTrip = trips.find(t => t.id === currentTripId);
+    if (!currentTrip?.startDate || !currentTrip?.endDate) return 1;
+    
+    const duration = Math.ceil((currentTrip.endDate.getTime() - currentTrip.startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Smart quantity suggestions based on item type and trip duration
+    const lowerName = itemName.toLowerCase();
+    
+    if (category === 'clothes') {
+      if (lowerName.includes('shirt') || lowerName.includes('top')) return Math.min(duration, 7);
+      if (lowerName.includes('underwear') || lowerName.includes('sock')) return duration + 1;
+      if (lowerName.includes('pants') || lowerName.includes('jeans')) return Math.ceil(duration / 3);
+    }
+    
+    if (category === 'toiletries') {
+      if (lowerName.includes('toothbrush')) return 1;
+      if (lowerName.includes('contact') && lowerName.includes('lens')) return duration;
+    }
+    
+    return 1;
   };
 
-  const addItem = async (name: string, category: string) => {
-    const newItem: PackingItem = {
+  const handleCreateTrip = (tripData: Omit<Trip, 'id' | 'created'>): string => {
+    const newTrip: Trip = {
+      ...tripData,
+      id: Date.now().toString(),
+      created: new Date(),
+    };
+    setTrips(prev => [...prev, newTrip]);
+    return newTrip.id;
+  };
+
+  const handleSelectTrip = (tripId: string) => {
+    // Save current items before switching
+    if (currentTripId) {
+      localStorage.setItem(`items_${currentTripId}`, JSON.stringify(items));
+    }
+    
+    // Load items for selected trip
+    const savedItems = localStorage.getItem(`items_${tripId}`);
+    setItems(savedItems ? JSON.parse(savedItems) : []);
+    setCurrentTripId(tripId);
+  };
+
+  const handleUpdateTrip = (tripId: string, updates: Partial<Trip>) => {
+    setTrips(prev => prev.map(trip => 
+      trip.id === tripId ? { ...trip, ...updates } : trip
+    ));
+  };
+
+  const handleDeleteTrip = (tripId: string) => {
+    if (trips.length === 1) {
+      toast({
+        title: "Cannot delete",
+        description: "You must have at least one trip.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setTrips(prev => prev.filter(trip => trip.id !== tripId));
+    localStorage.removeItem(`items_${tripId}`);
+    
+    if (currentTripId === tripId) {
+      const remainingTrips = trips.filter(trip => trip.id !== tripId);
+      setCurrentTripId(remainingTrips[0]?.id || null);
+    }
+    
+    toast({
+      title: "Trip deleted",
+      description: "Trip and all its items have been removed.",
+    });
+  };
+
+  const addItem = (name: string, category: string) => {
+    const quantity = suggestQuantity(name, category);
+    const newItem: PackingItemType = {
       id: Date.now().toString(),
       name,
       packed: false,
       category,
+      quantity,
     };
     
     setItems([...items, newItem]);
-
-    // Save to Supabase if user is authenticated
-    if (user && currentTripId) {
-      try {
-        await supabase.from('packing_items').insert({
-          trip_id: currentTripId,
-          user_id: user.id,
-          name,
-          category,
-          packed: false,
-        });
-      } catch (error: any) {
-        console.error('Error saving item:', error);
-      }
-    }
-
     toast({
       title: "Item added!",
       description: `${name} has been added to your packing list.`,
@@ -132,34 +197,29 @@ const Index = () => {
   };
 
   const addMultipleItems = (newItems: Array<{ name: string; category: string }>) => {
-    const itemsToAdd = newItems.map(item => ({
-      id: (Date.now() + Math.random()).toString(),
-      name: item.name,
-      packed: false,
-      category: item.category,
-    }));
+    const itemsToAdd = newItems.map(item => {
+      const quantity = suggestQuantity(item.name, item.category);
+      return {
+        id: (Date.now() + Math.random()).toString(),
+        name: item.name,
+        packed: false,
+        category: item.category,
+        quantity,
+      };
+    });
 
     setItems(prev => [...prev, ...itemsToAdd]);
-
-    // Save to Supabase if user is authenticated
-    if (user && currentTripId) {
-      const supabaseItems = itemsToAdd.map(item => ({
-        trip_id: currentTripId,
-        user_id: user.id,
-        name: item.name,
-        category: item.category,
-        packed: false,
-      }));
-
-      supabase.from('packing_items').insert(supabaseItems).then(({ error }) => {
-        if (error) console.error('Error saving items:', error);
-      });
-    }
   };
 
   const toggleItem = (id: string) => {
     setItems(items.map(item => 
       item.id === id ? { ...item, packed: !item.packed } : item
+    ));
+  };
+
+  const updateItem = (id: string, updates: Partial<PackingItemType>) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, ...updates } : item
     ));
   };
 
@@ -182,51 +242,20 @@ const Index = () => {
     });
   };
 
-  const handleTripNameSave = () => {
-    setTripName(tempTripName);
-    setIsEditingTrip(false);
-    toast({
-      title: "Trip renamed",
-      description: `Your trip is now called "${tempTripName}".`,
-    });
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    toast({
-      title: "Signed out",
-      description: "You've been signed out successfully.",
-    });
-  };
-
   const getItemsByCategory = (categoryId: string) => {
     return items.filter(item => item.category === categoryId);
   };
 
+  const currentTrip = trips.find(t => t.id === currentTripId);
   const totalItems = items.length;
   const packedItems = items.filter(item => item.packed).length;
   const progressPercentage = totalItems > 0 ? (packedItems / totalItems) * 100 : 0;
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Auth />;
-  }
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${
       darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     }`}>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -253,38 +282,25 @@ const Index = () => {
                 <Sparkles className="h-4 w-4 mr-2" />
                 Smart Lists
               </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setChecklistMode(!checklistMode)}
+                className="rounded-full"
+              >
+                {checklistMode ? <Grid3X3 className="h-4 w-4 mr-2" /> : <List className="h-4 w-4 mr-2" />}
+                {checklistMode ? 'Grid View' : 'Checklist'}
+              </Button>
             </div>
             
             <div className="flex-1 mx-4">
-              {isEditingTrip ? (
-                <div className="flex items-center gap-2 justify-center">
-                  <Input
-                    value={tempTripName}
-                    onChange={(e) => setTempTripName(e.target.value)}
-                    className="text-center text-2xl font-bold max-w-xs"
-                    onKeyPress={(e) => e.key === 'Enter' && handleTripNameSave()}
-                  />
-                  <Button size="sm" onClick={handleTripNameSave}>
-                    <Check className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {tripName}
-                  </h1>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setTempTripName(tripName);
-                      setIsEditingTrip(true);
-                    }}
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                PackSmart
+              </h1>
+              <p className="text-muted-foreground">
+                Pack smart, travel light ✈️
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -297,53 +313,59 @@ const Index = () => {
               >
                 <RotateCcw className="h-4 w-4" />
               </Button>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleSignOut}
-                className="rounded-full"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
-          <p className="text-muted-foreground mb-6">
-            Pack smart, travel light ✈️
-          </p>
-
           {/* Progress Bar */}
-          <ProgressBar 
-            current={packedItems} 
-            total={totalItems} 
-            percentage={progressPercentage}
-          />
+          {currentTrip && (
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold mb-2">{currentTrip.name}</h2>
+              <ProgressBar 
+                current={packedItems} 
+                total={totalItems} 
+                percentage={progressPercentage}
+              />
+            </div>
+          )}
         </motion.div>
 
-        {/* Categories */}
-        <div className="space-y-6">
-          <AnimatePresence>
-            {defaultCategories.map((category) => {
-              const categoryItems = getItemsByCategory(category.id);
-              const visibleItems = showCompleted 
-                ? categoryItems 
-                : categoryItems.filter(item => !item.packed);
+        {/* Trip Selector */}
+        <TripSelector
+          trips={trips}
+          currentTripId={currentTripId}
+          onSelectTrip={handleSelectTrip}
+          onCreateTrip={handleCreateTrip}
+          onUpdateTrip={handleUpdateTrip}
+          onDeleteTrip={handleDeleteTrip}
+        />
 
-              return (
-                <CategorySection
-                  key={category.id}
-                  category={category}
-                  items={visibleItems}
-                  onAddItem={(name) => addItem(name, category.id)}
-                  onToggleItem={toggleItem}
-                  onDeleteItem={deleteItem}
-                  showCompleted={showCompleted}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </div>
+        {/* Categories */}
+        {currentTripId && (
+          <div className="space-y-6">
+            <AnimatePresence>
+              {defaultCategories.map((category) => {
+                const categoryItems = getItemsByCategory(category.id);
+                const visibleItems = showCompleted 
+                  ? categoryItems 
+                  : categoryItems.filter(item => !item.packed);
+
+                return (
+                  <CategorySection
+                    key={category.id}
+                    category={category}
+                    items={visibleItems}
+                    onAddItem={(name) => addItem(name, category.id)}
+                    onToggleItem={toggleItem}
+                    onUpdateItem={updateItem}
+                    onDeleteItem={deleteItem}
+                    showCompleted={showCompleted}
+                    checklistMode={checklistMode}
+                  />
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* Show/Hide Completed Toggle */}
         {packedItems > 0 && (
@@ -363,7 +385,7 @@ const Index = () => {
         )}
 
         {/* Empty State */}
-        {totalItems === 0 && (
+        {totalItems === 0 && currentTripId && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

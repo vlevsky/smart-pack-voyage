@@ -48,8 +48,16 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
         .order('name');
 
       if (error) throw error;
-      setPremadeLists(data || []);
+      
+      // Parse the JSON items field correctly
+      const parsedData = (data || []).map(list => ({
+        ...list,
+        items: typeof list.items === 'string' ? JSON.parse(list.items) : list.items
+      }));
+      
+      setPremadeLists(parsedData);
     } catch (error: any) {
+      console.error('Error loading premade lists:', error);
       toast({
         title: "Error",
         description: "Failed to load premade lists",

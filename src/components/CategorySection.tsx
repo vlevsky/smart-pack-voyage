@@ -4,14 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PackingItem } from '@/components/PackingItem';
-
-interface PackingItemType {
-  id: string;
-  name: string;
-  packed: boolean;
-  category: string;
-}
+import { PackingItem, PackingItemType } from '@/components/PackingItem';
 
 interface Category {
   id: string;
@@ -25,8 +18,10 @@ interface CategorySectionProps {
   items: PackingItemType[];
   onAddItem: (name: string) => void;
   onToggleItem: (id: string) => void;
+  onUpdateItem: (id: string, updates: Partial<PackingItemType>) => void;
   onDeleteItem: (id: string) => void;
   showCompleted: boolean;
+  checklistMode?: boolean;
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -34,8 +29,10 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   items,
   onAddItem,
   onToggleItem,
+  onUpdateItem,
   onDeleteItem,
   showCompleted,
+  checklistMode = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [newItemName, setNewItemName] = useState('');
@@ -51,6 +48,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
   const packedCount = items.filter(item => item.packed).length;
   const totalCount = items.length;
+  const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const packedQuantity = items.filter(item => item.packed).reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+  if (checklistMode && (!showCompleted && packedCount === totalCount && totalCount > 0)) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -70,7 +73,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           <div>
             <h3 className="font-semibold text-lg">{category.name}</h3>
             <p className="text-sm text-muted-foreground">
-              {packedCount}/{totalCount} packed
+              {packedCount}/{totalCount} items ({packedQuantity}/{totalQuantity} total)
             </p>
           </div>
         </div>
@@ -138,7 +141,9 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                     key={item.id}
                     item={item}
                     onToggle={() => onToggleItem(item.id)}
+                    onUpdate={(updates) => onUpdateItem(item.id, updates)}
                     onDelete={() => onDeleteItem(item.id)}
+                    checklistMode={checklistMode}
                   />
                 ))}
               </AnimatePresence>
