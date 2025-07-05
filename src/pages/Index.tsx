@@ -1,11 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check } from 'lucide-react';
+import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, LogOut, Sparkles } from 'lucide-react';
 import { CategorySection } from '@/components/CategorySection';
 import { ProgressBar } from '@/components/ProgressBar';
+import { Auth } from '@/components/Auth';
+import { PremadeListsModal } from '@/components/PremadeListsModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface PackingItem {
@@ -31,15 +35,18 @@ const defaultCategories: Category[] = [
 ];
 
 const Index = () => {
+  const { user, loading: authLoading, signOut } = useAuth();
   const [items, setItems] = useState<PackingItem[]>([]);
   const [tripName, setTripName] = useState('My Amazing Trip');
   const [isEditingTrip, setIsEditingTrip] = useState(false);
   const [tempTripName, setTempTripName] = useState(tripName);
   const [darkMode, setDarkMode] = useState(false);
   const [showCompleted, setShowCompleted] = useState(true);
+  const [showPremadeLists, setShowPremadeLists] = useState(false);
+  const [currentTripId, setCurrentTripId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Load data from localStorage on mount
+  // Load data from localStorage on mount (fallback for offline)
   useEffect(() => {
     const savedItems = localStorage.getItem('packingItems');
     const savedTripName = localStorage.getItem('tripName');
@@ -50,7 +57,14 @@ const Index = () => {
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
   }, []);
 
-  // Save data to localStorage whenever state changes
+  // Create default trip for authenticated users
+  useEffect(() => {
+    if (user && !currentTripId) {
+      createDefaultTrip();
+    }
+  }, [user]);
+
+  // Save data to localStorage whenever state changes (offline support)
   useEffect(() => {
     localStorage.setItem('packingItems', JSON.stringify(items));
   }, [items]);
@@ -68,18 +82,79 @@ const Index = () => {
     }
   }, [darkMode]);
 
-  const addItem = (name: string, category: string) => {
+  const createDefaultTrip = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('trips')
+        .insert({
+          name: tripName,
+          user_id: user!.id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setCurrentTripId(data.id);
+    } catch (error: any) {
+      console.error('Error creating trip:', error);
+    }
+  };
+
+  const addItem = async (name: string, category: string) => {
     const newItem: PackingItem = {
       id: Date.now().toString(),
       name,
       packed: false,
       category,
     };
+    
     setItems([...items, newItem]);
+
+    // Save to Supabase if user is authenticated
+    if (user && currentTripId) {
+      try {
+        await supabase.from('packing_items').insert({
+          trip_id: currentTripId,
+          user_id: user.id,
+          name,
+          category,
+          packed: false,
+        });
+      } catch (error: any) {
+        console.error('Error saving item:', error);
+      }
+    }
+
     toast({
       title: "Item added!",
       description: `${name} has been added to your packing list.`,
     });
+  };
+
+  const addMultipleItems = (newItems: Array<{ name: string; category: string }>) => {
+    const itemsToAdd = newItems.map(item => ({
+      id: (Date.now() + Math.random()).toString(),
+      name: item.name,
+      packed: false,
+      category: item.category,
+    }));
+
+    setItems(prev => [...prev, ...itemsToAdd]);
+
+    // Save to Supabase if user is authenticated
+    if (user && currentTripId) {
+      const supabaseItems = itemsToAdd.map(item => ({
+        trip_id: currentTripId,
+        user_id: user.id,
+        name: item.name,
+        category: item.category,
+        packed: false,
+      }));
+
+      supabase.from('packing_items').insert(supabaseItems).then(({ error }) => {
+        if (error) console.error('Error saving items:', error);
+      });
+    }
   };
 
   const toggleItem = (id: string) => {
@@ -116,6 +191,14 @@ const Index = () => {
     });
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You've been signed out successfully.",
+    });
+  };
+
   const getItemsByCategory = (categoryId: string) => {
     return items.filter(item => item.category === categoryId);
   };
@@ -123,6 +206,21 @@ const Index = () => {
   const totalItems = items.length;
   const packedItems = items.filter(item => item.packed).length;
   const progressPercentage = totalItems > 0 ? (packedItems / totalItems) * 100 : 0;
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${
@@ -136,14 +234,26 @@ const Index = () => {
           className="text-center mb-8"
         >
           <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setDarkMode(!darkMode)}
-              className="rounded-full"
-            >
-              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setDarkMode(!darkMode)}
+                className="rounded-full"
+              >
+                {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPremadeLists(true)}
+                className="rounded-full"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Smart Lists
+              </Button>
+            </div>
             
             <div className="flex-1 mx-4">
               {isEditingTrip ? (
@@ -177,15 +287,26 @@ const Index = () => {
               )}
             </div>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={resetList}
-              className="rounded-full"
-              disabled={totalItems === 0}
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={resetList}
+                className="rounded-full"
+                disabled={totalItems === 0}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleSignOut}
+                className="rounded-full"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <p className="text-muted-foreground mb-6">
@@ -250,12 +371,26 @@ const Index = () => {
           >
             <div className="text-6xl mb-4">🎒</div>
             <h3 className="text-xl font-semibold mb-2">Ready to pack?</h3>
-            <p className="text-muted-foreground">
-              Start by adding items to your categories above!
+            <p className="text-muted-foreground mb-4">
+              Start by adding items to your categories above, or try our smart packing lists!
             </p>
+            <Button 
+              onClick={() => setShowPremadeLists(true)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Explore Smart Lists
+            </Button>
           </motion.div>
         )}
       </div>
+
+      {/* Premade Lists Modal */}
+      <PremadeListsModal
+        isOpen={showPremadeLists}
+        onClose={() => setShowPremadeLists(false)}
+        onAddItems={addMultipleItems}
+      />
     </div>
   );
 };
