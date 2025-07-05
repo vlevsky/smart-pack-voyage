@@ -55,30 +55,51 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     return null;
   }
 
+  const progressPercentage = totalCount > 0 ? (packedCount / totalCount) * 100 : 0;
+
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/20 overflow-hidden"
+      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/30 dark:border-gray-700/30 overflow-hidden hover:shadow-2xl transition-all duration-300"
     >
-      {/* Category Header */}
+      {/* Enhanced Category Header */}
       <div
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
+        className="flex items-center justify-between p-6 cursor-pointer hover:bg-white/60 dark:hover:bg-gray-700/50 transition-all duration-200"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl ${category.color} flex items-center justify-center text-white shadow-lg`}>
-            <span className="text-lg">{category.icon}</span>
+        <div className="flex items-center gap-4">
+          <div className={`w-14 h-14 rounded-2xl ${category.color} flex items-center justify-center text-white shadow-xl`}>
+            <span className="text-2xl">{category.icon}</span>
           </div>
           <div>
-            <h3 className="font-semibold text-lg">{category.name}</h3>
-            <p className="text-sm text-muted-foreground">
-              {packedCount}/{totalCount} items ({packedQuantity}/{totalQuantity} total)
-            </p>
+            <h3 className="font-bold text-xl text-gray-900 dark:text-white">{category.name}</h3>
+            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+              <span>
+                {packedCount}/{totalCount} items
+              </span>
+              <span>
+                ({packedQuantity}/{totalQuantity} pieces)
+              </span>
+              {totalCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full ${category.color} rounded-full`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progressPercentage}%` }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    />
+                  </div>
+                  <span className="font-semibold">{Math.round(progressPercentage)}%</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
@@ -86,38 +107,43 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               e.stopPropagation();
               setIsAddingItem(!isAddingItem);
             }}
-            className="rounded-full"
+            className="rounded-full h-10 w-10 p-0 bg-white/50 dark:bg-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             <Plus className="h-4 w-4" />
           </Button>
           <motion.div
             animate={{ rotate: isExpanded ? 90 : 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="text-gray-400"
           >
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            <ChevronRight className="h-6 w-6" />
           </motion.div>
         </div>
       </div>
 
-      {/* Add Item Form */}
+      {/* Enhanced Add Item Form */}
       <AnimatePresence>
         {isAddingItem && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="px-4 pb-4"
+            className="px-6 pb-4"
           >
-            <div className="flex gap-2">
+            <div className="flex gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4">
               <Input
                 placeholder={`Add ${category.name.toLowerCase()} item...`}
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
-                className="flex-1"
+                className="flex-1 rounded-xl border-0 bg-white dark:bg-gray-800 shadow-sm"
                 autoFocus
               />
-              <Button onClick={handleAddItem} disabled={!newItemName.trim()}>
+              <Button 
+                onClick={handleAddItem} 
+                disabled={!newItemName.trim()}
+                className="rounded-xl px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
+              >
                 Add
               </Button>
             </div>
@@ -125,17 +151,17 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Items List */}
+      {/* Enhanced Items List */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="pb-4"
+            className="pb-6"
           >
-            <div className="space-y-2 px-4">
-              <AnimatePresence>
+            <div className="space-y-3 px-6">
+              <AnimatePresence mode="popLayout">
                 {items.map((item) => (
                   <PackingItem
                     key={item.id}
@@ -150,12 +176,17 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               
               {items.length === 0 && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-8 text-muted-foreground"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-12 bg-gray-50 dark:bg-gray-700/30 rounded-2xl"
                 >
-                  <p>No items in this category yet</p>
-                  <p className="text-sm">Click the + button to add items</p>
+                  <div className="text-4xl mb-3">{category.icon}</div>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">
+                    No items in {category.name.toLowerCase()} yet
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Click the + button to add items
+                  </p>
                 </motion.div>
               )}
             </div>
