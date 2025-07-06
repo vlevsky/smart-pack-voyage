@@ -1,11 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar } from 'lucide-react';
+import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar, Info, HelpCircle } from 'lucide-react';
 import { CategorySection } from '@/components/CategorySection';
 import { ProgressBar } from '@/components/ProgressBar';
 import { PremadeListsModal } from '@/components/PremadeListsModal';
 import { LuggageView } from '@/components/LuggageView';
 import { TripSelector, Trip } from '@/components/TripSelector';
+import { SimpleModeToggle } from '@/components/SimpleModeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -31,10 +33,12 @@ const Index = () => {
   const [currentTripId, setCurrentTripId] = useState<string | null>(null);
   const [items, setItems] = useState<PackingItemType[]>([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [simpleMode, setSimpleMode] = useState(false);
   const [showCompleted, setShowCompleted] = useState(true);
   const [showPremadeLists, setShowPremadeLists] = useState(false);
   const [checklistMode, setChecklistMode] = useState(false);
   const [showLuggageView, setShowLuggageView] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const { toast } = useToast();
 
   // Load data from localStorage on mount
@@ -42,6 +46,7 @@ const Index = () => {
     const savedTrips = localStorage.getItem('trips');
     const savedCurrentTripId = localStorage.getItem('currentTripId');
     const savedDarkMode = localStorage.getItem('darkMode');
+    const savedSimpleMode = localStorage.getItem('simpleMode');
 
     if (savedTrips) {
       const parsedTrips = JSON.parse(savedTrips).map((trip: any) => ({
@@ -60,36 +65,35 @@ const Index = () => {
     }
     
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
+    if (savedSimpleMode) setSimpleMode(JSON.parse(savedSimpleMode));
   }, []);
 
-  // Save trips to localStorage
+  // Save all settings to localStorage
   useEffect(() => {
     localStorage.setItem('trips', JSON.stringify(trips));
   }, [trips]);
 
-  // Save current trip ID
   useEffect(() => {
     if (currentTripId) {
       localStorage.setItem('currentTripId', currentTripId);
     }
   }, [currentTripId]);
 
-  // Save items for current trip
   useEffect(() => {
     if (currentTripId) {
       localStorage.setItem(`items_${currentTripId}`, JSON.stringify(items));
     }
   }, [items, currentTripId]);
 
-  // Handle dark mode
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    localStorage.setItem('simpleMode', JSON.stringify(simpleMode));
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [darkMode]);
+  }, [darkMode, simpleMode]);
 
   // Create default trip if none exist
   useEffect(() => {
@@ -170,7 +174,7 @@ const Index = () => {
   const handleDeleteTrip = (tripId: string) => {
     if (trips.length === 1) {
       toast({
-        title: "Cannot delete",
+        title: "Cannot delete trip",
         description: "You must have at least one trip.",
         variant: "destructive",
       });
@@ -208,15 +212,16 @@ const Index = () => {
     });
   };
 
-  const addMultipleItems = (newItems: Array<{ name: string; category: string }>) => {
+  const addMultipleItems = (newItems: Array<{ name: string; category: string; quantity?: number; luggage?: string }>) => {
     const itemsToAdd = newItems.map(item => {
-      const quantity = suggestQuantity(item.name, item.category);
+      const quantity = item.quantity || suggestQuantity(item.name, item.category);
       return {
         id: (Date.now() + Math.random()).toString(),
         name: item.name,
         packed: false,
         category: item.category,
         quantity,
+        luggage: item.luggage,
       };
     });
 
@@ -276,50 +281,63 @@ const Index = () => {
         >
           <div className="flex items-center justify-between mb-6">
             {/* Left Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Button
                 variant="outline"
-                size="icon"
+                size={simpleMode ? "lg" : "icon"}
                 onClick={() => setDarkMode(!darkMode)}
                 className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
               >
-                {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {darkMode ? <Sun className={simpleMode ? "h-5 w-5 mr-2" : "h-4 w-4"} /> : <Moon className={simpleMode ? "h-5 w-5 mr-2" : "h-4 w-4"} />}
+                {simpleMode && (darkMode ? 'Light Mode' : 'Dark Mode')}
               </Button>
+              
+              {!simpleMode && (
+                <SimpleModeToggle 
+                  simpleMode={simpleMode} 
+                  onToggle={setSimpleMode} 
+                />
+              )}
               
               <Button
                 variant="outline"
+                size={simpleMode ? "lg" : "default"}
                 onClick={() => setShowPremadeLists(true)}
                 className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700"
               >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Smart Lists
+                <Sparkles className={simpleMode ? "h-5 w-5 mr-3" : "h-4 w-4 mr-2"} />
+                {simpleMode ? 'Browse Packing Lists' : 'Smart Lists'}
               </Button>
               
-              <Button
-                variant="outline"
-                onClick={() => setChecklistMode(!checklistMode)}
-                className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-              >
-                {checklistMode ? <Grid3X3 className="h-4 w-4 mr-2" /> : <List className="h-4 w-4 mr-2" />}
-                {checklistMode ? 'Grid View' : 'Checklist'}
-              </Button>
+              {!simpleMode && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setChecklistMode(!checklistMode)}
+                    className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    {checklistMode ? <Grid3X3 className="h-4 w-4 mr-2" /> : <List className="h-4 w-4 mr-2" />}
+                    {checklistMode ? 'Grid View' : 'Checklist'}
+                  </Button>
 
-              {totalItems > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={() => setShowLuggageView(true)}
-                  className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  View by Luggage
-                </Button>
+                  {totalItems > 0 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowLuggageView(true)}
+                      className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      View by Luggage
+                    </Button>
+                  )}
+                </>
               )}
             </div>
             
             {/* Center Title */}
             <div className="flex-1 mx-4">
               <motion.h1 
-                className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2"
+                className={`${simpleMode ? 'text-5xl md:text-6xl' : 'text-4xl md:text-5xl'} font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2`}
                 animate={{ 
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                 }}
@@ -331,50 +349,71 @@ const Index = () => {
               >
                 PackSmart
               </motion.h1>
-              <p className="text-lg text-muted-foreground font-medium">
+              <p className={`${simpleMode ? 'text-xl' : 'text-lg'} text-muted-foreground font-medium`}>
                 Your intelligent travel companion ✈️
               </p>
             </div>
 
             {/* Right Actions */}
             <div className="flex items-center gap-3">
+              {!simpleMode && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowHelp(true)}
+                  className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </Button>
+              )}
+              
               <Button
                 variant="outline"
-                size="icon"
+                size={simpleMode ? "lg" : "icon"}
                 onClick={resetList}
                 className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                 disabled={totalItems === 0}
               >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className={simpleMode ? "h-5 w-5 mr-2" : "h-4 w-4"} />
+                {simpleMode && 'Clear All Items'}
               </Button>
             </div>
           </div>
 
+          {simpleMode && (
+            <div className="mb-6">
+              <SimpleModeToggle 
+                simpleMode={simpleMode} 
+                onToggle={setSimpleMode} 
+              />
+            </div>
+          )}
+
           {/* Enhanced Progress Section */}
           {currentTrip && (
             <motion.div 
-              className="mb-8 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-3xl p-6 shadow-xl border border-white/20 dark:border-gray-700/20"
+              className={`mb-8 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-3xl ${simpleMode ? 'p-8' : 'p-6'} shadow-xl border border-white/20 dark:border-gray-700/20`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="text-left">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  <h2 className={`${simpleMode ? 'text-3xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white mb-1`}>
                     {currentTrip.name}
                   </h2>
                   {currentTrip.destination && (
-                    <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
+                    <p className={`text-gray-600 dark:text-gray-300 flex items-center gap-2 ${simpleMode ? 'text-lg' : ''}`}>
+                      <MapPin className={simpleMode ? "h-6 w-6" : "h-4 w-4"} />
                       {currentTrip.destination}
                     </p>
                   )}
                 </div>
                 
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <div className={`${simpleMode ? 'text-5xl' : 'text-3xl'} font-bold text-gray-900 dark:text-white`}>
                     {Math.round(progressPercentage)}%
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className={`${simpleMode ? 'text-lg' : 'text-sm'} text-gray-600 dark:text-gray-300`}>
                     {packedItems} of {totalItems} packed
                   </div>
                 </div>
@@ -387,9 +426,9 @@ const Index = () => {
               />
               
               {currentTrip.startDate && currentTrip.endDate && (
-                <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                <div className={`mt-4 flex items-center justify-center gap-4 ${simpleMode ? 'text-lg' : 'text-sm'} text-gray-600 dark:text-gray-300`}>
                   <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
+                    <Calendar className={simpleMode ? "h-6 w-6" : "h-4 w-4"} />
                     <span>
                       {currentTrip.startDate.toLocaleDateString()} - {currentTrip.endDate.toLocaleDateString()}
                     </span>
@@ -404,14 +443,16 @@ const Index = () => {
         </motion.div>
 
         {/* Trip Selector */}
-        <TripSelector
-          trips={trips}
-          currentTripId={currentTripId}
-          onSelectTrip={handleSelectTrip}
-          onCreateTrip={handleCreateTrip}
-          onUpdateTrip={handleUpdateTrip}
-          onDeleteTrip={handleDeleteTrip}
-        />
+        {!simpleMode && (
+          <TripSelector
+            trips={trips}
+            currentTripId={currentTripId}
+            onSelectTrip={handleSelectTrip}
+            onCreateTrip={handleCreateTrip}
+            onUpdateTrip={handleUpdateTrip}
+            onDeleteTrip={handleDeleteTrip}
+          />
+        )}
 
         {/* Categories */}
         {currentTripId && (
@@ -433,7 +474,7 @@ const Index = () => {
                     onUpdateItem={updateItem}
                     onDeleteItem={deleteItem}
                     showCompleted={showCompleted}
-                    checklistMode={checklistMode}
+                    checklistMode={checklistMode || simpleMode}
                   />
                 );
               })}
@@ -450,6 +491,7 @@ const Index = () => {
           >
             <Button
               variant="outline"
+              size={simpleMode ? "lg" : "default"}
               onClick={() => setShowCompleted(!showCompleted)}
               className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg"
             >
@@ -466,7 +508,7 @@ const Index = () => {
             className="text-center py-20"
           >
             <motion.div 
-              className="text-8xl mb-6"
+              className={simpleMode ? "text-9xl mb-8" : "text-8xl mb-6"}
               animate={{ 
                 rotate: [0, 10, -10, 0],
                 scale: [1, 1.1, 1]
@@ -479,25 +521,29 @@ const Index = () => {
             >
               🎒
             </motion.div>
-            <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h3 className={`${simpleMode ? 'text-4xl' : 'text-3xl'} font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}>
               Ready for your adventure?
             </h3>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Start by adding items to your categories above, or explore our smart packing lists 
-              tailored for your destination!
+            <p className={`${simpleMode ? 'text-2xl' : 'text-xl'} text-muted-foreground mb-8 max-w-2xl mx-auto`}>
+              {simpleMode 
+                ? "Get started by browsing our packing lists or adding items above!"
+                : "Start by adding items to your categories above, or explore our smart packing lists tailored for your destination!"
+              }
             </p>
             <div className="space-y-4">
               <Button 
                 onClick={() => setShowPremadeLists(true)}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 text-lg"
+                size={simpleMode ? "lg" : "lg"}
+                className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white ${simpleMode ? 'px-12 py-6 text-xl' : 'px-8 py-4 text-lg'} rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200`}
               >
-                <Sparkles className="h-5 w-5 mr-3" />
-                Explore Smart Lists
+                <Sparkles className={simpleMode ? "h-6 w-6 mr-4" : "h-5 w-5 mr-3"} />
+                {simpleMode ? 'Browse Packing Lists' : 'Explore Smart Lists'}
               </Button>
-              <p className="text-sm text-gray-500">
-                Or click the + button on any category to add items manually
-              </p>
+              {!simpleMode && (
+                <p className="text-sm text-gray-500">
+                  Or click the + button on any category to add items manually
+                </p>
+              )}
             </div>
           </motion.div>
         )}
@@ -516,6 +562,51 @@ const Index = () => {
         items={items}
         onToggleItem={toggleItem}
       />
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-gray-900 rounded-3xl p-8 max-w-2xl w-full shadow-2xl"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">How to Use PackSmart</h2>
+              <Button variant="ghost" onClick={() => setShowHelp(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="space-y-4 text-left">
+              <div>
+                <h3 className="font-semibold mb-2">📝 Adding Items</h3>
+                <p className="text-gray-600 dark:text-gray-300">Click the + button in any category to add packing items manually.</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">✨ Smart Lists</h3>
+                <p className="text-gray-600 dark:text-gray-300">Use pre-made packing lists tailored for different destinations and trip types.</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">👁️ Preview Items</h3>
+                <p className="text-gray-600 dark:text-gray-300">Preview any smart list before adding all items to your trip.</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">🧳 View by Luggage</h3>
+                <p className="text-gray-600 dark:text-gray-300">Organize items by which bag they go in (carry-on, checked, etc.).</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">📋 Checklist Mode</h3>
+                <p className="text-gray-600 dark:text-gray-300">Switch to a simplified view perfect for checking off items while packing.</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
