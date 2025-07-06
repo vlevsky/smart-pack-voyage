@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Package, Plane, Backpack, Briefcase } from 'lucide-react';
+import { Package, Plane, Backpack, Briefcase, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PackingItemType } from '@/components/PackingItem';
+import { LuggageLimitsModal } from '@/components/LuggageLimitsModal';
 
 interface LuggageViewProps {
   isOpen: boolean;
@@ -51,6 +52,8 @@ export const LuggageView: React.FC<LuggageViewProps> = ({
   items,
   onToggleItem,
 }) => {
+  const [showLimits, setShowLimits] = useState(false);
+
   if (!isOpen) return null;
 
   const getItemsByLuggage = (luggageType: string) => {
@@ -86,9 +89,19 @@ export const LuggageView: React.FC<LuggageViewProps> = ({
                 Organize your items by where they'll go
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-10 w-10">
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLimits(true)}
+                className="rounded-full"
+              >
+                <Info className="h-4 w-4 mr-2" />
+                View Limits
+              </Button>
+              <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-10 w-10">
+                <Package className="h-5 w-5 rotate-45" />
+              </Button>
+            </div>
           </div>
 
           {/* Luggage Categories */}
@@ -251,6 +264,12 @@ export const LuggageView: React.FC<LuggageViewProps> = ({
           </div>
         </motion.div>
       </div>
+
+      {/* Luggage Limits Modal */}
+      <LuggageLimitsModal
+        isOpen={showLimits}
+        onClose={() => setShowLimits(false)}
+      />
     </AnimatePresence>
   );
 };

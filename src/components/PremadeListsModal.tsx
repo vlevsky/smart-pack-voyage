@@ -1,10 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Calendar, Plus, Search, Filter, Eye, Info } from 'lucide-react';
+import { Plus, Search, Filter, Eye, Info, Calendar, MapPin, Clock, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,7 +26,7 @@ interface PremadeListsModalProps {
   onAddItems: (items: Array<{ name: string; category: string; quantity?: number; luggage?: string }>) => void;
 }
 
-// Comprehensive premade lists with detailed items
+// Massively expanded comprehensive premade lists
 const comprehensivePremadeLists: PremadeList[] = [
   {
     id: 'hawaii-beach',
@@ -496,8 +497,392 @@ const comprehensivePremadeLists: PremadeList[] = [
       { name: 'Emergency Contacts', category: 'documents', quantity: 1, luggage: 'personal' },
       { name: 'Kids\' ID Cards', category: 'documents', quantity: 2, luggage: 'personal' },
     ]
+  },
+  
+  // NEW EXPANDED LISTS
+  {
+    id: 'yoga-retreat',
+    name: 'Yoga Retreat',
+    destination: 'Wellness Center',
+    destination_type: 'wellness',
+    season: 'all',
+    description: 'Mindful packing for spiritual and physical renewal',
+    duration_days: 5,
+    items: [
+      // Clothes
+      { name: 'Yoga Pants', category: 'clothes', quantity: 4, luggage: 'carry-on' },
+      { name: 'Tank Tops', category: 'clothes', quantity: 5, luggage: 'carry-on' },
+      { name: 'Sports Bras', category: 'clothes', quantity: 3, luggage: 'carry-on' },
+      { name: 'Light Cardigan', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      { name: 'Meditation Shawl', category: 'clothes', quantity: 1, luggage: 'carry-on' },
+      { name: 'Comfortable Pajamas', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      { name: 'Walking Shoes', category: 'clothes', quantity: 1, luggage: 'checked' },
+      { name: 'Flip Flops', category: 'clothes', quantity: 1, luggage: 'carry-on' },
+      
+      // Toiletries
+      { name: 'Natural Deodorant', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Essential Oils', category: 'toiletries', quantity: 3, luggage: 'carry-on' },
+      { name: 'Face Moisturizer', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Sunscreen', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Herbal Tea Bags', category: 'toiletries', quantity: 10, luggage: 'carry-on' },
+      
+      // Miscellaneous
+      { name: 'Yoga Mat', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Meditation Cushion', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Journal', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Books on Mindfulness', category: 'miscellaneous', quantity: 2, luggage: 'carry-on' },
+      { name: 'Reusable Water Bottle', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Eye Mask', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
+      
+      // Electronics
+      { name: 'Phone Charger', category: 'electronics', quantity: 1, luggage: 'carry-on' },
+      { name: 'Meditation App Downloads', category: 'electronics', quantity: 1, luggage: 'personal' },
+    ]
+  },
+
+  {
+    id: 'couples-getaway',
+    name: 'Romantic Couples Getaway',
+    destination: 'Resort',
+    destination_type: 'romance',
+    season: 'all',
+    description: 'Perfect packing for romantic escapes',
+    duration_days: 4,
+    items: [
+      // Clothes
+      { name: 'Date Night Outfits', category: 'clothes', quantity: 3, luggage: 'carry-on' },
+      { name: 'Casual Day Outfits', category: 'clothes', quantity: 3, luggage: 'carry-on' },
+      { name: 'Lingerie/Sleepwear', category: 'clothes', quantity: 3, luggage: 'carry-on' },
+      { name: 'Nice Shoes', category: 'clothes', quantity: 2, luggage: 'checked' },
+      { name: 'Swimwear', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      { name: 'Cover-up', category: 'clothes', quantity: 1, luggage: 'carry-on' },
+      
+      // Toiletries
+      { name: 'Perfume/Cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Skincare Routine', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Hair Styling Products', category: 'toiletries', quantity: 2, luggage: 'carry-on' },
+      { name: 'Makeup', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Bubble Bath', category: 'toiletries', quantity: 1, luggage: 'checked' },
+      
+      // Electronics
+      { name: 'Camera for Photos', category: 'electronics', quantity: 1, luggage: 'carry-on' },
+      { name: 'Bluetooth Speaker', category: 'electronics', quantity: 1, luggage: 'checked' },
+      { name: 'Phone Charger', category: 'electronics', quantity: 1, luggage: 'carry-on' },
+      
+      // Miscellaneous
+      { name: 'Massage Oil', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Scented Candles', category: 'miscellaneous', quantity: 2, luggage: 'checked' },
+      { name: 'Wine/Champagne', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Love Notes/Cards', category: 'miscellaneous', quantity: 5, luggage: 'personal' },
+    ]
+  },
+
+  {
+    id: 'pet-travel',
+    name: 'Traveling with Pets',
+    destination: 'Various',
+    destination_type: 'pet-travel',
+    season: 'all',
+    description: 'Everything needed for pet-friendly adventures',
+    duration_days: 3,
+    items: [
+      // Pet Items (Miscellaneous)
+      { name: 'Pet Carrier/Crate', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Pet Food (3 days)', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Food/Water Bowls', category: 'miscellaneous', quantity: 2, luggage: 'checked' },
+      { name: 'Leash & Harness', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Pet Bedding', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
+      { name: 'Favorite Toys', category: 'miscellaneous', quantity: 3, luggage: 'carry-on' },
+      { name: 'Treats', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Waste Bags', category: 'miscellaneous', quantity: 20, luggage: 'carry-on' },
+      { name: 'Pet Wipes', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      
+      // Documents
+      { name: 'Pet Health Certificate', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Vaccination Records', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Pet ID Tags', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Vet Contact Info', category: 'documents', quantity: 1, luggage: 'personal' },
+      
+      // Toiletries (for pet)
+      { name: 'Pet Medications', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Pet Shampoo', category: 'toiletries', quantity: 1, luggage: 'checked' },
+      { name: 'First Aid Kit', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      
+      // Human essentials
+      { name: 'Extra Clothes (accidents)', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      { name: 'Lint Roller', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+    ]
+  },
+
+  {
+    id: 'tech-conference',
+    name: 'Tech Conference',
+    destination: 'Convention Center',
+    destination_type: 'business',
+    season: 'all',
+    description: 'Professional networking and learning essentials',
+    duration_days: 3,
+    items: [
+      // Electronics
+      { name: 'Laptop + Charger', category: 'electronics', quantity: 1, luggage: 'personal' },
+      { name: 'Phone + Charger', category: 'electronics', quantity: 1, luggage: 'personal' },
+      { name: 'Portable Battery Pack', category: 'electronics', quantity: 2, luggage: 'personal' },
+      { name: 'USB-C Hub/Dongles', category: 'electronics', quantity: 1, luggage: 'personal' },
+      { name: 'Noise-Canceling Headphones', category: 'electronics', quantity: 1, luggage: 'personal' },
+      { name: 'Presentation Remote', category: 'electronics', quantity: 1, luggage: 'personal' },
+      
+      // Documents
+      { name: 'Business Cards', category: 'documents', quantity: 100, luggage: 'personal' },
+      { name: 'Conference Badges', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Notebook + Pens', category: 'documents', quantity: 3, luggage: 'personal' },
+      { name: 'Resume Copies', category: 'documents', quantity: 10, luggage: 'personal' },
+      
+      // Clothes
+      { name: 'Professional Outfits', category: 'clothes', quantity: 3, luggage: 'carry-on' },
+      { name: 'Comfortable Shoes', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      { name: 'Conference T-shirts', category: 'clothes', quantity: 2, luggage: 'carry-on' },
+      
+      // Miscellaneous
+      { name: 'Professional Bag/Backpack', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
+      { name: 'Reusable Water Bottle', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
+      { name: 'Snacks for Long Days', category: 'miscellaneous', quantity: 5, luggage: 'personal' },
+    ]
+  },
+
+  {
+    id: 'emergency-bag',
+    name: 'Emergency Evacuation Bag',
+    destination: 'Emergency Shelter',
+    destination_type: 'emergency',
+    season: 'all',
+    description: 'Essential items for emergency preparedness',
+    duration_days: 7,
+    items: [
+      // Documents
+      { name: 'ID/Passport Copies', category: 'documents', quantity: 2, luggage: 'personal' },
+      { name: 'Insurance Papers', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Emergency Contacts', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Medical Records', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Cash in Small Bills', category: 'documents', quantity: 1, luggage: 'personal' },
+      
+      // Toiletries/Medical
+      { name: 'Prescription Medications', category: 'toiletries', quantity: 7, luggage: 'personal' },
+      { name: 'First Aid Kit', category: 'toiletries', quantity: 1, luggage: 'backpack' },
+      { name: 'Hand Sanitizer', category: 'toiletries', quantity: 2, luggage: 'personal' },
+      { name: 'Toothbrush + Toothpaste', category: 'toiletries', quantity: 1, luggage: 'personal' },
+      
+      // Electronics
+      { name: 'Emergency Radio', category: 'electronics', quantity: 1, luggage: 'backpack' },
+      { name: 'Flashlight + Batteries', category: 'electronics', quantity: 2, luggage: 'backpack' },
+      { name: 'Phone Charger + Power Bank', category: 'electronics', quantity: 1, luggage: 'personal' },
+      
+      // Miscellaneous
+      { name: 'Water (1 gallon/person)', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
+      { name: 'Non-perishable Food', category: 'miscellaneous', quantity: 7, luggage: 'backpack' },
+      { name: 'Blanket/Sleeping Bag', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
+      { name: 'Multi-tool/Swiss Army Knife', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
+      { name: 'Matches/Lighter', category: 'miscellaneous', quantity: 2, luggage: 'backpack' },
+      
+      // Clothes
+      { name: 'Weather-appropriate Clothes', category: 'clothes', quantity: 3, luggage: 'backpack' },
+      { name: 'Sturdy Shoes', category: 'clothes', quantity: 1, luggage: 'backpack' },
+      { name: 'Rain Gear', category: 'clothes', quantity: 1, luggage: 'backpack' },
+    ]
   }
 ];
+
+interface DynamicAdjustmentModalProps {
+  list: PremadeList;
+  onConfirm: (adjustedItems: Array<{ name: string; category: string; quantity?: number; luggage?: string }>) => void;
+  onCancel: () => void;
+}
+
+const DynamicAdjustmentModal: React.FC<DynamicAdjustmentModalProps> = ({
+  list,
+  onConfirm,
+  onCancel,
+}) => {
+  const [days, setDays] = useState(list.duration_days || 7);
+  const [packingLevel, setPackingLevel] = useState<'light' | 'balanced' | 'thorough'>('balanced');
+  const [showPreview, setShowPreview] = useState(false);
+
+  const adjustQuantities = (items: typeof list.items) => {
+    return items.map(item => {
+      let adjustedQuantity = item.quantity || 1;
+      
+      // Dynamic scaling based on days
+      const itemName = item.name.toLowerCase();
+      if (item.category === 'clothes') {
+        if (itemName.includes('shirt') || itemName.includes('top')) {
+          adjustedQuantity = Math.max(1, Math.ceil(days * (packingLevel === 'light' ? 0.7 : packingLevel === 'balanced' ? 1 : 1.3)));
+        } else if (itemName.includes('underwear') || itemName.includes('sock')) {
+          adjustedQuantity = days;
+        } else if (itemName.includes('pants')) {
+          adjustedQuantity = Math.max(1, Math.ceil(days / (packingLevel === 'light' ? 3 : packingLevel === 'balanced' ? 2 : 1.5)));
+        }
+      }
+      
+      // Apply packing level modifier
+      if (packingLevel === 'light') {
+        adjustedQuantity = Math.max(1, Math.floor(adjustedQuantity * 0.8));
+      } else if (packingLevel === 'thorough') {
+        adjustedQuantity = Math.ceil(adjustedQuantity * 1.2);
+      }
+      
+      return { ...item, quantity: adjustedQuantity };
+    });
+  };
+
+  const adjustedItems = adjustQuantities(list.items);
+
+  if (showPreview) {
+    const itemsByCategory = adjustedItems.reduce((acc, item) => {
+      if (!acc[item.category]) acc[item.category] = [];
+      acc[item.category].push(item);
+      return acc;
+    }, {} as Record<string, typeof adjustedItems>);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold">Preview: {list.name}</h3>
+          <Button variant="outline" onClick={() => setShowPreview(false)}>
+            Back to Settings
+          </Button>
+        </div>
+        
+        <div className="max-h-96 overflow-y-auto space-y-4">
+          {Object.entries(itemsByCategory).map(([category, items]) => (
+            <div key={category} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <h4 className="font-semibold mb-2 capitalize">{category} ({items.length} items)</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {items.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center bg-white dark:bg-gray-700 rounded p-2">
+                    <span>{item.name}</span>
+                    <div className="flex gap-2">
+                      {item.quantity && item.quantity > 1 && (
+                        <Badge variant="outline">x{item.quantity}</Badge>
+                      )}
+                      {item.luggage && (
+                        <Badge variant="secondary" className="text-xs">
+                          {item.luggage.replace('-', ' ')}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <Button 
+          onClick={() => onConfirm(adjustedItems)}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add All Items to My Trip
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-xl font-bold mb-2">Customize Your Packing List</h3>
+        <p className="text-gray-600 dark:text-gray-300">
+          Adjust these settings to get personalized quantities for "{list.name}"
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        <div>
+          <label className="block font-medium mb-3">Trip Duration</label>
+          <div className="flex items-center gap-4">
+            <Slider
+              value={[days]}
+              onValueChange={(value) => setDays(value[0])}
+              max={30}
+              min={1}
+              step={1}
+              className="flex-1"
+            />
+            <div className="text-lg font-semibold min-w-[80px]">
+              {days} day{days !== 1 ? 's' : ''}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block font-medium mb-3">Packing Style</label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => setPackingLevel('light')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                packingLevel === 'light'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              <div className="text-2xl mb-2">🎒</div>
+              <div className="font-semibold">Pack Light</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Minimal essentials</div>
+            </button>
+            
+            <button
+              onClick={() => setPackingLevel('balanced')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                packingLevel === 'balanced'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              <div className="text-2xl mb-2">🧳</div>
+              <div className="font-semibold">Balanced</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Perfect middle ground</div>
+            </button>
+            
+            <button
+              onClick={() => setPackingLevel('thorough')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                packingLevel === 'thorough'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              <div className="text-2xl mb-2">🎪</div>
+              <div className="font-semibold">Be Thorough</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Extra preparations</div>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowPreview(true)}
+            className="flex-1"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Preview Items ({adjustedItems.length})
+          </Button>
+          <Button
+            onClick={() => onConfirm(adjustedItems)}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add to Trip
+          </Button>
+        </div>
+
+        <Button variant="ghost" onClick={onCancel} className="w-full">
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   isOpen,
@@ -509,6 +894,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [previewList, setPreviewList] = useState<PremadeList | null>(null);
+  const [adjustmentList, setAdjustmentList] = useState<PremadeList | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -545,7 +931,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
     }
   };
 
-  const categories = ['all', 'city', 'beach', 'mountains', 'camping', 'cruise', 'festival', 'business', 'theme-park', 'ski', 'weekend', 'flight', 'road-trip'];
+  const categories = ['all', 'city', 'beach', 'mountains', 'camping', 'cruise', 'festival', 'business', 'theme-park', 'ski', 'weekend', 'flight', 'road-trip', 'wellness', 'romance', 'pet-travel', 'emergency'];
   
   const filteredLists = premadeLists.filter(list => {
     const matchesSearch = list.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -556,11 +942,16 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   });
 
   const handleAddList = (list: PremadeList) => {
-    onAddItems(list.items);
+    setAdjustmentList(list);
+  };
+
+  const handleConfirmAdd = (adjustedItems: typeof list.items) => {
+    onAddItems(adjustedItems);
     toast({
       title: "Items added! ✨",
-      description: `${list.items.length} items from "${list.name}" added to your list.`,
+      description: `${adjustedItems.length} items added to your list.`,
     });
+    setAdjustmentList(null);
     onClose();
   };
 
@@ -569,6 +960,25 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+  // Dynamic Adjustment Modal
+  if (adjustmentList) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-2xl w-full shadow-2xl border border-gray-200 dark:border-gray-700"
+        >
+          <DynamicAdjustmentModal
+            list={adjustmentList}
+            onConfirm={handleConfirmAdd}
+            onCancel={() => setAdjustmentList(null)}
+          />
+        </motion.div>
+      </div>
+    );
+  }
 
   // Preview Modal
   if (previewList) {
@@ -612,7 +1022,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setPreviewList(null)} className="rounded-full h-10 w-10">
-                <X className="h-5 w-5" />
+                <Plus className="h-5 w-5 rotate-45" />
               </Button>
             </div>
 
@@ -694,7 +1104,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
               </p>
             </div>
             <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-12 w-12 text-lg">
-              <X className="h-6 w-6" />
+              <Plus className="h-6 w-6 rotate-45" />
             </Button>
           </div>
 
@@ -808,14 +1218,14 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                         className="flex-1 rounded-2xl border-2 hover:border-blue-500 hover:text-blue-600"
                       >
                         <Eye className="h-4 w-4 mr-2" />
-                        Preview Items
+                        Preview
                       </Button>
                       <Button
                         onClick={() => handleAddList(list)}
                         className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl shadow-lg"
                       >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add All
+                        <Zap className="h-4 w-4 mr-2" />
+                        Customize
                       </Button>
                     </div>
                   </motion.div>
@@ -836,7 +1246,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <Info className="h-4 w-4" />
-              <span>Tip: Use "Preview Items" to see the complete list before adding to your trip</span>
+              <span>Tip: Use "Customize" to adjust quantities based on your trip length and packing style</span>
             </div>
           </div>
         </motion.div>

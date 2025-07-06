@@ -1,0 +1,405 @@
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Plane, Package, Info, Globe, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+
+interface AirlineLimits {
+  airline: string;
+  carryOn: {
+    dimensions: { imperial: string; metric: string };
+    weight: { imperial: string; metric: string };
+    notes?: string;
+  };
+  checkedBag: {
+    dimensions: { imperial: string; metric: string };
+    weight: { imperial: string; metric: string };
+    notes?: string;
+  };
+  personalItem: {
+    dimensions: { imperial: string; metric: string };
+    weight?: { imperial: string; metric: string };
+    notes?: string;
+  };
+  region: 'domestic' | 'international' | 'both';
+}
+
+const airlineLimits: AirlineLimits[] = [
+  {
+    airline: 'American Airlines',
+    region: 'both',
+    carryOn: {
+      dimensions: { imperial: '22" x 14" x 9"', metric: '56 x 36 x 23 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '18" x 14" x 8"', metric: '46 x 36 x 20 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Delta Air Lines',
+    region: 'both',
+    carryOn: {
+      dimensions: { imperial: '22" x 14" x 9"', metric: '56 x 36 x 23 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '18" x 14" x 8"', metric: '46 x 36 x 20 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'United Airlines',
+    region: 'both',
+    carryOn: {
+      dimensions: { imperial: '22" x 14" x 9"', metric: '56 x 36 x 23 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '17" x 10" x 9"', metric: '43 x 25 x 22 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Southwest Airlines',
+    region: 'domestic',
+    carryOn: {
+      dimensions: { imperial: '24" x 16" x 10"', metric: '61 x 41 x 25 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '18.5" x 8.5" x 13.5"', metric: '47 x 22 x 34 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'JetBlue Airways',
+    region: 'both',
+    carryOn: {
+      dimensions: { imperial: '22" x 14" x 9"', metric: '56 x 36 x 23 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '17" x 13" x 8"', metric: '43 x 33 x 20 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Alaska Airlines',
+    region: 'both',
+    carryOn: {
+      dimensions: { imperial: '22" x 14" x 9"', metric: '56 x 36 x 23 cm' },
+      weight: { imperial: 'No limit', metric: 'No limit' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '18" x 14" x 8"', metric: '46 x 36 x 20 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Lufthansa',
+    region: 'international',
+    carryOn: {
+      dimensions: { imperial: '21.5" x 15.5" x 9"', metric: '55 x 40 x 23 cm' },
+      weight: { imperial: '17.6 lbs', metric: '8 kg' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '11.5" x 15.5" x 4"', metric: '30 x 40 x 10 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'British Airways',
+    region: 'international',
+    carryOn: {
+      dimensions: { imperial: '22" x 18" x 10"', metric: '56 x 45 x 25 cm' },
+      weight: { imperial: '51 lbs', metric: '23 kg' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '51 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '16" x 12" x 6"', metric: '40 x 30 x 15 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Air Canada',
+    region: 'international',
+    carryOn: {
+      dimensions: { imperial: '21.5" x 15.5" x 9"', metric: '56 x 23 x 56 cm' },
+      weight: { imperial: '22 lbs', metric: '10 kg' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '50 lbs', metric: '23 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '16" x 13" x 6"', metric: '33 x 16 x 6 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+  {
+    airline: 'Emirates',
+    region: 'international',
+    carryOn: {
+      dimensions: { imperial: '21.5" x 15" x 8"', metric: '55 x 38 x 22 cm' },
+      weight: { imperial: '15.4 lbs', metric: '7 kg' },
+    },
+    checkedBag: {
+      dimensions: { imperial: '62" total', metric: '158 cm total' },
+      weight: { imperial: '66 lbs', metric: '30 kg' },
+    },
+    personalItem: {
+      dimensions: { imperial: '18" x 14" x 8"', metric: '45 x 35 x 20 cm' },
+      notes: 'Must fit under seat',
+    },
+  },
+];
+
+interface LuggageLimitsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const LuggageLimitsModal: React.FC<LuggageLimitsModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [isMetric, setIsMetric] = useState(false);
+
+  const filteredAirlines = airlineLimits.filter(airline => {
+    const matchesSearch = airline.airline.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = selectedRegion === 'all' || 
+                         airline.region === selectedRegion || 
+                         airline.region === 'both';
+    return matchesSearch && matchesRegion;
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-6xl w-full max-h-[85vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <Plane className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Airline Luggage Limits
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Size and weight restrictions for major airlines
+                </p>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-10 w-10">
+              <Package className="h-5 w-5 rotate-45" />
+            </Button>
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search airline..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 rounded-xl"
+              />
+            </div>
+            
+            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <SelectTrigger className="w-40 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="domestic">Domestic</SelectItem>
+                <SelectItem value="international">International</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Imperial</span>
+              <Switch checked={isMetric} onCheckedChange={setIsMetric} />
+              <span className="text-sm font-medium">Metric</span>
+            </div>
+          </div>
+
+          {/* Airlines List */}
+          <div className="overflow-y-auto max-h-[60vh]">
+            <div className="space-y-4">
+              {filteredAirlines.map((airline, index) => (
+                <motion.div
+                  key={airline.airline}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
+                  className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 border border-gray-200 dark:border-gray-600"
+                >
+                  {/* Airline Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <Plane className="h-4 w-4 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        {airline.airline}
+                      </h3>
+                    </div>
+                    <Badge variant="outline" className="capitalize">
+                      {airline.region === 'both' ? 'Domestic & International' : airline.region}
+                    </Badge>
+                  </div>
+
+                  {/* Luggage Types */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Carry-On */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Package className="h-4 w-4 text-blue-600" />
+                        <h4 className="font-semibold">Carry-On</h4>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Size:</span>
+                          <span className="ml-2 font-medium">
+                            {isMetric ? airline.carryOn.dimensions.metric : airline.carryOn.dimensions.imperial}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Weight:</span>
+                          <span className="ml-2 font-medium">
+                            {isMetric ? airline.carryOn.weight.metric : airline.carryOn.weight.imperial}
+                          </span>
+                        </div>
+                        {airline.carryOn.notes && (
+                          <div className="text-xs text-blue-600 dark:text-blue-400 flex items-start gap-1">
+                            <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span>{airline.carryOn.notes}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Checked Bag */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Package className="h-4 w-4 text-green-600" />
+                        <h4 className="font-semibold">Checked Bag</h4>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Size:</span>
+                          <span className="ml-2 font-medium">
+                            {isMetric ? airline.checkedBag.dimensions.metric : airline.checkedBag.dimensions.imperial}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Weight:</span>
+                          <span className="ml-2 font-medium">
+                            {isMetric ? airline.checkedBag.weight.metric : airline.checkedBag.weight.imperial}
+                          </span>
+                        </div>
+                        {airline.checkedBag.notes && (
+                          <div className="text-xs text-green-600 dark:text-green-400 flex items-start gap-1">
+                            <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span>{airline.checkedBag.notes}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Personal Item */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Package className="h-4 w-4 text-purple-600" />
+                        <h4 className="font-semibold">Personal Item</h4>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Size:</span>
+                          <span className="ml-2 font-medium">
+                            {isMetric ? airline.personalItem.dimensions.metric : airline.personalItem.dimensions.imperial}
+                          </span>
+                        </div>
+                        {airline.personalItem.weight && (
+                          <div>
+                            <span className="text-gray-600 dark:text-gray-400">Weight:</span>
+                            <span className="ml-2 font-medium">
+                              {isMetric ? airline.personalItem.weight.metric : airline.personalItem.weight.imperial}
+                            </span>
+                          </div>
+                        )}
+                        {airline.personalItem.notes && (
+                          <div className="text-xs text-purple-600 dark:text-purple-400 flex items-start gap-1">
+                            <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                            <span>{airline.personalItem.notes}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <Info className="h-4 w-4" />
+              <span>Always check with your airline for the most current restrictions before traveling</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
