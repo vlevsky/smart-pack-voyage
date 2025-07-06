@@ -375,7 +375,7 @@ const Index = () => {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="text-left">
-                  <h2 className={`${largeTextMode ? 'text-3xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white mb-1">
+                  <h2 className={`${largeTextMode ? 'text-3xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white mb-1`}>
                     {currentTrip.name}
                   </h2>
                   <div className="flex items-center gap-4">
