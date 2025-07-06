@@ -25,39 +25,39 @@ const smartLists = [
     description: 'Perfect for tropical beach getaways with sun, surf, and relaxation',
     items: [
       // Clothes
-      { name: 'Swimsuit', category: 'clothes', quantity: 2, luggage: 'carry-on' },
-      { name: 'Beach cover-up', category: 'clothes', quantity: 2, luggage: 'carry-on' },
-      { name: 'Sundresses', category: 'clothes', quantity: 3, luggage: 'checked' },
-      { name: 'Shorts', category: 'clothes', quantity: 4, luggage: 'checked' },
-      { name: 'Tank tops', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Light cardigan', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Flip flops', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Sandals', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Sun hat', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Underwear', category: 'clothes', quantity: 8, luggage: 'checked' },
+      { name: 'Swimsuit', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
+      { name: 'Beach cover-up', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
+      { name: 'Sundresses', category: 'clothes', quantity: 3, luggage: 'checked', required: false },
+      { name: 'Shorts', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
+      { name: 'Tank tops', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
+      { name: 'Light cardigan', category: 'clothes', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Flip flops', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Sandals', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Sun hat', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Underwear', category: 'clothes', quantity: 8, luggage: 'checked', required: true },
       
       // Toiletries
-      { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 2, luggage: 'checked' },
-      { name: 'After-sun lotion', category: 'toiletries', quantity: 1, luggage: 'checked' },
-      { name: 'Waterproof mascara', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
-      { name: 'Leave-in conditioner', category: 'toiletries', quantity: 1, luggage: 'checked' },
-      { name: 'Body wash', category: 'toiletries', quantity: 1, luggage: 'checked' },
+      { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 2, luggage: 'checked', required: true },
+      { name: 'After-sun lotion', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Waterproof mascara', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Leave-in conditioner', category: 'toiletries', quantity: 1, luggage: 'checked', required: false },
+      { name: 'Body wash', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
       
       // Electronics
-      { name: 'Waterproof phone case', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Bluetooth speaker', category: 'electronics', quantity: 1, luggage: 'checked' },
+      { name: 'Waterproof phone case', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Bluetooth speaker', category: 'electronics', quantity: 1, luggage: 'checked', required: false },
       
       // Documents
-      { name: 'Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal', required: false },
       
       // Miscellaneous
-      { name: 'Beach towel', category: 'miscellaneous', quantity: 2, luggage: 'checked' },
-      { name: 'Snorkel gear', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Beach bag', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Sunglasses', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Beach towel', category: 'miscellaneous', quantity: 2, luggage: 'checked', required: true },
+      { name: 'Snorkel gear', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: false },
+      { name: 'Beach bag', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Sunglasses', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
     ]
   },
   
@@ -71,34 +71,34 @@ const smartLists = [
     description: 'Professional attire and essentials for Manhattan business meetings',
     items: [
       // Clothes
-      { name: 'Business suits', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Dress shirts', category: 'clothes', quantity: 3, luggage: 'checked' },
-      { name: 'Ties', category: 'clothes', quantity: 3, luggage: 'carry-on' },
-      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Belt', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Blazer', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Dress pants', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'checked' },
-      { name: 'Dress socks', category: 'clothes', quantity: 4, luggage: 'checked' },
+      { name: 'Business suits', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
+      { name: 'Dress shirts', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
+      { name: 'Ties', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
+      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Belt', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Blazer', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Dress pants', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
+      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
+      { name: 'Dress socks', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
       
       // Electronics
-      { name: 'Laptop', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Laptop charger', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Business cards', category: 'electronics', quantity: 1, luggage: 'personal' },
-      { name: 'Presentation remote', category: 'electronics', quantity: 1, luggage: 'carry-on' },
+      { name: 'Laptop', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Laptop charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Business cards', category: 'electronics', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Presentation remote', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
       
       // Documents
-      { name: 'Meeting schedules', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Company ID', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Hotel confirmation', category: 'documents', quantity: 1, luggage: 'personal' },
+      { name: 'Meeting schedules', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Company ID', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Hotel confirmation', category: 'documents', quantity: 1, luggage: 'personal', required: true },
       
       // Toiletries
-      { name: 'Professional cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
-      { name: 'Hair styling gel', category: 'toiletries', quantity: 1, luggage: 'carry-on' },
+      { name: 'Professional cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Hair styling gel', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
       
       // Miscellaneous
-      { name: 'Umbrella', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Portfolio', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
+      { name: 'Umbrella', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Portfolio', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
     ]
   },
 
