@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 interface AIPackingAssistantProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerateList: (items: Array<{ name: string; category: string; quantity: number }>) => void;
+  onAddItems: (items: Array<{ name: string; category: string; quantity?: number }>) => void;
 }
 
 interface Message {
@@ -29,7 +29,7 @@ interface PackingProfile {
 export const AIPackingAssistant: React.FC<AIPackingAssistantProps> = ({
   isOpen,
   onClose,
-  onGenerateList,
+  onAddItems,
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -204,7 +204,7 @@ export const AIPackingAssistant: React.FC<AIPackingAssistantProps> = ({
       );
     }
 
-    onGenerateList(items);
+    onAddItems(items);
     
     const finalMessage: Message = {
       id: (Date.now() + 2).toString(),

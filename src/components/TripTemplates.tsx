@@ -21,6 +21,8 @@ interface Template {
 interface TripTemplatesProps {
   isOpen: boolean;
   onClose: () => void;
+  templates: Template[];
+  onSaveTemplate: (name: string, items: PackingItemType[]) => void;
   onLoadTemplate: (template: Template) => void;
   currentItems: PackingItemType[];
   currentTrip?: {
@@ -34,6 +36,8 @@ interface TripTemplatesProps {
 export const TripTemplates: React.FC<TripTemplatesProps> = ({
   isOpen,
   onClose,
+  templates: externalTemplates,
+  onSaveTemplate,
   onLoadTemplate,
   currentItems,
   currentTrip,

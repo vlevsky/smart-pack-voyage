@@ -48,7 +48,12 @@ interface Trip {
 interface Template {
   id: string;
   name: string;
+  description: string;
+  destination?: string;
+  duration: number;
   items: Item[];
+  created: Date;
+  luggage?: { [key: string]: string };
 }
 
 interface AccessibilitySettings {
@@ -162,7 +167,12 @@ export default function Index() {
     const newTemplate = {
       id: Date.now().toString(),
       name,
+      description: `Template created on ${new Date().toLocaleDateString()}`,
+      destination: currentTrip?.destination || '',
+      duration: 7, // Default duration
       items,
+      created: new Date(),
+      luggage: {},
     };
     setTemplates([...templates, newTemplate]);
     localStorage.setItem('packingTemplates', JSON.stringify([...templates, newTemplate]));
@@ -524,7 +534,12 @@ export default function Index() {
         templates={templates}
         onSaveTemplate={saveTemplate}
         onLoadTemplate={loadTemplate}
-        currentTrip={currentTrip}
+        currentTrip={currentTrip ? {
+          name: currentTrip.name,
+          destination: currentTrip.destination,
+          startDate: currentTrip.startDate ? new Date(currentTrip.startDate) : undefined,
+          endDate: currentTrip.endDate ? new Date(currentTrip.endDate) : undefined,
+        } : undefined}
         currentItems={items}
       />
 

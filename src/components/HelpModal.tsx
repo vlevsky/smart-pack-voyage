@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, List, Suitcase, GamepadIcon, Settings, Sparkles } from 'lucide-react';
+import { X, Plus, List, Luggage, GamepadIcon, Settings, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -32,7 +32,7 @@ const helpSections = [
     ]
   },
   {
-    icon: Suitcase,
+    icon: Luggage,
     title: 'Luggage Assignment',
     content: [
       'Assign items to different luggage pieces',
