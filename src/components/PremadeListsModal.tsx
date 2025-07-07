@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, X, Search } from 'lucide-react';
+import { Sparkles, X, Search, Calendar, Users, Thermometer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface PremadeListsModalProps {
   isOpen: boolean;
@@ -17,7 +18,14 @@ interface PremadeList {
   description: string;
   destinationType: string;
   season?: string;
-  items: Array<{ name: string; category: string; quantity?: number }>;
+  items: Array<{ 
+    name: string; 
+    category: string; 
+    quantity?: number;
+    baseQuantity?: number;
+    perDay?: boolean;
+    thoroughnessLevel?: 'light' | 'balanced' | 'thorough';
+  }>;
 }
 
 const premadeLists: PremadeList[] = [
@@ -28,11 +36,31 @@ const premadeLists: PremadeList[] = [
     destinationType: 'beach',
     season: 'summer',
     items: [
-      { name: 'Swimsuit', category: 'clothes', quantity: 2 },
-      { name: 'Sunscreen', category: 'toiletries' },
-      { name: 'Sunglasses', category: 'miscellaneous' },
-      { name: 'Beach towel', category: 'miscellaneous' },
-      { name: 'Flip flops', category: 'clothes' },
+      { name: 'Swimsuit', category: 'clothes', quantity: 2, baseQuantity: 2 },
+      { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 1 },
+      { name: 'Sunglasses', category: 'miscellaneous', quantity: 1 },
+      { name: 'Beach towel', category: 'miscellaneous', quantity: 1 },
+      { name: 'Flip flops', category: 'clothes', quantity: 1 },
+      { name: 'Shorts', category: 'clothes', quantity: 4, baseQuantity: 2, perDay: true },
+      { name: 'Tank tops', category: 'clothes', quantity: 5, baseQuantity: 3, perDay: true },
+      { name: 'Light dress', category: 'clothes', quantity: 2 },
+      { name: 'Waterproof phone case', category: 'electronics', quantity: 1 },
+      { name: 'Beach bag', category: 'miscellaneous', quantity: 1 },
+      { name: 'After-sun lotion', category: 'toiletries', quantity: 1 },
+      { name: 'Hat', category: 'clothes', quantity: 1 },
+      { name: 'Snorkeling gear', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Underwater camera', category: 'electronics', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Beach umbrella', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Cooling towel', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Reef-safe sunscreen', category: 'toiletries', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Water shoes', category: 'clothes', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Portable fan', category: 'electronics', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Beach games', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Insulated water bottle', category: 'miscellaneous', quantity: 1 },
+      { name: 'Sandal cleaner', category: 'toiletries', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Aloe vera gel', category: 'toiletries', quantity: 1 },
+      { name: 'Light cardigan', category: 'clothes', quantity: 1 },
+      { name: 'Waterproof watch', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'balanced' }
     ],
   },
   {
@@ -42,11 +70,31 @@ const premadeLists: PremadeList[] = [
     destinationType: 'city',
     season: 'spring',
     items: [
-      { name: 'Comfortable walking shoes', category: 'clothes' },
-      { name: 'Light jacket', category: 'clothes' },
-      { name: 'Travel adapter', category: 'electronics' },
-      { name: 'Phrasebook', category: 'documents' },
-      { name: 'Reusable water bottle', category: 'miscellaneous' },
+      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 1 },
+      { name: 'Light jacket', category: 'clothes', quantity: 1 },
+      { name: 'Travel adapter', category: 'electronics', quantity: 1 },
+      { name: 'French phrasebook', category: 'documents', quantity: 1 },
+      { name: 'Reusable water bottle', category: 'miscellaneous', quantity: 1 },
+      { name: 'Casual pants', category: 'clothes', quantity: 3, baseQuantity: 2, perDay: true },
+      { name: 'Nice shirts', category: 'clothes', quantity: 4, baseQuantity: 3, perDay: true },
+      { name: 'Scarf', category: 'clothes', quantity: 1 },
+      { name: 'Crossbody bag', category: 'miscellaneous', quantity: 1 },
+      { name: 'Portable charger', category: 'electronics', quantity: 1 },
+      { name: 'Camera', category: 'electronics', quantity: 1 },
+      { name: 'Metro map', category: 'documents', quantity: 1 },
+      { name: 'Umbrella', category: 'miscellaneous', quantity: 1 },
+      { name: 'Dress clothes for dinner', category: 'clothes', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Museum membership card', category: 'documents', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Binoculars for sightseeing', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Pocket wifi', category: 'electronics', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Travel insurance documents', category: 'documents', quantity: 1 },
+      { name: 'Hand warmers', category: 'miscellaneous', quantity: 2, thoroughnessLevel: 'thorough' },
+      { name: 'Foldable shopping bag', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Backup shoes', category: 'clothes', quantity: 1, thoroughnessLevel: 'thorough' },
+      { name: 'Travel journal', category: 'miscellaneous', quantity: 1, thoroughnessLevel: 'balanced' },
+      { name: 'Lip balm with SPF', category: 'toiletries', quantity: 1 },
+      { name: 'Hand cream', category: 'toiletries', quantity: 1 },
+      { name: 'Tissues', category: 'toiletries', quantity: 2 }
     ],
   },
   {
@@ -158,37 +206,22 @@ const premadeLists: PremadeList[] = [
   },
 ];
 
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case 'beach':
-      return '🏖️';
-    case 'city':
-      return '🏙️';
-    case 'outdoors':
-      return '🏞️';
-    case 'business':
-      return '💼';
-    case 'wellness':
-      return '🧘';
-    default:
-      return '🌍';
-  }
+interface TripCustomization {
+  days: number;
+  intensity: 'light' | 'balanced' | 'thorough';
+}
+
+const intensityColors = {
+  light: 'bg-green-500',
+  balanced: 'bg-yellow-500', 
+  thorough: 'bg-red-500'
 };
 
-interface PreviewItem {
-  name: string;
-  category: string;
-  quantity?: number;
-}
-
-interface PreviewList {
-  id: string;
-  name: string;
-  description: string;
-  destinationType: string;
-  season?: string;
-  items: PreviewItem[];
-}
+const intensityLabels = {
+  light: 'Light Packer',
+  balanced: 'Balanced',
+  thorough: 'Thorough'
+};
 
 export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   isOpen,
@@ -197,31 +230,35 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedList, setSelectedList] = useState<PreviewList | null>(null);
+  const [selectedList, setSelectedList] = useState<PremadeList | null>(null);
+  const [customization, setCustomization] = useState<TripCustomization>({
+    days: 7,
+    intensity: 'balanced'
+  });
+  const [showPreview, setShowPreview] = useState(false);
   const [pullToRefresh, setPullToRefresh] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const touchCurrent = e.touches[0].clientY;
-    const touchDifference = touchCurrent - touchStart;
-    
-    if (touchDifference > 50 && window.scrollY === 0) {
-      setPullToRefresh(true);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (pullToRefresh) {
-      // Simulate refresh
-      setTimeout(() => {
-        setPullToRefresh(false);
-        // Could add actual refresh logic here
-      }, 1000);
-    }
+  const calculateItems = (list: PremadeList, days: number, intensity: 'light' | 'balanced' | 'thorough') => {
+    return list.items.filter(item => {
+      // Filter by thoroughness level
+      if (item.thoroughnessLevel) {
+        if (intensity === 'light' && item.thoroughnessLevel !== 'light') return false;
+        if (intensity === 'balanced' && item.thoroughnessLevel === 'thorough') return false;
+      }
+      return true;
+    }).map(item => {
+      let quantity = item.quantity || 1;
+      
+      // Adjust quantity based on days
+      if (item.perDay && item.baseQuantity) {
+        quantity = Math.max(item.baseQuantity, Math.ceil(days * 0.6)); // Not exactly per day to avoid over-packing
+      }
+      
+      return {
+        ...item,
+        quantity
+      };
+    });
   };
 
   const filteredLists = premadeLists.filter((list) => {
@@ -231,129 +268,109 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
     return matchesSearch && matchesCategory;
   });
 
-  const categoryCount = premadeLists.reduce((acc: { [key: string]: number }, list) => {
-    const category = list.destinationType;
-    acc[category] = (acc[category] || 0) + 1;
-    return acc;
-  }, {});
+  const handlePreview = (list: PremadeList) => {
+    setSelectedList(list);
+    setShowPreview(true);
+  };
+
+  const handleAddItems = () => {
+    if (!selectedList) return;
+    const items = calculateItems(selectedList, customization.days, customization.intensity);
+    onAddItems(items);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
+  const previewItems = selectedList ? calculateItems(selectedList, customization.days, customization.intensity) : [];
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col"
+        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col"
       >
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold">Smart Packing Lists</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {premadeLists.length} curated lists for every adventure
-              </p>
-            </div>
-          </div>
-          <Button variant="ghost" onClick={onClose} className="rounded-full h-10 w-10 p-0">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search destinations, activities, or items..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12"
-            />
-          </div>
-          
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === 'all' ? 'default' : 'outline'}
-              onClick={() => setSelectedCategory('all')}
-              className="whitespace-nowrap"
-            >
-              All ({premadeLists.length})
-            </Button>
-            {Object.entries(categoryCount).map(([category, count]) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(category)}
-                className="whitespace-nowrap capitalize"
-              >
-                {category} ({count})
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div 
-          className="flex-1 overflow-y-auto"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {pullToRefresh && (
-            <div className="flex items-center justify-center py-4 text-blue-500">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-2"></div>
-              Refreshing lists...
-            </div>
-          )}
-
-          <div className="p-4 md:p-6">
-            {filteredLists.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-2">No lists found</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Try adjusting your search or category filter
-                </p>
+        {!showPreview ? (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">Smart Packing Lists</h2>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {premadeLists.length} curated lists
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Search */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search destinations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-10"
+                />
+              </div>
+              
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                <Button
+                  variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                  onClick={() => setSelectedCategory('all')}
+                  className="whitespace-nowrap text-xs px-3 py-1 h-7"
+                >
+                  All
+                </Button>
+                {['beach', 'city', 'outdoors', 'business'].map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    onClick={() => setSelectedCategory(category)}
+                    className="whitespace-nowrap capitalize text-xs px-3 py-1 h-7"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Scrollable Lists */}
+            <ScrollArea className="flex-1 px-4">
+              <div className="py-4 space-y-3">
                 {filteredLists.map((list) => (
                   <motion.div
                     key={list.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 hover:shadow-lg transition-all cursor-pointer group"
-                    onClick={() => setSelectedList(list)}
+                    className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 cursor-pointer"
+                    onClick={() => handlePreview(list)}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {list.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <h3 className="font-semibold text-sm">{list.name}</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                           {list.description}
                         </p>
                       </div>
-                      <div className="ml-3 text-2xl">
-                        {getCategoryIcon(list.destinationType)}
+                      <div className="ml-3 text-lg">
+                        {list.destinationType === 'beach' ? '🏖️' : 
+                         list.destinationType === 'city' ? '🏙️' : 
+                         list.destinationType === 'outdoors' ? '🏞️' : '💼'}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-3">
-                      {list.season && (
-                        <Badge variant="secondary" className="text-xs">
-                          {list.season}
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        {list.destinationType}
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                      <span>{Array.isArray(list.items) ? list.items.length : 0} items</span>
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span>{list.items.length} items</span>
                       <span className="text-blue-600 dark:text-blue-400 font-medium">
                         Preview →
                       </span>
@@ -361,71 +378,107 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                   </motion.div>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
+            </ScrollArea>
+          </>
+        ) : (
+          <>
+            {/* Preview Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+              <div>
+                <h3 className="text-lg font-semibold">{selectedList?.name}</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Customize your packing list
+                </p>
+              </div>
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowPreview(false)}
+                className="rounded-full h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-        {selectedList && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-2 md:p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
-            >
-              <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-xl font-semibold">{selectedList.name}</h3>
+            {/* Customization Controls */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 shrink-0 space-y-4">
+              {/* Days Selector */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <Calendar className="h-4 w-4" />
+                  Trip Length: {customization.days} {customization.days === 1 ? 'day' : 'days'}
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="30"
+                  value={customization.days}
+                  onChange={(e) => setCustomization(prev => ({ ...prev, days: parseInt(e.target.value) }))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Intensity Selector */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <Thermometer className="h-4 w-4" />
+                  Packing Style
+                </label>
                 <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      onAddItems(selectedList.items);
-                      onClose();
-                    }}
-                    className="bg-blue-500 hover:bg-blue-600"
-                  >
-                    Add All Items
-                  </Button>
-                  <Button variant="ghost" onClick={() => setSelectedList(null)} className="rounded-full h-10 w-10 p-0">
-                    <X className="h-4 w-4" />
-                  </Button>
+                  {(['light', 'balanced', 'thorough'] as const).map((intensity) => (
+                    <Button
+                      key={intensity}
+                      variant={customization.intensity === intensity ? 'default' : 'outline'}
+                      onClick={() => setCustomization(prev => ({ ...prev, intensity }))}
+                      className={`flex-1 text-xs h-8 ${
+                        customization.intensity === intensity ? intensityColors[intensity] : ''
+                      }`}
+                    >
+                      {intensityLabels[intensity]}
+                    </Button>
+                  ))}
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                {selectedList.items.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-6xl mb-4">🗂️</div>
-                    <h3 className="text-xl font-semibold mb-2">No items in this list</h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      This list is currently empty.
-                    </p>
-                  </div>
-                ) : (
-                  <ul className="space-y-3">
-                    {selectedList.items.map((item, index) => (
-                      <li key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                        <div>
-                          <h4 className="font-medium">{item.name}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Category: {item.category}
-                          </p>
+            </div>
+
+            {/* Items Preview */}
+            <ScrollArea className="flex-1 px-4">
+              <div className="py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-medium">Items ({previewItems.length})</h4>
+                  <Badge variant="secondary" className={intensityColors[customization.intensity]}>
+                    {intensityLabels[customization.intensity]}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  {previewItems.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">{item.name}</span>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          {item.category}
                         </div>
-                        {item.quantity && (
-                          <Badge variant="secondary">
-                            {item.quantity}
-                          </Badge>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                      </div>
+                      {item.quantity && item.quantity > 1 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {item.quantity}
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </ScrollArea>
+
+            {/* Actions */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 shrink-0">
+              <Button
+                onClick={handleAddItems}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                Add {previewItems.length} Items to Trip
+              </Button>
+            </div>
+          </>
         )}
       </motion.div>
     </div>

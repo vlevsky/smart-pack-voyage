@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Zap, Target, Award, Gift } from 'lucide-react';
@@ -197,24 +196,27 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
 
   if (!isEnabled) {
     return (
-      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white mb-4">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl p-4 text-white mb-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            <span className="font-medium">Game Mode</span>
+            <div className="bg-white/20 rounded-full p-2">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="font-semibold text-lg">Game Mode</span>
+              <p className="text-sm opacity-90 mt-1">
+                Turn packing into a fun challenge!
+              </p>
+            </div>
           </div>
           <Button
             onClick={() => onToggle(true)}
-            variant="secondary"
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30 font-medium"
             size="sm"
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30"
           >
             Enable
           </Button>
         </div>
-        <p className="text-sm opacity-90 mt-2">
-          Turn packing into a game! Earn XP, unlock achievements, and level up.
-        </p>
       </div>
     );
   }
@@ -224,89 +226,80 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white mb-4 relative overflow-hidden"
+        className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-4 text-white mb-4 relative overflow-hidden shadow-lg"
       >
-        {confetti && (
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 bg-yellow-300 rounded-full"
-                initial={{
-                  x: Math.random() * 100 + '%',
-                  y: '100%',
-                  scale: 0,
-                }}
-                animate={{
-                  y: '-100%',
-                  scale: [0, 1, 0],
-                  rotate: 360,
-                }}
-                transition={{
-                  duration: 2,
-                  delay: Math.random() * 0.5,
-                  ease: 'easeOut',
-                }}
-              />
-            ))}
-          </div>
-        )}
+        {/* Decorative background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-2 right-2 w-12 h-12 bg-white rounded-full"></div>
+          <div className="absolute bottom-2 left-2 w-8 h-8 bg-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-white rounded-full"></div>
+        </div>
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            <div>
-              <div className="font-semibold">Level {gameStats.level}</div>
-              <div className="text-xs opacity-90">{getLevelTitle(gameStats.level)}</div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 rounded-full p-2 backdrop-blur-sm">
+                <Trophy className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="font-bold text-xl">Level {gameStats.level}</div>
+                <div className="text-sm opacity-90">{getLevelTitle(gameStats.level)}</div>
+              </div>
+            </div>
+            <Button
+              onClick={() => onToggle(false)}
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 h-8 w-8 p-0 rounded-full"
+            >
+              ×
+            </Button>
+          </div>
+
+          <div className="space-y-3 mb-4">
+            <div className="flex justify-between text-sm font-medium">
+              <span>XP Progress</span>
+              <span>{gameStats.xp}/{gameStats.xpToNextLevel}</span>
+            </div>
+            <div className="bg-white/20 rounded-full h-3 overflow-hidden backdrop-blur-sm">
+              <div 
+                className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-500"
+                style={{ width: `${progressPercentage}%` }}
+              />
             </div>
           </div>
-          <Button
-            onClick={() => onToggle(false)}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 h-8 w-8 p-0"
-          >
-            ×
-          </Button>
-        </div>
 
-        <div className="space-y-2 mb-3">
-          <div className="flex justify-between text-sm">
-            <span>XP Progress</span>
-            <span>{gameStats.xp}/{gameStats.xpToNextLevel}</span>
+          <div className="grid grid-cols-3 gap-4 text-center mb-4">
+            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+              <div className="font-bold text-lg">{gameStats.totalXP}</div>
+              <div className="text-xs opacity-75">Total XP</div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+              <div className="font-bold text-lg">{gameStats.streak}</div>
+              <div className="text-xs opacity-75">Streak</div>
+            </div>
+            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+              <div className="font-bold text-lg">{Math.round(completionPercentage)}%</div>
+              <div className="text-xs opacity-75">Complete</div>
+            </div>
           </div>
-          <Progress value={progressPercentage} className="h-2 bg-white/20" />
-        </div>
 
-        <div className="grid grid-cols-3 gap-3 text-center text-sm">
-          <div>
-            <div className="font-semibold">{gameStats.totalXP}</div>
-            <div className="opacity-75">Total XP</div>
-          </div>
-          <div>
-            <div className="font-semibold">{gameStats.streak}</div>
-            <div className="opacity-75">Streak</div>
-          </div>
-          <div>
-            <div className="font-semibold">{Math.round(completionPercentage)}%</div>
-            <div className="opacity-75">Complete</div>
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-3 flex-wrap">
-          {gameStats.achievements.filter(a => a.unlocked).map((achievement) => {
-            const Icon = achievement.icon;
-            return (
-              <Badge
-                key={achievement.id}
-                variant="secondary"
-                className="bg-white/20 text-white border-white/30 text-xs"
-              >
-                <Icon className="h-3 w-3 mr-1" />
-                {achievement.name}
-              </Badge>
-            );
-          })}
+          {gameStats.achievements.filter(a => a.unlocked).length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {gameStats.achievements.filter(a => a.unlocked).slice(0, 3).map((achievement) => {
+                const Icon = achievement.icon;
+                return (
+                  <div
+                    key={achievement.id}
+                    className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1"
+                  >
+                    <Icon className="h-3 w-3" />
+                    <span className="text-xs font-medium">{achievement.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -319,7 +312,12 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
             className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
             <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-2xl p-8 text-center shadow-2xl">
-              <Trophy className="h-16 w-16 mx-auto mb-4" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <Trophy className="h-16 w-16 mx-auto mb-4" />
+              </motion.div>
               <h2 className="text-3xl font-bold mb-2">Level Up!</h2>
               <p className="text-lg">Welcome to Level {gameStats.level}</p>
               <p className="text-sm opacity-90 mt-2">{getLevelTitle(gameStats.level)}</p>
@@ -332,7 +330,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-4 right-4 bg-green-500 text-white rounded-xl p-4 shadow-lg z-50 max-w-sm"
+            className="fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 shadow-lg z-50 max-w-sm"
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
