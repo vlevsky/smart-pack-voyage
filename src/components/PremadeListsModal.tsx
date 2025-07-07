@@ -14,7 +14,28 @@ interface PremadeListsModalProps {
   onAddItems: (items: Array<{ name: string; category: string; quantity?: number; luggage?: string }>) => void;
 }
 
-const smartLists = [
+interface SmartListItem {
+  name: string;
+  category: string;
+  quantity: number;
+  luggage?: string;
+  required?: boolean;
+  weatherDependent?: boolean;
+  description?: string;
+}
+
+interface SmartList {
+  id: string;
+  name: string;
+  destination: string;
+  type: string;
+  season: string;
+  duration: string;
+  description: string;
+  items: SmartListItem[];
+}
+
+const smartLists: SmartList[] = [
   {
     id: 'hawaii-beach',
     name: 'Hawaii Beach Vacation',
@@ -24,7 +45,6 @@ const smartLists = [
     duration: '7 days',
     description: 'Perfect for tropical beach getaways with sun, surf, and relaxation',
     items: [
-      // Clothes
       { name: 'Swimsuit', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
       { name: 'Beach cover-up', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
       { name: 'Sundresses', category: 'clothes', quantity: 3, luggage: 'checked', required: false },
@@ -35,25 +55,17 @@ const smartLists = [
       { name: 'Sandals', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
       { name: 'Sun hat', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
       { name: 'Underwear', category: 'clothes', quantity: 8, luggage: 'checked', required: true },
-      
-      // Toiletries
       { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 2, luggage: 'checked', required: true },
       { name: 'After-sun lotion', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
       { name: 'Waterproof mascara', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
       { name: 'Leave-in conditioner', category: 'toiletries', quantity: 1, luggage: 'checked', required: false },
       { name: 'Body wash', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
-      
-      // Electronics
       { name: 'Waterproof phone case', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
       { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
       { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
       { name: 'Bluetooth speaker', category: 'electronics', quantity: 1, luggage: 'checked', required: false },
-      
-      // Documents
       { name: 'Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal', required: true },
       { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal', required: false },
-      
-      // Miscellaneous
       { name: 'Beach towel', category: 'miscellaneous', quantity: 2, luggage: 'checked', required: true },
       { name: 'Snorkel gear', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: false },
       { name: 'Beach bag', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: true },
@@ -61,6 +73,118 @@ const smartLists = [
     ]
   },
   
+  {
+    id: 'paris-getaway',
+    name: 'Paris Romantic Getaway',
+    destination: 'Paris, France',
+    type: 'City',
+    season: 'Spring/Fall',
+    duration: '5 days',
+    description: 'Elegant city break with romantic dinners and museum visits',
+    items: [
+      { name: 'Dress pants', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
+      { name: 'Nice blouses', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
+      { name: 'Little black dress', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Light jacket', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Scarf', category: 'clothes', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Underwear', category: 'clothes', quantity: 6, luggage: 'checked', required: true },
+      { name: 'Nice perfume', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Makeup essentials', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Hair styling tools', category: 'toiletries', quantity: 1, luggage: 'checked', required: false },
+      { name: 'European adapter', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Phone charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Passport', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Museum passes', category: 'documents', quantity: 1, luggage: 'personal', required: false },
+      { name: 'Small crossbody bag', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Guidebook', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'French phrasebook', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: false },
+    ]
+  },
+
+  {
+    id: 'nyc-weekend',
+    name: 'NYC Weekend Trip',
+    destination: 'New York City',
+    type: 'City',
+    season: 'All Season',
+    duration: '3 days',
+    description: 'Fast-paced city adventure with shows, food, and sightseeing',
+    items: [
+      { name: 'Comfortable jeans', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
+      { name: 'Casual shirts', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
+      { name: 'One nice outfit', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Light jacket', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'carry-on', required: true },
+      { name: 'Socks', category: 'clothes', quantity: 4, luggage: 'carry-on', required: true },
+      { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Phone', category: 'electronics', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'ID/Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Credit cards', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Show tickets', category: 'documents', quantity: 1, luggage: 'personal', required: false },
+      { name: 'Subway map', category: 'miscellaneous', quantity: 1, luggage: 'personal', required: false },
+      { name: 'Umbrella', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Cash for tips', category: 'miscellaneous', quantity: 1, luggage: 'personal', required: true },
+    ]
+  },
+
+  {
+    id: 'business-trip',
+    name: 'Business Trip',
+    destination: 'Any City',
+    type: 'Business',
+    season: 'All Season',
+    duration: '4 days',
+    description: 'Professional meetings and presentations',
+    items: [
+      { name: 'Business suits', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
+      { name: 'Dress shirts', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
+      { name: 'Ties', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
+      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Belt', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Underwear', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
+      { name: 'Dress socks', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
+      { name: 'Laptop', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Laptop charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Phone charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Business cards', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Meeting schedules', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Company ID', category: 'documents', quantity: 1, luggage: 'personal', required: true },
+      { name: 'Professional cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Portfolio', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
+    ]
+  },
+
+  {
+    id: 'ski-trip',
+    name: 'Winter Ski Trip',
+    destination: 'Mountain Resort',
+    type: 'Winter Sports',
+    season: 'Winter',
+    duration: '5 days',
+    description: 'Hit the slopes with all winter gear',
+    items: [
+      { name: 'Ski jacket', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Ski pants', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Thermal underwear', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
+      { name: 'Wool socks', category: 'clothes', quantity: 6, luggage: 'checked', required: true },
+      { name: 'Gloves', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
+      { name: 'Beanie', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Goggles', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Après-ski boots', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
+      { name: 'Casual winter clothes', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
+      { name: 'GoPro camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
+      { name: 'Hand warmers', category: 'miscellaneous', quantity: 10, luggage: 'checked', required: true },
+      { name: 'Lip balm with SPF', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: true },
+      { name: 'Lift tickets', category: 'documents', quantity: 1, luggage: 'personal', required: false },
+    ]
+  },
+
   {
     id: 'business-nyc',
     name: 'Business Trip NYC',
@@ -409,7 +533,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedSeason, setSelectedSeason] = useState('all');
-  const [previewList, setPreviewList] = useState<typeof smartLists[0] | null>(null);
+  const [previewList, setPreviewList] = useState<SmartList | null>(null);
   const [tripDuration, setTripDuration] = useState([7]);
   const [packingStyle, setPackingStyle] = useState('balanced');
   const [isVoiceInputEnabled, setIsVoiceInputEnabled] = useState(false);
@@ -424,13 +548,12 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
     return matchesSearch && matchesType && matchesSeason;
   });
 
-  const adjustQuantitiesForDuration = (items: any[], duration: number, style: string) => {
+  const adjustQuantitiesForDuration = (items: SmartListItem[], duration: number, style: string) => {
     const multiplier = style === 'light' ? 0.7 : style === 'thorough' ? 1.3 : 1;
     
     return items.map(item => {
       let newQuantity = item.quantity;
       
-      // Adjust quantity based on duration for certain items
       if (item.name.toLowerCase().includes('shirt') || 
           item.name.toLowerCase().includes('outfit') ||
           item.name.toLowerCase().includes('underwear') ||
@@ -445,7 +568,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
     });
   };
 
-  const handlePreviewList = (selectedList: typeof smartLists[0]) => {
+  const handlePreviewList = (selectedList: SmartList) => {
     setPreviewList(selectedList);
   };
 
@@ -479,7 +602,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
       if (!acc[item.category]) acc[item.category] = [];
       acc[item.category].push(item);
       return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, SmartListItem[]>);
 
     return (
       <AnimatePresence>
@@ -488,24 +611,22 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-4xl w-full max-h-[85vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-900 rounded-3xl p-4 md:p-6 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
           >
-            {/* Preview Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
                   Preview: {previewList.name}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300">{previewList.description}</p>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">{previewList.description}</p>
               </div>
-              <Button variant="ghost" onClick={() => setPreviewList(null)} className="rounded-full">
-                <X className="h-5 w-5" />
+              <Button variant="ghost" onClick={() => setPreviewList(null)} className="rounded-full h-8 w-8 md:h-10 md:w-10">
+                <X className="h-4 w-4 md:h-5 md:w-5" />
               </Button>
             </div>
 
-            {/* Duration and Style Controls */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 md:p-4 mb-4 md:mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">Trip Duration: {tripDuration[0]} days</label>
                   <Slider
@@ -520,7 +641,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                 <div>
                   <label className="block text-sm font-medium mb-2">Packing Style</label>
                   <Select value={packingStyle} onValueChange={setPackingStyle}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -533,11 +654,10 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
               </div>
             </div>
 
-            {/* Items by Category */}
-            <div className="overflow-y-auto max-h-96 space-y-4">
+            <div className="overflow-y-auto max-h-[50vh] space-y-3 md:space-y-4">
               {Object.entries(itemsByCategory).map(([category, items]) => (
-                <div key={category} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-semibold text-lg mb-3 capitalize flex items-center gap-2">
+                <div key={category} className="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-semibold text-base md:text-lg mb-3 capitalize flex items-center gap-2">
                     {category === 'clothes' && '👕'}
                     {category === 'toiletries' && '🧴'}
                     {category === 'electronics' && '📱'}
@@ -545,7 +665,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                     {category === 'miscellaneous' && '🎒'}
                     {category} ({items.length} items)
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2">
                     {items.map((item, index) => (
                       <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <span className="text-sm">{item.name}</span>
@@ -566,8 +686,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
               ))}
             </div>
 
-            {/* Add to Trip Button */}
-            <div className="mt-6 flex gap-3">
+            <div className="mt-4 md:mt-6 flex flex-col sm:flex-row gap-3">
               <Button 
                 onClick={handleAddList}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-2xl font-semibold"
@@ -592,25 +711,23 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-6xl w-full max-h-[85vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-gray-900 rounded-3xl p-4 md:p-6 max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Smart Packing Lists ✨
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-1">
                 Choose from expertly curated lists for your destination
               </p>
             </div>
-            <Button variant="ghost" onClick={onClose} className="rounded-full h-10 w-10">
-              <X className="h-5 w-5" />
+            <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 md:h-10 md:w-10">
+              <X className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </div>
 
-          {/* Search and Filters */}
-          <div className="mb-6 space-y-4">
+          <div className="mb-4 md:mb-6 space-y-3 md:space-y-4">
             <div className="flex gap-3">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -618,22 +735,22 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                   placeholder="Search destinations, activities, or trip types..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 rounded-2xl border-2 focus:border-blue-500"
+                  className="pl-10 rounded-2xl border-2 focus:border-blue-500 h-12"
                 />
               </div>
               <Button
                 variant="outline"
                 onClick={startVoiceInput}
                 disabled={isVoiceInputEnabled}
-                className="rounded-2xl px-4"
+                className="rounded-2xl px-4 h-12"
               >
                 <Volume2 className={`h-4 w-4 ${isVoiceInputEnabled ? 'text-red-500' : ''}`} />
               </Button>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-48 rounded-2xl">
+                <SelectTrigger className="w-full sm:w-48 rounded-2xl h-12">
                   <SelectValue placeholder="Trip Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -643,16 +760,12 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                   <SelectItem value="Business">Business</SelectItem>
                   <SelectItem value="Adventure">Adventure</SelectItem>
                   <SelectItem value="Family">Family</SelectItem>
-                  <SelectItem value="Entertainment">Entertainment</SelectItem>
-                  <SelectItem value="Cruise">Cruise</SelectItem>
-                  <SelectItem value="Camping">Camping</SelectItem>
-                  <SelectItem value="Backpacking">Backpacking</SelectItem>
                   <SelectItem value="Winter Sports">Winter Sports</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-                <SelectTrigger className="w-48 rounded-2xl">
+                <SelectTrigger className="w-full sm:w-48 rounded-2xl h-12">
                   <SelectValue placeholder="Season" />
                 </SelectTrigger>
                 <SelectContent>
@@ -667,23 +780,22 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
             </div>
           </div>
 
-          {/* Lists Grid */}
-          <div className="overflow-y-auto max-h-[calc(85vh-300px)]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="overflow-y-auto max-h-[calc(90vh-300px)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {filteredLists.map((smartList) => (
                 <motion.div
                   key={smartList.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   whileHover={{ scale: 1.02 }}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-5 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
+                  className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-4 md:p-5 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1">
+                      <h3 className="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-1">
                         {smartList.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-2">
                         <MapPin className="h-3 w-3" />
                         <span>{smartList.destination}</span>
                         <Calendar className="h-3 w-3 ml-2" />
@@ -695,7 +807,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                     </Badge>
                   </div>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
                     {smartList.description}
                   </p>
 
@@ -709,7 +821,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => handlePreviewList(smartList)}
-                      className="flex-1 rounded-xl border-blue-200 hover:border-blue-400"
+                      className="flex-1 rounded-xl border-blue-200 hover:border-blue-400 h-9"
                     >
                       <Eye className="h-3 w-3 mr-1" />
                       Preview
@@ -720,7 +832,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                         onAddItems(smartList.items);
                         onClose();
                       }}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl h-9"
                     >
                       <Plus className="h-3 w-3 mr-1" />
                       Add

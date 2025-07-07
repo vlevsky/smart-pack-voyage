@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar, Info, HelpCircle, Menu, Volume2, Luggage, Eye, ZoomIn, Target, DollarSign, Clock, Shield, X } from 'lucide-react';
+import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar, Info, HelpCircle, Menu, Volume2, Luggage, Eye, ZoomIn, Target, DollarSign, Clock, Shield, X, Contrast, Type, Volume, VolumeX, Accessibility } from 'lucide-react';
 import { CategorySection } from '@/components/CategorySection';
 import { ProgressBar } from '@/components/ProgressBar';
 import { PremadeListsModal } from '@/components/PremadeListsModal';
 import { LuggageView } from '@/components/LuggageView';
+import { LuggageLimitsModal } from '@/components/LuggageLimitsModal';
 import { TripSelector, Trip } from '@/components/TripSelector';
 import { SimpleModeToggle } from '@/components/SimpleModeToggle';
 import { Button } from '@/components/ui/button';
@@ -36,8 +37,12 @@ const Index = () => {
   const [accessibilityMode, setAccessibilityMode] = useState(false);
   const [largeTextMode, setLargeTextMode] = useState(false);
   const [highContrastMode, setHighContrastMode] = useState(false);
+  const [dyslexiaFriendlyMode, setDyslexiaFriendlyMode] = useState(false);
+  const [motionReduced, setMotionReduced] = useState(false);
+  const [voiceHintsEnabled, setVoiceHintsEnabled] = useState(false);
   const [showCompleted, setShowCompleted] = useState(true);
   const [showPremadeLists, setShowPremadeLists] = useState(false);
+  const [showLuggageLimits, setShowLuggageLimits] = useState(false);
   const [checklistMode, setChecklistMode] = useState(false);
   const [showLuggageView, setShowLuggageView] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -312,24 +317,40 @@ const Index = () => {
     ? Math.ceil((currentTrip.startDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
+  const speakText = (text: string) => {
+    if (voiceHintsEnabled && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+  };
+
   return (
     <div className={`min-h-screen transition-all duration-500 ${
-      darkMode ? 'dark bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-    } ${largeTextMode ? 'text-lg' : ''} ${highContrastMode ? 'high-contrast' : ''}`}>
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      darkMode ? 'dark' : ''
+    } ${
+      highContrastMode ? 'contrast-more bg-black text-white' : 
+      darkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 
+      'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
+    } ${
+      largeTextMode ? 'text-lg' : ''
+    } ${
+      dyslexiaFriendlyMode ? 'font-mono' : ''
+    }`}>
+      <div className="container mx-auto px-4 py-4 md:py-6 max-w-7xl">
+        
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex items-center gap-2 md:gap-4">
               <motion.h1 
-                className={`${simpleMode || largeTextMode ? 'text-5xl md:text-6xl' : 'text-4xl md:text-5xl'} font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent`}
-                animate={{ 
+                className={`${simpleMode || largeTextMode ? 'text-3xl md:text-5xl' : 'text-2xl md:text-4xl'} font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent`}
+                animate={motionReduced ? {} : { 
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                 }}
-                transition={{ 
+                transition={motionReduced ? {} : { 
                   duration: 8, 
                   repeat: Infinity, 
                   ease: "linear" 
@@ -337,68 +358,82 @@ const Index = () => {
               >
                 PackSmart
               </motion.h1>
+              
               {!simpleMode && (
-                <p className={`${largeTextMode ? 'text-xl' : 'text-lg'} text-muted-foreground font-medium hidden md:block`}>
-                  Your intelligent travel companion ✈️
-                </p>
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowPremadeLists(true);
+                      speakText("Opening smart packing lists");
+                    }}
+                    className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 ${largeTextMode ? 'text-base px-4 py-2' : 'text-sm px-3 py-2'} md:px-6 md:py-3 md:text-base`}
+                  >
+                    <Sparkles className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-1 md:mr-2`} />
+                    <span className="hidden sm:inline">Smart Lists</span>
+                    <span className="sm:hidden">Lists</span>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowLuggageLimits(true);
+                      speakText("Opening airline baggage limits");
+                    }}
+                    className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-200 ${largeTextMode ? 'text-base px-4 py-2' : 'text-sm px-3 py-2'} md:px-4 md:py-3 md:text-base`}
+                  >
+                    <Package className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-1`} />
+                    <span className="hidden md:inline">Airlines</span>
+                  </Button>
+                </>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
-              {!simpleMode && (
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPremadeLists(true)}
-                  className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 ${largeTextMode ? 'text-lg px-6 py-3' : ''}`}
-                >
-                  <Sparkles className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
-                  {simpleMode ? 'Lists' : 'Smart Lists'}
-                </Button>
-              )}
-              
-              <Button
-                variant="outline"
-                size={largeTextMode ? 'lg' : 'default'}
-                onClick={() => setShowMenu(!showMenu)}
-                className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 relative"
-              >
-                <Menu className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'}`} />
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size={largeTextMode ? 'lg' : 'default'}
+              onClick={() => {
+                setShowMenu(!showMenu);
+                speakText("Opening settings menu");
+              }}
+              className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 relative h-10 w-10 md:h-12 md:w-12"
+            >
+              <Menu className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4 md:h-5 md:w-5'}`} />
+            </Button>
           </div>
 
           {currentTrip && (
             <motion.div 
-              className="mb-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-3xl p-6 shadow-xl border border-white/20 dark:border-gray-700/20"
+              className="mb-4 md:mb-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-xl border border-white/20 dark:border-gray-700/20"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-left">
-                  <h2 className={`${largeTextMode ? 'text-3xl' : 'text-2xl'} font-bold text-gray-900 dark:text-white mb-1`}>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 md:mb-4">
+                <div className="mb-3 sm:mb-0">
+                  <h2 className={`${largeTextMode ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'} font-bold text-gray-900 dark:text-white mb-1`}>
                     {currentTrip.name}
                   </h2>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     {currentTrip.destination && (
-                      <p className={`text-gray-600 dark:text-gray-300 flex items-center gap-2 ${largeTextMode ? 'text-lg' : ''}`}>
-                        <MapPin className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'}`} />
+                      <p className={`text-gray-600 dark:text-gray-300 flex items-center gap-2 ${largeTextMode ? 'text-base' : 'text-sm'}`}>
+                        <MapPin className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'}`} />
                         {currentTrip.destination}
                       </p>
                     )}
                     {daysUntilTrip !== null && daysUntilTrip > 0 && (
-                      <p className={`text-blue-600 dark:text-blue-400 font-medium flex items-center gap-2 ${largeTextMode ? 'text-lg' : ''}`}>
-                        <Clock className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'}`} />
+                      <p className={`text-blue-600 dark:text-blue-400 font-medium flex items-center gap-2 ${largeTextMode ? 'text-base' : 'text-sm'}`}>
+                        <Clock className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'}`} />
                         {daysUntilTrip} days to go
                       </p>
                     )}
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <div className={`${largeTextMode ? 'text-4xl' : 'text-3xl'} font-bold text-gray-900 dark:text-white`}>
+                <div className="text-center sm:text-right">
+                  <div className={`${largeTextMode ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'} font-bold text-gray-900 dark:text-white`}>
                     {Math.round(progressPercentage)}%
                   </div>
-                  <div className={`${largeTextMode ? 'text-base' : 'text-sm'} text-gray-600 dark:text-gray-300`}>
+                  <div className={`${largeTextMode ? 'text-sm md:text-base' : 'text-xs md:text-sm'} text-gray-600 dark:text-gray-300`}>
                     {packedItems} of {totalItems} packed
                   </div>
                 </div>
@@ -411,9 +446,9 @@ const Index = () => {
               />
               
               {currentTrip.startDate && currentTrip.endDate && (
-                <div className={`mt-4 flex items-center justify-center gap-4 ${largeTextMode ? 'text-base' : 'text-sm'} text-gray-600 dark:text-gray-300`}>
+                <div className={`mt-3 md:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-4 ${largeTextMode ? 'text-sm md:text-base' : 'text-xs md:text-sm'} text-gray-600 dark:text-gray-300`}>
                   <div className="flex items-center gap-1">
-                    <Calendar className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'}`} />
+                    <Calendar className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'}`} />
                     <span>
                       {currentTrip.startDate.toLocaleDateString()} - {currentTrip.endDate.toLocaleDateString()}
                     </span>
@@ -433,102 +468,132 @@ const Index = () => {
               initial={{ opacity: 0, x: 300 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 300 }}
-              className={`fixed top-0 right-0 h-full ${simpleMode || largeTextMode ? 'w-96' : 'w-80'} bg-white dark:bg-gray-900 shadow-2xl z-50 p-6 border-l border-gray-200 dark:border-gray-700`}
+              className={`fixed top-0 right-0 h-full ${simpleMode || largeTextMode ? 'w-full sm:w-96' : 'w-full sm:w-80'} bg-white dark:bg-gray-900 shadow-2xl z-50 p-4 md:p-6 border-l border-gray-200 dark:border-gray-700 overflow-y-auto`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className={`${largeTextMode ? 'text-2xl' : 'text-xl'} font-bold`}>Settings & Options</h3>
+                <h3 className={`${largeTextMode ? 'text-xl md:text-2xl' : 'text-lg md:text-xl'} font-bold`}>Settings & Options</h3>
                 <Button variant="ghost" size={largeTextMode ? 'lg' : 'sm'} onClick={() => setShowMenu(false)}>
                   <X className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'}`} />
                 </Button>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <h4 className={`${largeTextMode ? 'text-lg' : 'text-base'} font-semibold`}>Display Mode</h4>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold flex items-center gap-2`}>
+                    <Eye className="h-4 w-4" />
+                    Display Mode
+                  </h4>
                   
-                  <Button
-                    variant="outline"
-                    onClick={() => setDarkMode(!darkMode)}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''}`}
-                  >
-                    {darkMode ? <Sun className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} /> : <Moon className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />}
-                    {darkMode ? 'Light Mode' : 'Dark Mode'}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setDarkMode(!darkMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      {darkMode ? <Sun className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} /> : <Moon className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />}
+                      {darkMode ? 'Light Mode' : 'Dark Mode'}
+                    </Button>
 
-                  <SimpleModeToggle 
-                    simpleMode={simpleMode} 
-                    onToggle={setSimpleMode}
-                    large={largeTextMode}
-                  />
+                    <SimpleModeToggle 
+                      simpleMode={simpleMode} 
+                      onToggle={setSimpleMode}
+                      large={largeTextMode}
+                    />
 
-                  <Button
-                    variant="outline"
-                    onClick={() => setChecklistMode(!checklistMode)}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''}`}
-                  >
-                    {checklistMode ? <Grid3X3 className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} /> : <List className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />}
-                    {checklistMode ? 'Grid View' : 'Checklist Mode'}
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setChecklistMode(!checklistMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      {checklistMode ? <Grid3X3 className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} /> : <List className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />}
+                      {checklistMode ? 'Grid View' : 'Checklist Mode'}
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="space-y-3">
-                  <h4 className={`${largeTextMode ? 'text-lg' : 'text-base'} font-semibold`}>Accessibility</h4>
+                <div className="space-y-4">
+                  <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold flex items-center gap-2`}>
+                    <Accessibility className="h-4 w-4" />
+                    Accessibility (5 Options)
+                  </h4>
                   
-                  <Button
-                    variant="outline"
-                    onClick={() => setLargeTextMode(!largeTextMode)}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''}`}
-                  >
-                    <ZoomIn className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
-                    Large Text Mode
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      variant={highContrastMode ? "default" : "outline"}
+                      onClick={() => setHighContrastMode(!highContrastMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <Contrast className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      High Contrast Mode
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={() => setHighContrastMode(!highContrastMode)}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''}`}
-                  >
-                    <Target className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
-                    High Contrast
-                  </Button>
+                    <Button
+                      variant={largeTextMode ? "default" : "outline"}
+                      onClick={() => setLargeTextMode(!largeTextMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <ZoomIn className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Large Text Mode
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={voiceNavigationEnabled ? stopVoiceNavigation : startVoiceNavigation}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''} ${voiceNavigationEnabled ? 'bg-red-50 text-red-600' : ''}`}
-                  >
-                    <Volume2 className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2 ${voiceNavigationEnabled ? 'text-red-500' : ''}`} />
-                    {voiceNavigationEnabled ? 'Stop Voice Nav' : 'Voice Navigation'}
-                  </Button>
+                    <Button
+                      variant={dyslexiaFriendlyMode ? "default" : "outline"}
+                      onClick={() => setDyslexiaFriendlyMode(!dyslexiaFriendlyMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <Type className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Dyslexia Friendly Font
+                    </Button>
+
+                    <Button
+                      variant={motionReduced ? "default" : "outline"}
+                      onClick={() => setMotionReduced(!motionReduced)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <Target className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Reduce Motion
+                    </Button>
+
+                    <Button
+                      variant={voiceHintsEnabled ? "default" : "outline"}
+                      onClick={() => setVoiceHintsEnabled(!voiceHintsEnabled)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      {voiceHintsEnabled ? <Volume2 className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} /> : <VolumeX className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />}
+                      Voice Hints
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="space-y-3">
-                  <h4 className={`${largeTextMode ? 'text-lg' : 'text-base'} font-semibold`}>Actions</h4>
+                <div className="space-y-4">
+                  <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold`}>Actions</h4>
                   
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowHelp(true);
-                      setShowMenu(false);
-                    }}
-                    className={`w-full justify-start ${largeTextMode ? 'text-lg py-3' : ''}`}
-                  >
-                    <HelpCircle className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
-                    Help & Tutorial
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowHelp(true);
+                        setShowMenu(false);
+                        speakText("Opening help and tutorial");
+                      }}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <HelpCircle className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Help & Tutorial
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      resetList();
-                      setShowMenu(false);
-                    }}
-                    className={`w-full justify-start hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 ${largeTextMode ? 'text-lg py-3' : ''}`}
-                    disabled={totalItems === 0}
-                  >
-                    <RotateCcw className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
-                    Clear All Items
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowMenu(false);
+                      }}
+                      className={`w-full justify-start hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                      disabled={totalItems === 0}
+                    >
+                      <RotateCcw className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Clear All Items
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -540,7 +605,7 @@ const Index = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setShowMenu(false)}
           />
         )}
@@ -651,14 +716,17 @@ const Index = () => {
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="fixed bottom-6 right-6 z-40"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40"
         >
           <Button
-            onClick={() => setShowLuggageView(true)}
-            className={`rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 ${largeTextMode ? 'h-16 w-16' : 'h-14 w-14'}`}
+            onClick={() => {
+              setShowLuggageView(true);
+              speakText("Opening luggage view");
+            }}
+            className={`rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 ${largeTextMode ? 'h-16 w-16' : 'h-12 w-12 md:h-14 md:w-14'}`}
             title="See what's in your luggage"
           >
-            <Luggage className={`${largeTextMode ? 'h-8 w-8' : 'h-6 w-6'}`} />
+            <Luggage className={`${largeTextMode ? 'h-8 w-8' : 'h-5 w-5 md:h-6 md:w-6'}`} />
           </Button>
         </motion.div>
       )}
@@ -676,76 +744,112 @@ const Index = () => {
         onToggleItem={toggleItem}
       />
 
+      <LuggageLimitsModal
+        isOpen={showLuggageLimits}
+        onClose={() => setShowLuggageLimits(false)}
+      />
+
       {showHelp && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`bg-white dark:bg-gray-900 rounded-3xl p-8 max-w-4xl w-full max-h-[85vh] overflow-y-auto shadow-2xl ${largeTextMode ? 'text-lg' : ''}`}
+            className={`bg-white dark:bg-gray-900 rounded-2xl md:rounded-3xl p-4 md:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className={`${largeTextMode ? 'text-4xl' : 'text-3xl'} font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}>
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h2 className={`${largeTextMode ? 'text-2xl md:text-4xl' : 'text-xl md:text-3xl'} font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}>
                 Welcome to PackSmart! 🎒
               </h2>
-              <Button variant="ghost" onClick={() => setShowHelp(false)} className="rounded-full">
-                <X className={`${largeTextMode ? 'h-6 w-6' : 'h-5 w-5'}`} />
+              <Button variant="ghost" onClick={() => setShowHelp(false)} className="rounded-full h-8 w-8 md:h-10 md:w-10">
+                <X className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'}`} />
               </Button>
             </div>
             
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6">
-                  <div className={`${largeTextMode ? 'text-6xl' : 'text-4xl'} mb-3`}>🗂️</div>
-                  <h3 className={`font-bold ${largeTextMode ? 'text-2xl' : 'text-lg'} mb-2`}>Managing Trips</h3>
-                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-lg' : ''}`}>
+            <div className="space-y-6 md:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>🗂️</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>Managing Trips</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
                     Create multiple trips, set dates and destinations. Each trip has its own packing list that saves automatically.
                   </p>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl p-6">
-                  <div className={`${largeTextMode ? 'text-6xl' : 'text-4xl'} mb-3`}>✨</div>
-                  <h3 className={`font-bold ${largeTextMode ? 'text-2xl' : 'text-lg'} mb-2`}>Smart Packing Lists</h3>
-                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-lg' : ''}`}>
-                    Browse pre-made lists for destinations like Hawaii, Paris, or activities like camping. Preview before adding!
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>✨</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>Smart Packing Lists</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
+                    Browse 50+ pre-made lists for destinations like Hawaii, Paris, or activities like camping. Preview before adding!
                   </p>
                 </div>
 
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl p-6">
-                  <div className={`${largeTextMode ? 'text-6xl' : 'text-4xl'} mb-3`}>🧳</div>
-                  <h3 className={`font-bold ${largeTextMode ? 'text-2xl' : 'text-lg'} mb-2`}>Luggage Organization</h3>
-                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-lg' : ''}`}>
+                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>🧳</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>Luggage Organization</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
                     Assign items to carry-on, checked bags, or backpack. View by luggage type to see what goes where.
                   </p>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-2xl p-6">
-                  <div className={`${largeTextMode ? 'text-6xl' : 'text-4xl'} mb-3`}>♿</div>
-                  <h3 className={`font-bold ${largeTextMode ? 'text-2xl' : 'text-lg'} mb-2`}>Accessibility Features</h3>
-                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-lg' : ''}`}>
-                    Large text mode, high contrast, voice navigation, and simple mode for easier use.
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>♿</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>5 Accessibility Features</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
+                    High contrast, large text, dyslexia-friendly fonts, motion reduction, and voice hints for easier use.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>✈️</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>75+ Airlines Database</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
+                    Check baggage limits, fees, and restrictions for major airlines worldwide. Switch between metric/imperial units.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                  <div className={`${largeTextMode ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'} mb-3`}>📱</div>
+                  <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-2`}>Mobile-First Design</h3>
+                  <p className={`text-gray-600 dark:text-gray-300 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
+                    Optimized for phones with touch-friendly controls, spacious layouts, and offline functionality.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6">
-                <h3 className={`font-bold ${largeTextMode ? 'text-2xl' : 'text-lg'} mb-4 flex items-center gap-2`}>
-                  <Info className={`${largeTextMode ? 'h-6 w-6' : 'h-5 w-5'}`} />
-                  Voice Commands (say these out loud)
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl md:rounded-2xl p-4 md:p-6">
+                <h3 className={`font-bold ${largeTextMode ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} mb-4 flex items-center gap-2`}>
+                  <Info className={`${largeTextMode ? 'h-5 w-5 md:h-6 md:w-6' : 'h-4 w-4 md:h-5 md:w-5'}`} />
+                  Step-by-Step Guide
                 </h3>
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${largeTextMode ? 'text-lg' : 'text-sm'}`}>
-                  <div>• "Show luggage" - Opens luggage view</div>
-                  <div>• "Add item" - Focus on item input</div>
-                  <div>• "Help" - Opens this help screen</div>
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}>
+                  <div>
+                    <strong>1. Create a Trip:</strong> Tap the trip selector to add your destination and dates
+                  </div>
+                  <div>
+                    <strong>2. Add Items:</strong> Use the + button on categories or browse Smart Lists
+                  </div>
+                  <div>
+                    <strong>3. Preview Lists:</strong> Check what's included before adding to your trip
+                  </div>
+                  <div>
+                    <strong>4. Assign Luggage:</strong> Use the luggage button to organize by bag type
+                  </div>
+                  <div>
+                    <strong>5. Check Airlines:</strong> View baggage limits for your airline
+                  </div>
+                  <div>
+                    <strong>6. Pack & Track:</strong> Check off items as you pack them
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex justify-center">
+            <div className="mt-6 md:mt-8 flex justify-center">
               <Button 
                 onClick={() => setShowHelp(false)}
-                className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl ${largeTextMode ? 'px-10 py-4 text-xl' : 'px-8 py-3'}`}
+                className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl md:rounded-2xl ${largeTextMode ? 'px-8 py-4 text-lg md:text-xl' : 'px-6 py-3 md:px-8 md:py-3'}`}
               >
-                <Check className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4'} mr-2`} />
+                <Check className={`${largeTextMode ? 'h-5 w-5 md:h-6 md:w-6' : 'h-4 w-4'} mr-2`} />
                 Got it, let's start packing!
               </Button>
             </div>
