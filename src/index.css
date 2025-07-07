@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,19 +40,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -92,6 +86,29 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* High Contrast Mode */
+  .contrast-more {
+    --background: 0 0% 0%;
+    --foreground: 60 100% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 60 100% 100%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 60 100% 100%;
+    --primary: 60 100% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 60 100% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 60 100% 85%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 60 100% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 60 100% 100%;
+    --border: 60 100% 100%;
+    --input: 0 0% 15%;
+    --ring: 60 100% 100%;
+  }
 }
 
 @layer base {
@@ -102,4 +119,172 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Smooth scrolling for better mobile experience */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+
+  /* Mobile-first touch targets */
+  @media (max-width: 768px) {
+    button, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Dyslexia-friendly font */
+  .font-mono {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* High contrast mode enhancements */
+  .contrast-more button {
+    border: 2px solid currentColor !important;
+  }
+
+  .contrast-more input {
+    border: 2px solid currentColor !important;
+  }
+
+  /* Large text mode */
+  .text-lg {
+    font-size: 1.125rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  .text-lg h1 {
+    font-size: 3rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .text-lg h2 {
+    font-size: 2.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .text-lg h3 {
+    font-size: 2rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Pull to refresh styling */
+  .pull-to-refresh {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease;
+  }
+
+  .pull-to-refresh.active {
+    transform: translateY(0);
+  }
+
+  /* Drag and drop styling */
+  .drag-over {
+    @apply bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700 border-2 border-dashed;
+  }
+
+  .dragging {
+    @apply opacity-50 transform scale-95;
+  }
+
+  /* Game mode animations */
+  @keyframes levelUp {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .level-up {
+    animation: levelUp 0.6s ease-in-out;
+  }
+
+  @keyframes xpGain {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-30px); opacity: 0; }
+  }
+
+  .xp-gain {
+    animation: xpGain 1s ease-out forwards;
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 640px) {
+  .mobile-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mobile-spacing > * + * {
+    margin-top: 1rem;
+  }
+
+  .mobile-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .mobile-button {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.contrast-more button:focus-visible,
+.contrast-more input:focus-visible,
+.contrast-more [role="button"]:focus-visible {
+  outline: 3px solid #ffff00;
+  outline-offset: 2px;
 }

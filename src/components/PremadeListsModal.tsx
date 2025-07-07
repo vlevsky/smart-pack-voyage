@@ -1,529 +1,194 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, MapPin, Calendar, Users, Sparkles, Eye, Plus, Minus, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 
 interface PremadeListsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddItems: (items: Array<{ name: string; category: string; quantity?: number; luggage?: string }>) => void;
+  onAddItems: (items: Array<{ name: string; category: string; quantity?: number }>) => void;
 }
 
-interface SmartListItem {
-  name: string;
-  category: string;
-  quantity: number;
-  luggage?: string;
-  required?: boolean;
-  weatherDependent?: boolean;
-  description?: string;
-}
-
-interface SmartList {
+interface PremadeList {
   id: string;
   name: string;
-  destination: string;
-  type: string;
-  season: string;
-  duration: string;
   description: string;
-  items: SmartListItem[];
+  destinationType: string;
+  season?: string;
+  items: Array<{ name: string; category: string; quantity?: number }>;
 }
 
-const smartLists: SmartList[] = [
+const premadeLists: PremadeList[] = [
   {
-    id: 'hawaii-beach',
+    id: 'hawaii-beach-vacation',
     name: 'Hawaii Beach Vacation',
-    destination: 'Hawaii',
-    type: 'Beach',
-    season: 'Summer',
-    duration: '7 days',
-    description: 'Perfect for tropical beach getaways with sun, surf, and relaxation',
+    description: 'Essential items for a relaxing beach vacation in Hawaii.',
+    destinationType: 'beach',
+    season: 'summer',
     items: [
-      { name: 'Swimsuit', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
-      { name: 'Beach cover-up', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
-      { name: 'Sundresses', category: 'clothes', quantity: 3, luggage: 'checked', required: false },
-      { name: 'Shorts', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
-      { name: 'Tank tops', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
-      { name: 'Light cardigan', category: 'clothes', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Flip flops', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Sandals', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Sun hat', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Underwear', category: 'clothes', quantity: 8, luggage: 'checked', required: true },
-      { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 2, luggage: 'checked', required: true },
-      { name: 'After-sun lotion', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Waterproof mascara', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Leave-in conditioner', category: 'toiletries', quantity: 1, luggage: 'checked', required: false },
-      { name: 'Body wash', category: 'toiletries', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Waterproof phone case', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Bluetooth speaker', category: 'electronics', quantity: 1, luggage: 'checked', required: false },
-      { name: 'Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal', required: false },
-      { name: 'Beach towel', category: 'miscellaneous', quantity: 2, luggage: 'checked', required: true },
-      { name: 'Snorkel gear', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: false },
-      { name: 'Beach bag', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Sunglasses', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
-    ]
+      { name: 'Swimsuit', category: 'clothes', quantity: 2 },
+      { name: 'Sunscreen', category: 'toiletries' },
+      { name: 'Sunglasses', category: 'miscellaneous' },
+      { name: 'Beach towel', category: 'miscellaneous' },
+      { name: 'Flip flops', category: 'clothes' },
+    ],
   },
-  
   {
-    id: 'paris-getaway',
-    name: 'Paris Romantic Getaway',
-    destination: 'Paris, France',
-    type: 'City',
-    season: 'Spring/Fall',
-    duration: '5 days',
-    description: 'Elegant city break with romantic dinners and museum visits',
+    id: 'paris-city-break',
+    name: 'Paris City Break',
+    description: 'A curated list for exploring the romantic streets of Paris.',
+    destinationType: 'city',
+    season: 'spring',
     items: [
-      { name: 'Dress pants', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
-      { name: 'Nice blouses', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
-      { name: 'Little black dress', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Light jacket', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Scarf', category: 'clothes', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Underwear', category: 'clothes', quantity: 6, luggage: 'checked', required: true },
-      { name: 'Nice perfume', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Makeup essentials', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Hair styling tools', category: 'toiletries', quantity: 1, luggage: 'checked', required: false },
-      { name: 'European adapter', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Phone charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Passport', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Museum passes', category: 'documents', quantity: 1, luggage: 'personal', required: false },
-      { name: 'Small crossbody bag', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Guidebook', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'French phrasebook', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: false },
-    ]
+      { name: 'Comfortable walking shoes', category: 'clothes' },
+      { name: 'Light jacket', category: 'clothes' },
+      { name: 'Travel adapter', category: 'electronics' },
+      { name: 'Phrasebook', category: 'documents' },
+      { name: 'Reusable water bottle', category: 'miscellaneous' },
+    ],
   },
-
   {
-    id: 'nyc-weekend',
-    name: 'NYC Weekend Trip',
-    destination: 'New York City',
-    type: 'City',
-    season: 'All Season',
-    duration: '3 days',
-    description: 'Fast-paced city adventure with shows, food, and sightseeing',
+    id: 'camping-adventure',
+    name: 'Camping Adventure',
+    description: 'All the essentials for a weekend camping trip in the wilderness.',
+    destinationType: 'outdoors',
+    season: 'fall',
     items: [
-      { name: 'Comfortable jeans', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
-      { name: 'Casual shirts', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
-      { name: 'One nice outfit', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Light jacket', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'carry-on', required: true },
-      { name: 'Socks', category: 'clothes', quantity: 4, luggage: 'carry-on', required: true },
-      { name: 'Portable charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Phone', category: 'electronics', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'ID/Driver\'s license', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Credit cards', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Show tickets', category: 'documents', quantity: 1, luggage: 'personal', required: false },
-      { name: 'Subway map', category: 'miscellaneous', quantity: 1, luggage: 'personal', required: false },
-      { name: 'Umbrella', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Cash for tips', category: 'miscellaneous', quantity: 1, luggage: 'personal', required: true },
-    ]
+      { name: 'Tent', category: 'miscellaneous' },
+      { name: 'Sleeping bag', category: 'miscellaneous' },
+      { name: 'Headlamp', category: 'electronics' },
+      { name: 'Insect repellent', category: 'toiletries' },
+      { name: 'First aid kit', category: 'miscellaneous' },
+    ],
   },
-
+  {
+    id: 'ski-trip',
+    name: 'Ski Trip',
+    description: 'Gear and clothing for a fun and safe ski trip in the mountains.',
+    destinationType: 'outdoors',
+    season: 'winter',
+    items: [
+      { name: 'Ski jacket', category: 'clothes' },
+      { name: 'Ski pants', category: 'clothes' },
+      { name: 'Gloves', category: 'clothes' },
+      { name: 'Goggles', category: 'miscellaneous' },
+      { name: 'Thermal underwear', category: 'clothes' },
+    ],
+  },
   {
     id: 'business-trip',
     name: 'Business Trip',
-    destination: 'Any City',
-    type: 'Business',
-    season: 'All Season',
-    duration: '4 days',
-    description: 'Professional meetings and presentations',
+    description: 'Professional attire and gadgets for a successful business trip.',
+    destinationType: 'business',
     items: [
-      { name: 'Business suits', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
-      { name: 'Dress shirts', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
-      { name: 'Ties', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
-      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Belt', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Underwear', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
-      { name: 'Dress socks', category: 'clothes', quantity: 5, luggage: 'checked', required: true },
-      { name: 'Laptop', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Laptop charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Phone charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Business cards', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Meeting schedules', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Company ID', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Professional cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Portfolio', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
-    ]
+      { name: 'Laptop', category: 'electronics' },
+      { name: 'Charger', category: 'electronics' },
+      { name: 'Dress shirts', category: 'clothes', quantity: 3 },
+      { name: 'Dress pants', category: 'clothes', quantity: 2 },
+      { name: 'Business cards', category: 'documents' },
+    ],
   },
-
   {
-    id: 'ski-trip',
-    name: 'Winter Ski Trip',
-    destination: 'Mountain Resort',
-    type: 'Winter Sports',
-    season: 'Winter',
-    duration: '5 days',
-    description: 'Hit the slopes with all winter gear',
+    id: 'backpacking-europe',
+    name: 'Backpacking Europe',
+    description: 'Lightweight essentials for backpacking across Europe.',
+    destinationType: 'city',
+    season: 'summer',
     items: [
-      { name: 'Ski jacket', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Ski pants', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Thermal underwear', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
-      { name: 'Wool socks', category: 'clothes', quantity: 6, luggage: 'checked', required: true },
-      { name: 'Gloves', category: 'clothes', quantity: 2, luggage: 'carry-on', required: true },
-      { name: 'Beanie', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Goggles', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Après-ski boots', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Casual winter clothes', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
-      { name: 'GoPro camera', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Hand warmers', category: 'miscellaneous', quantity: 10, luggage: 'checked', required: true },
-      { name: 'Lip balm with SPF', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Lift tickets', category: 'documents', quantity: 1, luggage: 'personal', required: false },
-    ]
+      { name: 'Backpack', category: 'miscellaneous' },
+      { name: 'Travel towel', category: 'miscellaneous' },
+      { name: 'Universal adapter', category: 'electronics' },
+      { name: 'Padlock', category: 'miscellaneous' },
+      { name: 'Quick-dry clothing', category: 'clothes', quantity: 3 },
+    ],
   },
-
   {
-    id: 'business-nyc',
-    name: 'Business Trip NYC',
-    destination: 'New York City',
-    type: 'Business',
-    season: 'All Season',
-    duration: '3 days',
-    description: 'Professional attire and essentials for Manhattan business meetings',
+    id: 'cruise-vacation',
+    name: 'Cruise Vacation',
+    description: 'Items for a relaxing and enjoyable cruise vacation.',
+    destinationType: 'beach',
     items: [
-      // Clothes
-      { name: 'Business suits', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
-      { name: 'Dress shirts', category: 'clothes', quantity: 3, luggage: 'checked', required: true },
-      { name: 'Ties', category: 'clothes', quantity: 3, luggage: 'carry-on', required: true },
-      { name: 'Dress shoes', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Belt', category: 'clothes', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Blazer', category: 'clothes', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Dress pants', category: 'clothes', quantity: 2, luggage: 'checked', required: true },
-      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
-      { name: 'Dress socks', category: 'clothes', quantity: 4, luggage: 'checked', required: true },
-      
-      // Electronics
-      { name: 'Laptop', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Laptop charger', category: 'electronics', quantity: 1, luggage: 'carry-on', required: true },
-      { name: 'Business cards', category: 'electronics', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Presentation remote', category: 'electronics', quantity: 1, luggage: 'carry-on', required: false },
-      
-      // Documents
-      { name: 'Meeting schedules', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Company ID', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      { name: 'Hotel confirmation', category: 'documents', quantity: 1, luggage: 'personal', required: true },
-      
-      // Toiletries
-      { name: 'Professional cologne', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      { name: 'Hair styling gel', category: 'toiletries', quantity: 1, luggage: 'carry-on', required: false },
-      
-      // Miscellaneous
-      { name: 'Umbrella', category: 'miscellaneous', quantity: 1, luggage: 'checked', required: true },
-      { name: 'Portfolio', category: 'miscellaneous', quantity: 1, luggage: 'carry-on', required: true },
-    ]
+      { name: 'Formal wear', category: 'clothes' },
+      { name: 'Swimsuit', category: 'clothes', quantity: 2 },
+      { name: 'Sun hat', category: 'clothes' },
+      { name: 'Motion sickness pills', category: 'toiletries' },
+      { name: 'Binoculars', category: 'miscellaneous' },
+    ],
   },
-
   {
-    id: 'music-festival',
-    name: 'Music Festival Weekend',
-    destination: 'Festival Grounds',
-    type: 'Entertainment',
-    season: 'Summer',
-    duration: '3 days',
-    description: 'Everything you need for an epic music festival experience',
+    id: 'road-trip',
+    name: 'Road Trip',
+    description: 'Essentials for a safe and fun road trip adventure.',
+    destinationType: 'outdoors',
     items: [
-      // Clothes
-      { name: 'Comfortable t-shirts', category: 'clothes', quantity: 4, luggage: 'backpack' },
-      { name: 'Shorts', category: 'clothes', quantity: 2, luggage: 'backpack' },
-      { name: 'Comfortable sneakers', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Rain poncho', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Bandana', category: 'clothes', quantity: 2, luggage: 'backpack' },
-      { name: 'Hat', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Underwear', category: 'clothes', quantity: 4, luggage: 'backpack' },
-      { name: 'Socks', category: 'clothes', quantity: 4, luggage: 'backpack' },
-      
-      // Electronics
-      { name: 'Portable phone charger', category: 'electronics', quantity: 2, luggage: 'backpack' },
-      { name: 'Charging cables', category: 'electronics', quantity: 2, luggage: 'backpack' },
-      { name: 'Waterproof phone pouch', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      
-      // Toiletries
-      { name: 'Wet wipes', category: 'toiletries', quantity: 3, luggage: 'backpack' },
-      { name: 'Hand sanitizer', category: 'toiletries', quantity: 1, luggage: 'backpack' },
-      { name: 'Sunscreen', category: 'toiletries', quantity: 1, luggage: 'backpack' },
-      { name: 'Deodorant', category: 'toiletries', quantity: 1, luggage: 'backpack' },
-      
-      // Miscellaneous
-      { name: 'Reusable water bottle', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Earplugs', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Cash for vendors', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
-      { name: 'Fanny pack', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Festival tickets', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
-    ]
+      { name: 'Car charger', category: 'electronics' },
+      { name: 'Phone mount', category: 'miscellaneous' },
+      { name: 'Snacks', category: 'miscellaneous' },
+      { name: 'Road maps', category: 'documents' },
+      { name: 'Sunglasses', category: 'miscellaneous' },
+    ],
   },
-
   {
-    id: 'disney-world',
-    name: 'Disney World Family Trip',
-    destination: 'Orlando, FL',
-    type: 'Family',
-    season: 'All Season',
-    duration: '5 days',
-    description: 'Magical family vacation with everything for Disney parks',
+    id: 'yoga-retreat',
+    name: 'Yoga Retreat',
+    description: 'Items for a peaceful and rejuvenating yoga retreat.',
+    destinationType: 'wellness',
     items: [
-      // Clothes
-      { name: 'Comfortable walking shoes', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Mickey ears', category: 'clothes', quantity: 4, luggage: 'carry-on' },
-      { name: 'Disney t-shirts', category: 'clothes', quantity: 6, luggage: 'checked' },
-      { name: 'Shorts', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Light jacket', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Swimsuit', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Pajamas', category: 'clothes', quantity: 2, luggage: 'checked' },
-      
-      // Electronics
-      { name: 'Portable chargers', category: 'electronics', quantity: 2, luggage: 'backpack' },
-      { name: 'Camera', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      { name: 'Disney app downloaded', category: 'electronics', quantity: 1, luggage: 'personal' },
-      
-      // Documents
-      { name: 'Park tickets', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Hotel reservation', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'FastPass reservations', category: 'documents', quantity: 1, luggage: 'personal' },
-      
-      // Miscellaneous
-      { name: 'Stroller', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Snacks', category: 'miscellaneous', quantity: 10, luggage: 'backpack' },
-      { name: 'Water bottles', category: 'miscellaneous', quantity: 4, luggage: 'backpack' },
-      { name: 'Autograph book', category: 'miscellaneous', quantity: 2, luggage: 'backpack' },
-      { name: 'Ponchos', category: 'miscellaneous', quantity: 4, luggage: 'backpack' },
-      { name: 'First aid kit', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-    ]
+      { name: 'Yoga mat', category: 'miscellaneous' },
+      { name: 'Comfortable clothing', category: 'clothes', quantity: 3 },
+      { name: 'Water bottle', category: 'miscellaneous' },
+      { name: 'Meditation cushion', category: 'miscellaneous' },
+      { name: 'Essential oils', category: 'toiletries' },
+    ],
   },
-
   {
     id: 'safari-adventure',
-    name: 'African Safari',
-    destination: 'Kenya/Tanzania',
-    type: 'Adventure',
-    season: 'Dry Season',
-    duration: '10 days',
-    description: 'Ultimate safari experience with wildlife viewing essentials',
+    name: 'Safari Adventure',
+    description: 'Clothing and gear for an exciting safari adventure.',
+    destinationType: 'outdoors',
     items: [
-      // Clothes
-      { name: 'Khaki pants', category: 'clothes', quantity: 4, luggage: 'checked' },
-      { name: 'Long-sleeve shirts', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Safari hat', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Hiking boots', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Light fleece', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Bandanas', category: 'clothes', quantity: 3, luggage: 'checked' },
-      
-      // Electronics
-      { name: 'Binoculars', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Camera with zoom lens', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Extra camera batteries', category: 'electronics', quantity: 4, luggage: 'carry-on' },
-      { name: 'Headlamp', category: 'electronics', quantity: 1, luggage: 'checked' },
-      
-      // Toiletries
-      { name: 'Insect repellent DEET', category: 'toiletries', quantity: 2, luggage: 'checked' },
-      { name: 'Sunscreen SPF 50+', category: 'toiletries', quantity: 2, luggage: 'checked' },
-      { name: 'Anti-malaria medication', category: 'toiletries', quantity: 1, luggage: 'personal' },
-      
-      // Documents
-      { name: 'Passport', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Visa', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Yellow fever certificate', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal' },
-      
-      // Miscellaneous
-      { name: 'Safari guidebook', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
-      { name: 'Dust masks', category: 'miscellaneous', quantity: 5, luggage: 'checked' },
-      { name: 'Safari vest', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-    ]
+      { name: 'Binoculars', category: 'miscellaneous' },
+      { name: 'Long-sleeved shirts', category: 'clothes', quantity: 3 },
+      { name: 'Long pants', category: 'clothes', quantity: 2 },
+      { name: 'Hat', category: 'clothes' },
+      { name: 'Insect repellent', category: 'toiletries' },
+    ],
   },
-
-  {
-    id: 'winter-skiing',
-    name: 'Ski Resort Getaway',
-    destination: 'Mountain Resort',
-    type: 'Winter Sports',
-    season: 'Winter',
-    duration: '4 days',
-    description: 'Hit the slopes with all the winter gear you need',
-    items: [
-      // Clothes
-      { name: 'Ski jacket', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Ski pants', category: 'clothes', quantity: 1, luggage: 'checked' },
-      { name: 'Thermal underwear', category: 'clothes', quantity: 3, luggage: 'checked' },
-      { name: 'Wool socks', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Gloves', category: 'clothes', quantity: 2, luggage: 'carry-on' },
-      { name: 'Beanie', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Goggles', category: 'clothes', quantity: 1, luggage: 'carry-on' },
-      { name: 'Après-ski boots', category: 'clothes', quantity: 1, luggage: 'checked' },
-      
-      // Electronics
-      { name: 'GoPro camera', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Hand warmers', category: 'electronics', quantity: 10, luggage: 'checked' },
-      
-      // Documents
-      { name: 'Lift tickets', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Ski lesson reservations', category: 'documents', quantity: 1, luggage: 'personal' },
-      
-      // Miscellaneous
-      { name: 'Ski equipment rental', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
-      { name: 'Lip balm with SPF', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
-      { name: 'Hot chocolate packets', category: 'miscellaneous', quantity: 5, luggage: 'checked' },
-    ]
-  },
-
-  {
-    id: 'backpack-southeast-asia',
-    name: 'Southeast Asia Backpacking',
-    destination: 'Thailand/Vietnam/Cambodia',
-    type: 'Backpacking',
-    season: 'Dry Season',
-    duration: '21 days',
-    description: 'Budget travel through Southeast Asia with minimal gear',
-    items: [
-      // Clothes
-      { name: 'Quick-dry t-shirts', category: 'clothes', quantity: 4, luggage: 'backpack' },
-      { name: 'Lightweight pants', category: 'clothes', quantity: 2, luggage: 'backpack' },
-      { name: 'Shorts', category: 'clothes', quantity: 3, luggage: 'backpack' },
-      { name: 'Flip flops', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Walking shoes', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Rain jacket', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Sarong', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      
-      // Electronics
-      { name: 'Universal adapter', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      { name: 'Powerbank', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      { name: 'Waterproof phone case', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      
-      // Toiletries
-      { name: 'Mosquito repellent', category: 'toiletries', quantity: 2, luggage: 'backpack' },
-      { name: 'Travel-size toiletries', category: 'toiletries', quantity: 1, luggage: 'backpack' },
-      { name: 'Water purification tablets', category: 'toiletries', quantity: 1, luggage: 'backpack' },
-      
-      // Documents
-      { name: 'Passport copies', category: 'documents', quantity: 3, luggage: 'personal' },
-      { name: 'Travel insurance', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Hostel bookings', category: 'documents', quantity: 1, luggage: 'personal' },
-      
-      // Miscellaneous
-      { name: 'Money belt', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
-      { name: 'Padlock', category: 'miscellaneous', quantity: 2, luggage: 'backpack' },
-      { name: 'Travel towel', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'First aid kit', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-    ]
-  },
-
-  {
-    id: 'cruise-caribbean',
-    name: 'Caribbean Cruise',
-    destination: 'Caribbean Islands',
-    type: 'Cruise',
-    season: 'All Season',
-    duration: '7 days',
-    description: 'Luxury cruise with formal nights and tropical excursions',
-    items: [
-      // Clothes
-      { name: 'Formal dinner attire', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Cocktail dresses', category: 'clothes', quantity: 3, luggage: 'checked' },
-      { name: 'Swimsuits', category: 'clothes', quantity: 3, luggage: 'carry-on' },
-      { name: 'Cover-ups', category: 'clothes', quantity: 2, luggage: 'carry-on' },
-      { name: 'Casual dinner outfits', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Dress shoes', category: 'clothes', quantity: 2, luggage: 'checked' },
-      { name: 'Sandals', category: 'clothes', quantity: 2, luggage: 'checked' },
-      
-      // Electronics
-      { name: 'Underwater camera', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'Cruise app downloaded', category: 'electronics', quantity: 1, luggage: 'personal' },
-      
-      // Documents
-      { name: 'Cruise documents', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Excursion bookings', category: 'documents', quantity: 1, luggage: 'personal' },
-      { name: 'Passport', category: 'documents', quantity: 1, luggage: 'personal' },
-      
-      // Miscellaneous
-      { name: 'Formal jewelry', category: 'miscellaneous', quantity: 1, luggage: 'carry-on' },
-      { name: 'Beach bag', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Seasickness medication', category: 'miscellaneous', quantity: 1, luggage: 'personal' },
-    ]
-  },
-
-  {
-    id: 'camping-weekend',
-    name: 'Weekend Camping Trip',
-    destination: 'National Park',
-    type: 'Camping',
-    season: 'Summer',
-    duration: '2 days',
-    description: 'Everything needed for a perfect camping weekend in nature',
-    items: [
-      // Clothes
-      { name: 'Hiking boots', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Hiking pants', category: 'clothes', quantity: 2, luggage: 'backpack' },
-      { name: 'Moisture-wicking shirts', category: 'clothes', quantity: 3, luggage: 'backpack' },
-      { name: 'Warm jacket', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Rain gear', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      { name: 'Hat', category: 'clothes', quantity: 1, luggage: 'backpack' },
-      
-      // Electronics
-      { name: 'Headlamp', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      { name: 'Flashlight', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      { name: 'Portable battery pack', category: 'electronics', quantity: 1, luggage: 'backpack' },
-      
-      // Miscellaneous
-      { name: 'Tent', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Sleeping bag', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Sleeping pad', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Camping stove', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Water bottles', category: 'miscellaneous', quantity: 2, luggage: 'backpack' },
-      { name: 'Fire starter', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'First aid kit', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-      { name: 'Bug spray', category: 'miscellaneous', quantity: 1, luggage: 'backpack' },
-    ]
-  },
-
-  {
-    id: 'baby-travel',
-    name: 'Baby Travel Essentials',
-    destination: 'Family Visit',
-    type: 'Family',
-    season: 'All Season',
-    duration: '5 days',
-    description: 'Everything needed when traveling with baby or toddler',
-    items: [
-      // Clothes
-      { name: 'Baby outfits', category: 'clothes', quantity: 8, luggage: 'checked' },
-      { name: 'Pajamas', category: 'clothes', quantity: 3, luggage: 'checked' },
-      { name: 'Bibs', category: 'clothes', quantity: 5, luggage: 'checked' },
-      { name: 'Burp cloths', category: 'clothes', quantity: 6, luggage: 'checked' },
-      { name: 'Socks', category: 'clothes', quantity: 10, luggage: 'checked' },
-      { name: 'Hat', category: 'clothes', quantity: 2, luggage: 'carry-on' },
-      
-      // Electronics
-      { name: 'Baby monitor', category: 'electronics', quantity: 1, luggage: 'carry-on' },
-      { name: 'White noise machine', category: 'electronics', quantity: 1, luggage: 'checked' },
-      
-      // Toiletries
-      { name: 'Diapers', category: 'toiletries', quantity: 30, luggage: 'checked' },
-      { name: 'Baby wipes', category: 'toiletries', quantity: 5, luggage: 'checked' },
-      { name: 'Baby lotion', category: 'toiletries', quantity: 1, luggage: 'checked' },
-      { name: 'Baby shampoo', category: 'toiletries', quantity: 1, luggage: 'checked' },
-      
-      // Miscellaneous
-      { name: 'Car seat', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Stroller', category: 'miscellaneous', quantity: 1, luggage: 'checked' },
-      { name: 'Baby toys', category: 'miscellaneous', quantity: 5, luggage: 'carry-on' },
-      { name: 'Bottles', category: 'miscellaneous', quantity: 4, luggage: 'carry-on' },
-      { name: 'Baby food', category: 'miscellaneous', quantity: 10, luggage: 'carry-on' },
-      { name: 'Pacifiers', category: 'miscellaneous', quantity: 3, luggage: 'carry-on' },
-    ]
-  }
 ];
+
+const getCategoryIcon = (category: string) => {
+  switch (category) {
+    case 'beach':
+      return '🏖️';
+    case 'city':
+      return '🏙️';
+    case 'outdoors':
+      return '🏞️';
+    case 'business':
+      return '💼';
+    case 'wellness':
+      return '🧘';
+    default:
+      return '🌍';
+  }
+};
+
+interface PreviewItem {
+  name: string;
+  category: string;
+  quantity?: number;
+}
+
+interface PreviewList {
+  id: string;
+  name: string;
+  description: string;
+  destinationType: string;
+  season?: string;
+  items: PreviewItem[];
+}
 
 export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   isOpen,
@@ -531,331 +196,238 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   onAddItems,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedSeason, setSelectedSeason] = useState('all');
-  const [previewList, setPreviewList] = useState<SmartList | null>(null);
-  const [tripDuration, setTripDuration] = useState([7]);
-  const [packingStyle, setPackingStyle] = useState('balanced');
-  const [isVoiceInputEnabled, setIsVoiceInputEnabled] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedList, setSelectedList] = useState<PreviewList | null>(null);
+  const [pullToRefresh, setPullToRefresh] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
 
-  const filteredLists = smartLists.filter(currentList => {
-    const matchesSearch = currentList.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         currentList.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         currentList.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'all' || currentList.type === selectedType;
-    const matchesSeason = selectedSeason === 'all' || currentList.season === selectedSeason;
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touchCurrent = e.touches[0].clientY;
+    const touchDifference = touchCurrent - touchStart;
     
-    return matchesSearch && matchesType && matchesSeason;
+    if (touchDifference > 50 && window.scrollY === 0) {
+      setPullToRefresh(true);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullToRefresh) {
+      // Simulate refresh
+      setTimeout(() => {
+        setPullToRefresh(false);
+        // Could add actual refresh logic here
+      }, 1000);
+    }
+  };
+
+  const filteredLists = premadeLists.filter((list) => {
+    const searchRegex = new RegExp(searchTerm, 'i');
+    const matchesSearch = searchRegex.test(list.name) || searchRegex.test(list.description);
+    const matchesCategory = selectedCategory === 'all' || list.destinationType === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const adjustQuantitiesForDuration = (items: SmartListItem[], duration: number, style: string) => {
-    const multiplier = style === 'light' ? 0.7 : style === 'thorough' ? 1.3 : 1;
-    
-    return items.map(item => {
-      let newQuantity = item.quantity;
-      
-      if (item.name.toLowerCase().includes('shirt') || 
-          item.name.toLowerCase().includes('outfit') ||
-          item.name.toLowerCase().includes('underwear') ||
-          item.name.toLowerCase().includes('sock')) {
-        newQuantity = Math.max(1, Math.ceil((duration * multiplier) * (item.quantity / 7)));
-      } else if (item.name.toLowerCase().includes('pants') || 
-                 item.name.toLowerCase().includes('jean')) {
-        newQuantity = Math.max(1, Math.ceil((duration / 3) * multiplier));
-      }
-      
-      return { ...item, quantity: newQuantity };
-    });
-  };
-
-  const handlePreviewList = (selectedList: SmartList) => {
-    setPreviewList(selectedList);
-  };
-
-  const handleAddList = () => {
-    if (previewList) {
-      const adjustedItems = adjustQuantitiesForDuration(previewList.items, tripDuration[0], packingStyle);
-      onAddItems(adjustedItems);
-      setPreviewList(null);
-      onClose();
-    }
-  };
-
-  const startVoiceInput = () => {
-    if ('webkitSpeechRecognition' in window) {
-      const recognition = new (window as any).webkitSpeechRecognition();
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setSearchTerm(transcript);
-        setIsVoiceInputEnabled(false);
-      };
-      recognition.start();
-      setIsVoiceInputEnabled(true);
-    }
-  };
+  const categoryCount = premadeLists.reduce((acc: { [key: string]: number }, list) => {
+    const category = list.destinationType;
+    acc[category] = (acc[category] || 0) + 1;
+    return acc;
+  }, {});
 
   if (!isOpen) return null;
 
-  if (previewList) {
-    const adjustedItems = adjustQuantitiesForDuration(previewList.items, tripDuration[0], packingStyle);
-    const itemsByCategory = adjustedItems.reduce((acc, item) => {
-      if (!acc[item.category]) acc[item.category] = [];
-      acc[item.category].push(item);
-      return acc;
-    }, {} as Record<string, SmartListItem[]>);
-
-    return (
-      <AnimatePresence>
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white dark:bg-gray-900 rounded-3xl p-4 md:p-6 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
-          >
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                  Preview: {previewList.name}
-                </h2>
-                <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">{previewList.description}</p>
-              </div>
-              <Button variant="ghost" onClick={() => setPreviewList(null)} className="rounded-full h-8 w-8 md:h-10 md:w-10">
-                <X className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </div>
-
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 md:p-4 mb-4 md:mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Trip Duration: {tripDuration[0]} days</label>
-                  <Slider
-                    value={tripDuration}
-                    onValueChange={setTripDuration}
-                    max={30}
-                    min={1}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Packing Style</label>
-                  <Select value={packingStyle} onValueChange={setPackingStyle}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">🟢 Light (Carry-on only)</SelectItem>
-                      <SelectItem value="balanced">🟨 Balanced</SelectItem>
-                      <SelectItem value="thorough">🟥 Thorough (Everything)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-y-auto max-h-[50vh] space-y-3 md:space-y-4">
-              {Object.entries(itemsByCategory).map(([category, items]) => (
-                <div key={category} className="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border border-gray-200 dark:border-gray-700">
-                  <h3 className="font-semibold text-base md:text-lg mb-3 capitalize flex items-center gap-2">
-                    {category === 'clothes' && '👕'}
-                    {category === 'toiletries' && '🧴'}
-                    {category === 'electronics' && '📱'}
-                    {category === 'documents' && '📋'}
-                    {category === 'miscellaneous' && '🎒'}
-                    {category} ({items.length} items)
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {items.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <span className="text-sm">{item.name}</span>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            x{item.quantity}
-                          </Badge>
-                          {item.luggage && (
-                            <Badge className="text-xs bg-blue-500 text-white">
-                              {item.luggage}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 md:mt-6 flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={handleAddList}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-2xl font-semibold"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add {adjustedItems.length} Items to My Trip
-              </Button>
-              <Button variant="outline" onClick={() => setPreviewList(null)} className="px-6 py-3 rounded-2xl">
-                Cancel
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </AnimatePresence>
-    );
-  }
-
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="bg-white dark:bg-gray-900 rounded-3xl p-4 md:p-6 max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between mb-4 md:mb-6">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col"
+      >
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Smart Packing Lists ✨
-              </h2>
-              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-1">
-                Choose from expertly curated lists for your destination
+              <h2 className="text-xl md:text-2xl font-bold">Smart Packing Lists</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {premadeLists.length} curated lists for every adventure
               </p>
             </div>
-            <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 md:h-10 md:w-10">
-              <X className="h-4 w-4 md:h-5 md:w-5" />
+          </div>
+          <Button variant="ghost" onClick={onClose} className="rounded-full h-10 w-10 p-0">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4 p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search destinations, activities, or items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-12"
+            />
+          </div>
+          
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <Button
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('all')}
+              className="whitespace-nowrap"
+            >
+              All ({premadeLists.length})
             </Button>
-          </div>
-
-          <div className="mb-4 md:mb-6 space-y-3 md:space-y-4">
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search destinations, activities, or trip types..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 rounded-2xl border-2 focus:border-blue-500 h-12"
-                />
-              </div>
+            {Object.entries(categoryCount).map(([category, count]) => (
               <Button
-                variant="outline"
-                onClick={startVoiceInput}
-                disabled={isVoiceInputEnabled}
-                className="rounded-2xl px-4 h-12"
+                key={category}
+                variant={selectedCategory === category ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory(category)}
+                className="whitespace-nowrap capitalize"
               >
-                <Volume2 className={`h-4 w-4 ${isVoiceInputEnabled ? 'text-red-500' : ''}`} />
+                {category} ({count})
               </Button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-full sm:w-48 rounded-2xl h-12">
-                  <SelectValue placeholder="Trip Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Beach">Beach</SelectItem>
-                  <SelectItem value="City">City</SelectItem>
-                  <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="Adventure">Adventure</SelectItem>
-                  <SelectItem value="Family">Family</SelectItem>
-                  <SelectItem value="Winter Sports">Winter Sports</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-                <SelectTrigger className="w-full sm:w-48 rounded-2xl h-12">
-                  <SelectValue placeholder="Season" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Seasons</SelectItem>
-                  <SelectItem value="Spring">Spring</SelectItem>
-                  <SelectItem value="Summer">Summer</SelectItem>
-                  <SelectItem value="Fall">Fall</SelectItem>
-                  <SelectItem value="Winter">Winter</SelectItem>
-                  <SelectItem value="All Season">All Season</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            ))}
           </div>
+        </div>
 
-          <div className="overflow-y-auto max-h-[calc(90vh-300px)]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {filteredLists.map((smartList) => (
-                <motion.div
-                  key={smartList.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-4 md:p-5 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-200"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-1">
-                        {smartList.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-2">
-                        <MapPin className="h-3 w-3" />
-                        <span>{smartList.destination}</span>
-                        <Calendar className="h-3 w-3 ml-2" />
-                        <span>{smartList.duration}</span>
+        <div 
+          className="flex-1 overflow-y-auto"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {pullToRefresh && (
+            <div className="flex items-center justify-center py-4 text-blue-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-2"></div>
+              Refreshing lists...
+            </div>
+          )}
+
+          <div className="p-4 md:p-6">
+            {filteredLists.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold mb-2">No lists found</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Try adjusting your search or category filter
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {filteredLists.map((list) => (
+                  <motion.div
+                    key={list.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 hover:shadow-lg transition-all cursor-pointer group"
+                    onClick={() => setSelectedList(list)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {list.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          {list.description}
+                        </p>
+                      </div>
+                      <div className="ml-3 text-2xl">
+                        {getCategoryIcon(list.destinationType)}
                       </div>
                     </div>
-                    <Badge className="bg-blue-500 text-white text-xs">
-                      {smartList.type}
-                    </Badge>
-                  </div>
 
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                    {smartList.description}
-                  </p>
+                    <div className="flex items-center gap-2 mb-3">
+                      {list.season && (
+                        <Badge variant="secondary" className="text-xs">
+                          {list.season}
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        {list.destinationType}
+                      </Badge>
+                    </div>
 
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    <span>{smartList.items.length} items</span>
-                    <span>{smartList.season}</span>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePreviewList(smartList)}
-                      className="flex-1 rounded-xl border-blue-200 hover:border-blue-400 h-9"
-                    >
-                      <Eye className="h-3 w-3 mr-1" />
-                      Preview
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        onAddItems(smartList.items);
-                        onClose();
-                      }}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl h-9"
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {filteredLists.length === 0 && (
-              <div className="text-center py-12">
-                <Sparkles className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  No lists found
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Try adjusting your search or filters
-                </p>
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                      <span>{Array.isArray(list.items) ? list.items.length : 0} items</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-medium">
+                        Preview →
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             )}
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+        </div>
+
+        {selectedList && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-2 md:p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold">{selectedList.name}</h3>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      onAddItems(selectedList.items);
+                      onClose();
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600"
+                  >
+                    Add All Items
+                  </Button>
+                  <Button variant="ghost" onClick={() => setSelectedList(null)} className="rounded-full h-10 w-10 p-0">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                {selectedList.items.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🗂️</div>
+                    <h3 className="text-xl font-semibold mb-2">No items in this list</h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      This list is currently empty.
+                    </p>
+                  </div>
+                ) : (
+                  <ul className="space-y-3">
+                    {selectedList.items.map((item, index) => (
+                      <li key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                        <div>
+                          <h4 className="font-medium">{item.name}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Category: {item.category}
+                          </p>
+                        </div>
+                        {item.quantity && (
+                          <Badge variant="secondary">
+                            {item.quantity}
+                          </Badge>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   );
 };

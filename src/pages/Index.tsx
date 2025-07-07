@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar, Info, HelpCircle, Menu, Volume2, Luggage, Eye, ZoomIn, Target, DollarSign, Clock, Shield, X, Contrast, Type, Volume, VolumeX, Accessibility } from 'lucide-react';
+import { Plus, Settings, Moon, Sun, RotateCcw, Edit3, Check, Sparkles, List, Grid3X3, Package, MapPin, Calendar, Info, HelpCircle, Menu, Volume2, Luggage, Eye, ZoomIn, Target, DollarSign, Clock, Shield, X, Contrast, Type, Volume, VolumeX, Accessibility, Bot, Save, Trophy, CreditCard } from 'lucide-react';
 import { CategorySection } from '@/components/CategorySection';
 import { ProgressBar } from '@/components/ProgressBar';
 import { PremadeListsModal } from '@/components/PremadeListsModal';
@@ -8,6 +8,11 @@ import { LuggageView } from '@/components/LuggageView';
 import { LuggageLimitsModal } from '@/components/LuggageLimitsModal';
 import { TripSelector, Trip } from '@/components/TripSelector';
 import { SimpleModeToggle } from '@/components/SimpleModeToggle';
+import { SubscriptionModal } from '@/components/SubscriptionModal';
+import { AIPackingAssistant } from '@/components/AIPackingAssistant';
+import { TripTemplates } from '@/components/TripTemplates';
+import { TripCountdown } from '@/components/TripCountdown';
+import { PackingGameMode } from '@/components/PackingGameMode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +53,12 @@ const Index = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [voiceNavigationEnabled, setVoiceNavigationEnabled] = useState(false);
+  const [showSubscription, setShowSubscription] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [gameMode, setGameMode] = useState(false);
+  const [subscription, setSubscription] = useState<string | null>(null);
+  const [dragDropMode, setDragDropMode] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -129,6 +140,20 @@ const Index = () => {
       setCurrentTripId(defaultTrip.id);
     }
   }, [trips.length]);
+
+  useEffect(() => {
+    const savedSubscription = localStorage.getItem('subscription');
+    const savedGameMode = localStorage.getItem('gameMode');
+    if (savedSubscription) setSubscription(savedSubscription);
+    if (savedGameMode) setGameMode(JSON.parse(savedGameMode));
+  }, []);
+
+  useEffect(() => {
+    if (subscription) {
+      localStorage.setItem('subscription', subscription);
+    }
+    localStorage.setItem('gameMode', JSON.stringify(gameMode));
+  }, [subscription, gameMode]);
 
   const startVoiceNavigation = () => {
     if ('webkitSpeechRecognition' in window) {
@@ -324,6 +349,56 @@ const Index = () => {
     }
   };
 
+  const handleSubscribe = (tier: string) => {
+    setSubscription(tier);
+    toast({
+      title: "Subscription activated!",
+      description: `Welcome to ${tier} tier! All premium features are now unlocked.`,
+    });
+  };
+
+  const handleAIGenerateList = (items: Array<{ name: string; category: string; quantity: number }>) => {
+    addMultipleItems(items);
+    toast({
+      title: "AI list generated!",
+      description: `Added ${items.length} items to your packing list.`,
+    });
+  };
+
+  const isFeatureLocked = (feature: string) => {
+    if (!subscription) return true;
+    
+    const tierHierarchy = {
+      'one-trip': ['basic', 'smart-lists', 'ai-assistant'],
+      'silver': ['basic', 'smart-lists', 'templates'],
+      'gold': ['basic', 'smart-lists', 'ai-assistant', 'templates', 'game-mode'],
+      'exclusive': ['basic', 'smart-lists', 'ai-assistant', 'templates', 'game-mode', 'advanced-features']
+    };
+    
+    return !tierHierarchy[subscription as keyof typeof tierHierarchy]?.includes(feature);
+  };
+
+  const LockedFeatureButton = ({ feature, children, onClick }: { feature: string; children: React.ReactNode; onClick: () => void }) => {
+    const locked = isFeatureLocked(feature);
+    
+    return (
+      <div className="relative">
+        <Button
+          onClick={locked ? () => setShowSubscription(true) : onClick}
+          className={`${locked ? 'opacity-75 cursor-not-allowed' : ''} relative`}
+          disabled={locked}
+        >
+          {children}
+          {locked && (
+            <div className="absolute -top-1 -right-1 bg-yellow-500 rounded-full p-1">
+              <CreditCard className="h-3 w-3 text-white" />
+            </div>
+          )}
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className={`min-h-screen transition-all duration-500 ${
       darkMode ? 'dark' : ''
@@ -360,19 +435,28 @@ const Index = () => {
               </motion.h1>
               
               {!simpleMode && (
-                <>
-                  <Button
-                    variant="outline"
+                <div className="flex gap-2">
+                  <LockedFeatureButton
+                    feature="smart-lists"
                     onClick={() => {
                       setShowPremadeLists(true);
                       speakText("Opening smart packing lists");
                     }}
-                    className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 ${largeTextMode ? 'text-base px-4 py-2' : 'text-sm px-3 py-2'} md:px-6 md:py-3 md:text-base`}
                   >
                     <Sparkles className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-1 md:mr-2`} />
                     <span className="hidden sm:inline">Smart Lists</span>
-                    <span className="sm:hidden">Lists</span>
-                  </Button>
+                  </LockedFeatureButton>
+
+                  <LockedFeatureButton
+                    feature="ai-assistant"
+                    onClick={() => {
+                      setShowAIAssistant(true);
+                      speakText("Opening AI packing assistant");
+                    }}
+                  >
+                    <Bot className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-1`} />
+                    <span className="hidden md:inline">AI Assistant</span>
+                  </LockedFeatureButton>
 
                   <Button
                     variant="outline"
@@ -385,7 +469,7 @@ const Index = () => {
                     <Package className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-1`} />
                     <span className="hidden md:inline">Airlines</span>
                   </Button>
-                </>
+                </div>
               )}
             </div>
 
@@ -401,6 +485,23 @@ const Index = () => {
               <Menu className={`${largeTextMode ? 'h-6 w-6' : 'h-4 w-4 md:h-5 md:w-5'}`} />
             </Button>
           </div>
+
+          {currentTrip && (
+            <TripCountdown
+              tripName={currentTrip.name}
+              destination={currentTrip.destination}
+              startDate={currentTrip.startDate}
+              endDate={currentTrip.endDate}
+            />
+          )}
+
+          <PackingGameMode
+            isEnabled={gameMode}
+            onToggle={setGameMode}
+            packedItems={packedItems}
+            totalItems={totalItems}
+            onItemPacked={() => {}}
+          />
 
           {currentTrip && (
             <motion.div 
@@ -478,6 +579,24 @@ const Index = () => {
               </div>
 
               <div className="space-y-6">
+                {!subscription && (
+                  <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CreditCard className="h-5 w-5" />
+                      <span className="font-semibold">Upgrade to Premium</span>
+                    </div>
+                    <p className="text-sm opacity-90 mb-3">
+                      Unlock AI assistant, advanced templates, and more!
+                    </p>
+                    <Button
+                      onClick={() => setShowSubscription(true)}
+                      className="bg-white text-blue-600 hover:bg-gray-100 text-sm"
+                    >
+                      View Plans
+                    </Button>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold flex items-center gap-2`}>
                     <Eye className="h-4 w-4" />
@@ -507,6 +626,15 @@ const Index = () => {
                     >
                       {checklistMode ? <Grid3X3 className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} /> : <List className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />}
                       {checklistMode ? 'Grid View' : 'Checklist Mode'}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setDragDropMode(!dragDropMode)}
+                      className={`w-full justify-start ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
+                    >
+                      <Luggage className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Drag & Drop Luggage
                     </Button>
                   </div>
                 </div>
@@ -566,6 +694,31 @@ const Index = () => {
                 </div>
 
                 <div className="space-y-4">
+                  <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold`}>Premium Features</h4>
+                  
+                  <div className="space-y-3">
+                    <LockedFeatureButton
+                      feature="templates"
+                      onClick={() => {
+                        setShowTemplates(true);
+                        setShowMenu(false);
+                      }}
+                    >
+                      <Save className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Trip Templates
+                    </LockedFeatureButton>
+
+                    <LockedFeatureButton
+                      feature="game-mode"
+                      onClick={() => setGameMode(!gameMode)}
+                    >
+                      <Trophy className={`${largeTextMode ? 'h-5 w-5' : 'h-4 w-4'} mr-2`} />
+                      Game Mode
+                    </LockedFeatureButton>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
                   <h4 className={`${largeTextMode ? 'text-base md:text-lg' : 'text-sm md:text-base'} font-semibold`}>Actions</h4>
                   
                   <div className="space-y-3">
@@ -585,6 +738,7 @@ const Index = () => {
                     <Button
                       variant="outline"
                       onClick={() => {
+                        resetList();
                         setShowMenu(false);
                       }}
                       className={`w-full justify-start hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 ${largeTextMode ? 'text-base py-4' : 'text-sm py-3'}`}
@@ -747,6 +901,32 @@ const Index = () => {
       <LuggageLimitsModal
         isOpen={showLuggageLimits}
         onClose={() => setShowLuggageLimits(false)}
+      />
+
+      <SubscriptionModal
+        isOpen={showSubscription}
+        onClose={() => setShowSubscription(false)}
+        onSubscribe={handleSubscribe}
+      />
+
+      <AIPackingAssistant
+        isOpen={showAIAssistant}
+        onClose={() => setShowAIAssistant(false)}
+        onGenerateList={handleAIGenerateList}
+      />
+
+      <TripTemplates
+        isOpen={showTemplates}
+        onClose={() => setShowTemplates(false)}
+        onLoadTemplate={(template) => {
+          setItems(template.items);
+          toast({
+            title: "Template loaded!",
+            description: `Loaded ${template.items.length} items from ${template.name}`,
+          });
+        }}
+        currentItems={items}
+        currentTrip={currentTrip}
       />
 
       {showHelp && (
