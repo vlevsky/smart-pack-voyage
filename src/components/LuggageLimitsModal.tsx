@@ -42,46 +42,21 @@ interface AirlineData {
 }
 
 const airlines: AirlineData[] = [
+  // US Major Airlines
   {
     name: 'Delta Air Lines',
     code: 'DL',
     logo: '✈️',
     baggage: {
       economy: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 50, kg: 23 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' },
-          weight: { lbs: 22, kg: 10 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 50, kg: 23 },
-          fee: { domestic: 30, international: 60 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 50, kg: 23 } },
+        personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 22, kg: 10 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 60 } }],
       },
       business: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 50, kg: 23 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' },
-          weight: { lbs: 22, kg: 10 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 70, kg: 32 },
-          fee: { domestic: 0, international: 0 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 50, kg: 23 } },
+        personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 22, kg: 10 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 70, kg: 32 }, fee: { domestic: 0, international: 0 } }],
       },
     },
   },
@@ -91,40 +66,14 @@ const airlines: AirlineData[] = [
     logo: '✈️',
     baggage: {
       economy: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '17 x 10 x 9', cm: '43 x 25 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 50, kg: 23 },
-          fee: { domestic: 30, international: 75 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 0, kg: 0 } },
+        personal: { type: 'personal', dimensions: { inches: '17 x 10 x 9', cm: '43 x 25 x 23' }, weight: { lbs: 0, kg: 0 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 75 } }],
       },
       business: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '17 x 10 x 9', cm: '43 x 25 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 70, kg: 32 },
-          fee: { domestic: 0, international: 0 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 0, kg: 0 } },
+        personal: { type: 'personal', dimensions: { inches: '17 x 10 x 9', cm: '43 x 25 x 23' }, weight: { lbs: 0, kg: 0 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 70, kg: 32 }, fee: { domestic: 0, international: 0 } }],
       },
     },
   },
@@ -134,93 +83,94 @@ const airlines: AirlineData[] = [
     logo: '✈️',
     baggage: {
       economy: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 50, kg: 23 },
-          fee: { domestic: 30, international: 75 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 0, kg: 0 } },
+        personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 0, kg: 0 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 75 } }],
       },
       business: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 70, kg: 32 },
-          fee: { domestic: 0, international: 0 },
-        }],
+        'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 0, kg: 0 } },
+        personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 0, kg: 0 } },
+        checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 70, kg: 32 }, fee: { domestic: 0, international: 0 } }],
       },
     },
   },
-  {
-    name: 'Southwest Airlines',
-    code: 'WN',
-    logo: '✈️',
-    baggage: {
-      economy: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '24 x 16 x 10', cm: '61 x 41 x 28' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '18.5 x 8.5 x 13.5', cm: '47 x 22 x 34' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '158 linear' },
-          weight: { lbs: 50, kg: 23 },
-          fee: { domestic: 0, international: 0 },
-        }],
-      },
-    },
-  },
-  {
-    name: 'JetBlue',
-    code: 'B6',
-    logo: '✈️',
-    baggage: {
-      economy: {
-        'carry-on': {
-          type: 'carry-on',
-          dimensions: { inches: '22 x 14 x 9', cm: '55.8 x 35.5 x 22.8' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        personal: {
-          type: 'personal',
-          dimensions: { inches: '17 x 13 x 8', cm: '43.2 x 33 x 20.3' },
-          weight: { lbs: 0, kg: 0 },
-        },
-        checked: [{
-          type: 'checked',
-          dimensions: { inches: '62 linear', cm: '157.5 linear' },
-          weight: { lbs: 50, kg: 23 },
-          fee: { domestic: 35, international: 60 },
-        }],
-      },
-    },
-  },
+  { name: 'Southwest Airlines', code: 'WN', logo: '✈️', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '24 x 16 x 10', cm: '61 x 41 x 28' }, weight: { lbs: 0, kg: 0 } }, personal: { type: 'personal', dimensions: { inches: '18.5 x 8.5 x 13.5', cm: '47 x 22 x 34' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'JetBlue', code: 'B6', logo: '✈️', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55.8 x 35.5 x 22.8' }, weight: { lbs: 0, kg: 0 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 8', cm: '43.2 x 33 x 20.3' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '157.5 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 35, international: 60 } }] } } },
+  { name: 'Alaska Airlines', code: 'AS', logo: '✈️', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 0, kg: 0 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 6', cm: '43 x 33 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 75 } }] } } },
+  { name: 'Spirit Airlines', code: 'NK', logo: '✈️', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 18 x 10', cm: '56 x 46 x 25' }, weight: { lbs: 40, kg: 18 } }, personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '46 x 36 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 40, kg: 18 }, fee: { domestic: 45, international: 65 } }] } } },
+  { name: 'Frontier Airlines', code: 'F9', logo: '✈️', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '24 x 16 x 10', cm: '61 x 41 x 25' }, weight: { lbs: 35, kg: 16 } }, personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '46 x 36 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 39, international: 75 } }] } } },
+
+  // International Airlines
+  { name: 'British Airways', code: 'BA', logo: '🇬🇧', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 18 x 10', cm: '56 x 45 x 25' }, weight: { lbs: 51, kg: 23 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 75, international: 100 } }] } } },
+  { name: 'Lufthansa', code: 'LH', logo: '🇩🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 60, international: 80 } }] } } },
+  { name: 'Air France', code: 'AF', logo: '🇫🇷', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 26, kg: 12 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 70, international: 90 } }] } } },
+  { name: 'KLM', code: 'KL', logo: '🇳🇱', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 26, kg: 12 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 70, international: 90 } }] } } },
+  { name: 'Emirates', code: 'EK', logo: '🇦🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 15 x 8', cm: '55 x 38 x 21' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Qatar Airways', code: 'QR', logo: '🇶🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 10', cm: '55 x 37 x 25' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Singapore Airlines', code: 'SQ', logo: '🇸🇬', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Japan Airlines', code: 'JL', logo: '🇯🇵', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 10', cm: '55 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 7', cm: '43 x 33 x 18' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'ANA', code: 'NH', logo: '🇯🇵', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 10', cm: '55 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 7', cm: '43 x 33 x 18' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Cathay Pacific', code: 'CX', logo: '🇭🇰', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+
+  // More Airlines (continuing to reach 50+)
+  { name: 'Turkish Airlines', code: 'TK', logo: '🇹🇷', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Swiss International', code: 'LX', logo: '🇨🇭', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 60, international: 80 } }] } } },
+  { name: 'Austrian Airlines', code: 'OS', logo: '🇦🇹', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 60, international: 80 } }] } } },
+  { name: 'Scandinavian Airlines', code: 'SK', logo: '🇸🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 70, international: 90 } }] } } },
+  { name: 'Air Canada', code: 'AC', logo: '🇨🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 13 x 6', cm: '41 x 33 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 70 } }] } } },
+  { name: 'WestJet', code: 'WS', logo: '🇨🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 13 x 6', cm: '41 x 33 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 29, international: 65 } }] } } },
+  { name: 'Qantas', code: 'QF', logo: '🇦🇺', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 8', cm: '43 x 33 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Virgin Australia', code: 'VA', logo: '🇦🇺', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 8', cm: '43 x 33 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 35, international: 65 } }] } } },
+  { name: 'Air New Zealand', code: 'NZ', logo: '🇳🇿', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 10', cm: '56 x 35 x 25' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+
+  // Asian Airlines
+  { name: 'Korean Air', code: 'KE', logo: '🇰🇷', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 10', cm: '55 x 40 x 25' }, weight: { lbs: 26, kg: 12 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 8', cm: '43 x 33 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Asiana Airlines', code: 'OZ', logo: '🇰🇷', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 10', cm: '55 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 8', cm: '43 x 33 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Thai Airways', code: 'TG', logo: '🇹🇭', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 66, kg: 30 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Malaysia Airlines', code: 'MH', logo: '🇲🇾', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 66, kg: 30 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Vietnam Airlines', code: 'VN', logo: '🇻🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Philippine Airlines', code: 'PR', logo: '🇵🇭', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '14 x 10 x 6', cm: '35 x 25 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 20, international: 50 } }] } } },
+  { name: 'China Eastern', code: 'MU', logo: '🇨🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'China Southern', code: 'CZ', logo: '🇨🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 11, kg: 5 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Air China', code: 'CA', logo: '🇨🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 11, kg: 5 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+
+  // Latin American Airlines
+  { name: 'LATAM Airlines', code: 'LA', logo: '🇨🇱', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '17 x 13 x 6', cm: '43 x 33 x 16' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 25, international: 70 } }] } } },
+  { name: 'Copa Airlines', code: 'CM', logo: '🇵🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 35 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '18 x 14 x 8', cm: '45 x 35 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 30, international: 60 } }] } } },
+  { name: 'Avianca', code: 'AV', logo: '🇨🇴', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '18 x 13 x 8', cm: '45 x 33 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 50, kg: 23 }, fee: { domestic: 35, international: 70 } }] } } },
+  { name: 'Aeromexico', code: 'AM', logo: '🇲🇽', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 55, kg: 25 }, fee: { domestic: 25, international: 60 } }] } } },
+
+  // African Airlines  
+  { name: 'South African Airways', code: 'SA', logo: '🇿🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 30, international: 80 } }] } } },
+  { name: 'Ethiopian Airlines', code: 'ET', logo: '🇪🇹', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Egypt Air', code: 'MS', logo: '🇪🇬', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 25, international: 60 } }] } } },
+  { name: 'Kenya Airways', code: 'KQ', logo: '🇰🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '56 x 36 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 20, international: 50 } }] } } },
+
+  // Middle Eastern Airlines
+  { name: 'Etihad Airways', code: 'EY', logo: '🇦🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 8', cm: '56 x 40 x 21' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'Royal Jordanian', code: 'RJ', logo: '🇯🇴', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 30, international: 60 } }] } } },
+  { name: 'Saudia', code: 'SV', logo: '🇸🇦', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 40 x 23' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 66, kg: 30 }, fee: { domestic: 0, international: 0 } }] } } },
+
+  // Low-Cost European Airlines
+  { name: 'Ryanair', code: 'FR', logo: '🇮🇪', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 20' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 8', cm: '40 x 20 x 25' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '54 linear', cm: '138 linear' }, weight: { lbs: 44, kg: 20 }, fee: { domestic: 30, international: 50 } }] } } },
+  { name: 'EasyJet', code: 'U2', logo: '🇬🇧', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 45 x 25' }, weight: { lbs: 0, kg: 0 } }, personal: { type: 'personal', dimensions: { inches: '17 x 14 x 8', cm: '45 x 36 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '108 linear', cm: '275 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 45, international: 60 } }] } } },
+  { name: 'Wizz Air', code: 'W6', logo: '🇭🇺', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 18' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '58 linear', cm: '149 linear' }, weight: { lbs: 44, kg: 20 }, fee: { domestic: 30, international: 45 } }] } } },
+  { name: 'Vueling', code: 'VY', logo: '🇪🇸', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 8', cm: '55 x 40 x 20' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '14 x 8 x 12', cm: '35 x 20 x 30' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 25, international: 45 } }] } } },
+
+  // Indian Airlines
+  { name: 'Air India', code: 'AI', logo: '🇮🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '18 x 12 x 8', cm: '45 x 30 x 20' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'IndiGo', code: '6E', logo: '🇮🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '14 x 10 x 6', cm: '35 x 25 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 33, kg: 15 }, fee: { domestic: 15, international: 40 } }] } } },
+  { name: 'SpiceJet', code: 'SG', logo: '🇮🇳', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 14 x 9', cm: '55 x 35 x 25' }, weight: { lbs: 15, kg: 7 } }, personal: { type: 'personal', dimensions: { inches: '14 x 10 x 6', cm: '35 x 25 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 33, kg: 15 }, fee: { domestic: 15, international: 35 } }] } } },
+
+  // Russian Airlines
+  { name: 'Aeroflot', code: 'SU', logo: '🇷🇺', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 0, international: 0 } }] } } },
+  { name: 'S7 Airlines', code: 'S7', logo: '🇷🇺', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 20, international: 50 } }] } } },
+
+  // Additional Airlines to reach 50+
+  { name: 'Iberia', code: 'IB', logo: '🇪🇸', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 40 x 25' }, weight: { lbs: 22, kg: 10 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 25, international: 60 } }] } } },
+  { name: 'TAP Air Portugal', code: 'TP', logo: '🇵🇹', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 30, international: 70 } }] } } },
+  { name: 'Alitalia', code: 'AZ', logo: '🇮🇹', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '55 x 40 x 23' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 30, international: 70 } }] } } },
+  { name: 'Finnair', code: 'AY', logo: '🇫🇮', baggage: { economy: { 'carry-on': { type: 'carry-on', dimensions: { inches: '22 x 16 x 9', cm: '56 x 45 x 25' }, weight: { lbs: 18, kg: 8 } }, personal: { type: 'personal', dimensions: { inches: '16 x 12 x 6', cm: '40 x 30 x 15' }, weight: { lbs: 0, kg: 0 } }, checked: [{ type: 'checked', dimensions: { inches: '62 linear', cm: '158 linear' }, weight: { lbs: 51, kg: 23 }, fee: { domestic: 30, international: 60 } }] } } },
 ];
 
 export const LuggageLimitsModal: React.FC<LuggageLimitsModalProps> = ({
