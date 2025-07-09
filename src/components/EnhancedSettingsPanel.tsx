@@ -38,6 +38,9 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
   const [expandedSections, setExpandedSections] = useState<string[]>(['subscription']);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [autoSave, setAutoSave] = useState(true);
+  const [smartNotifications, setSmartNotifications] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(true);
 
   if (!isOpen) return null;
 
@@ -392,8 +395,8 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                           {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={isSilverOrAbove}
-                          onCheckedChange={() => {}}
+                          checked={isSilverOrAbove && autoSave}
+                          onCheckedChange={(checked) => isSilverOrAbove && setAutoSave(checked)}
                           disabled={!isSilverOrAbove}
                         />
                       </div>
@@ -406,8 +409,8 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                           {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={isSilverOrAbove}
-                          onCheckedChange={() => {}}
+                          checked={isSilverOrAbove && smartNotifications}
+                          onCheckedChange={(checked) => isSilverOrAbove && setSmartNotifications(checked)}
                           disabled={!isSilverOrAbove}
                         />
                       </div>
@@ -420,8 +423,8 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                           {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={isSilverOrAbove}
-                          onCheckedChange={() => {}}
+                          checked={isSilverOrAbove && offlineMode}
+                          onCheckedChange={(checked) => isSilverOrAbove && setOfflineMode(checked)}
                           disabled={!isSilverOrAbove}
                         />
                       </div>
