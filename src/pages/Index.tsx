@@ -40,6 +40,7 @@ import { GameModeTab } from '@/components/GameModeTab';
 import { SmartSuggestions } from '@/components/SmartSuggestions';
 import { GameModeSubscriptionModal } from '@/components/GameModeSubscriptionModal';
 import { QuickAddModal } from '@/components/QuickAddModal';
+import { PackingListManager } from '@/components/PackingListManager';
 
 interface Item {
   id: string;
@@ -129,6 +130,8 @@ export default function Index() {
   const [customFont, setCustomFont] = useState<string>('inter');
   const [lastAddedItem, setLastAddedItem] = useState<string>('');
   const [blockedSuggestions, setBlockedSuggestions] = useState<string[]>([]);
+  const [currentPackingListId, setCurrentPackingListId] = useState<string | null>(null);
+  const [currentPackingListName, setCurrentPackingListName] = useState<string>('');
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingListItems');
@@ -457,207 +460,235 @@ export default function Index() {
           {/* Main App Content - Only show when on trips tab */}
           {activeTab === 'trips' && currentTrip && (
             <div>
-              
               {/* Simple Mode Toggle */}
               <SimpleModeToggle
                 simpleMode={simpleMode}
                 onToggle={setSimpleMode}
               />
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className={`font-bold ${
-                simpleMode || accessibilitySettings.largeText ? 'text-2xl' : 'text-xl'
-              } ${
-                accessibilitySettings.highContrast ? 'text-yellow-400' : 'text-gray-900 dark:text-white'
-              }`}>
-                Pack Smart
-              </h1>
-              <p className={`${
-                accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-400'
-              } mt-1 text-sm`}>
-                {currentTrip?.name || 'Create your first trip'}
-              </p>
-            </div>
 
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('settings')}
-              className={`rounded-full h-8 w-8 p-0 ${
-                accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
-              }`}
-            >
-              ⚙️
-            </Button>
-          </div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className={`font-bold ${
+                    simpleMode || accessibilitySettings.largeText ? 'text-2xl' : 'text-xl'
+                  } ${
+                    accessibilitySettings.highContrast ? 'text-yellow-400' : 'text-gray-900 dark:text-white'
+                  }`}>
+                    Pack Smart
+                  </h1>
+                  <p className={`${
+                    accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-400'
+                  } mt-1 text-sm`}>
+                    {currentTrip?.name || 'Create your first trip'}
+                  </p>
+                </div>
 
-          {/* Trip Countdown */}
-          {currentTrip && currentTrip.startDate && (
-            <TripCountdown
-              tripName={currentTrip.name}
-              destination={currentTrip.destination}
-              startDate={new Date(currentTrip.startDate)}
-              endDate={currentTrip.endDate ? new Date(currentTrip.endDate) : undefined}
-            />
-          )}
-
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <Button
-              onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
-              className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
-                hasSubscription('smart-lists') 
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' 
-                  : 'bg-gray-400 hover:bg-gray-500 opacity-70'
-              }`}
-              disabled={!hasSubscription('smart-lists')}
-            >
-              <Sparkles className="h-3 w-3" />
-              <span className="text-xs font-medium">Smart Lists</span>
-              {!hasSubscription('smart-lists') && (
-                <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
-              )}
-            </Button>
-
-            <Button
-              onClick={() => requiresSubscription('templates', () => setShowTemplates(true))}
-              className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
-                hasSubscription('templates') 
-                  ? 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
-                  : 'bg-gray-400 hover:bg-gray-500 opacity-70 border border-gray-300'
-              }`}
-              disabled={!hasSubscription('templates')}
-            >
-              <Bookmark className="h-3 w-3" />
-              <span className="text-xs font-medium">Templates</span>
-              {!hasSubscription('templates') && (
-                <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
-              )}
-            </Button>
-
-            <Button
-              onClick={() => setShowQuickAdd(true)}
-              className="h-12 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white"
-            >
-              <Plus className="h-3 w-3" />
-              <span className="text-xs font-medium">Quick Add</span>
-            </Button>
-          </div>
-
-          {/* Add Item Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-4 shadow-sm">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add new item..."
-                value={newItem}
-                onChange={(e) => setNewItem(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                className="flex-1 h-9 text-sm"
-              />
-              <Button onClick={addItem} className="px-3 h-9">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Categories */}
-          {!simpleMode && (
-            <div className="flex gap-1 mb-3 overflow-x-auto pb-2">
-              <Button
-                variant={selectedCategory === 'all' ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory('all')}
-                className="whitespace-nowrap text-xs h-7 px-2 text-xs"
-              >
-                All ({items.length})
-              </Button>
-              {categories.map(category => {
-                const count = items.filter(item => item.category === category).length;
-                return (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? 'default' : 'outline'}
-                    onClick={() => setSelectedCategory(category)}
-                    className="whitespace-nowrap text-xs h-7 px-2 text-xs capitalize"
-                  >
-                    {category} ({count})
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Smart Suggestions */}
-          <SmartSuggestions
-            lastAddedItem={lastAddedItem}
-            onAddItem={addSuggestedItem}
-            blockedItems={blockedSuggestions}
-            onBlockItem={(item) => setBlockedSuggestions([...blockedSuggestions, item])}
-          />
-
-          {/* Progress */}
-          <ProgressBar
-            current={items.filter(item => item.packed).length}
-            total={items.length}
-            percentage={items.length > 0 ? Math.round((items.filter(item => item.packed).length / items.length) * 100) : 0}
-          />
-
-          {/* Items List */}
-          <div className="space-y-2">
-            {filteredItems.map(item => (
-              <PackingItem
-                key={item.id}
-                item={item}
-                onToggle={() => toggleItem(item.id)}
-                onDelete={() => removeItem(item.id)}
-                onUpdate={(updates: Partial<Item>) => {
-                  setItems(items.map(i => i.id === item.id ? { ...i, ...updates } : i));
-                }}
-                textSize={accessibilitySettings.largeText ? 'large' : 'normal'}
-              />
-            ))}
-            
-            {filteredItems.length === 0 && (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-3">🎒</div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
-                  Your packing list is empty
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  Add items manually or use our smart lists to get started
-                </p>
                 <Button
-                  onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
-                  className={hasSubscription('smart-lists') 
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" 
-                    : "bg-gray-400 hover:bg-gray-500 opacity-70 relative"
-                  }
-                  disabled={!hasSubscription('smart-lists')}
+                  variant="ghost"
+                  onClick={() => setActiveTab('settings')}
+                  className={`rounded-full h-8 w-8 p-0 ${
+                    accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
+                  }`}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Browse Smart Lists
-                  {!hasSubscription('smart-lists') && (
-                    <Lock className="h-3 w-3 absolute top-1 right-1" />
-                  )}
+                  ⚙️
                 </Button>
               </div>
-            )}
-          </div>
-        </div>
-        )}
 
-          {/* Additional Action Buttons */}
-          {activeTab === 'trips' && currentTrip && (
-            <div className="fixed bottom-20 right-4 flex flex-col gap-2">
-              <Button
-                onClick={() => setShowLuggageView(true)}
-                className="rounded-full h-10 w-10 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
-              >
-                <Move className="h-4 w-4" />
-              </Button>
+              {/* Trip Countdown */}
+              {currentTrip && currentTrip.startDate && (
+                <TripCountdown
+                  tripName={currentTrip.name}
+                  destination={currentTrip.destination}
+                  startDate={new Date(currentTrip.startDate)}
+                  endDate={currentTrip.endDate ? new Date(currentTrip.endDate) : undefined}
+                />
+              )}
+
+              {/* Packing Lists Management */}
+              {currentTrip && (
+                <div className="mb-6">
+                  <PackingListManager
+                    tripId={currentTrip.id}
+                    onListSelect={(listId, listName) => {
+                      setCurrentPackingListId(listId);
+                      setCurrentPackingListName(listName);
+                    }}
+                    selectedListId={currentPackingListId}
+                  />
+                </div>
+              )}
+
+              {/* Only show packing interface if a list is selected */}
+              {currentPackingListId && (
+                <div>
+                  {/* Current List Header */}
+                  <div className="bg-primary/10 rounded-lg p-3 mb-4 border border-primary/20">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 bg-primary rounded-full"></div>
+                      <span className="text-sm font-medium text-primary">
+                        Currently editing: {currentPackingListName}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <Button
+                      onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
+                      className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                        hasSubscription('smart-lists') 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' 
+                          : 'bg-gray-400 hover:bg-gray-500 opacity-70'
+                      }`}
+                      disabled={!hasSubscription('smart-lists')}
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      <span className="text-xs font-medium">Smart Lists</span>
+                      {!hasSubscription('smart-lists') && (
+                        <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={() => requiresSubscription('templates', () => setShowTemplates(true))}
+                      className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                        hasSubscription('templates') 
+                          ? 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
+                          : 'bg-gray-400 hover:bg-gray-500 opacity-70 border border-gray-300'
+                      }`}
+                      disabled={!hasSubscription('templates')}
+                    >
+                      <Bookmark className="h-3 w-3" />
+                      <span className="text-xs font-medium">Templates</span>
+                      {!hasSubscription('templates') && (
+                        <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={() => setShowQuickAdd(true)}
+                      className="h-12 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      <Plus className="h-3 w-3" />
+                      <span className="text-xs font-medium">Quick Add</span>
+                    </Button>
+                  </div>
+
+                  {/* Add Item Section */}
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-4 shadow-sm">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add new item..."
+                        value={newItem}
+                        onChange={(e) => setNewItem(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                        className="flex-1 h-9 text-sm"
+                      />
+                      <Button onClick={addItem} className="px-3 h-9">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Categories */}
+                  {!simpleMode && (
+                    <div className="flex gap-1 mb-3 overflow-x-auto pb-2">
+                      <Button
+                        variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                        onClick={() => setSelectedCategory('all')}
+                        className="whitespace-nowrap text-xs h-7 px-2"
+                      >
+                        All ({items.length})
+                      </Button>
+                      {categories.map(category => {
+                        const count = items.filter(item => item.category === category).length;
+                        return (
+                          <Button
+                            key={category}
+                            variant={selectedCategory === category ? 'default' : 'outline'}
+                            onClick={() => setSelectedCategory(category)}
+                            className="whitespace-nowrap text-xs h-7 px-2 capitalize"
+                          >
+                            {category} ({count})
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Smart Suggestions */}
+                  <SmartSuggestions
+                    lastAddedItem={lastAddedItem}
+                    onAddItem={addSuggestedItem}
+                    blockedItems={blockedSuggestions}
+                    onBlockItem={(item) => setBlockedSuggestions([...blockedSuggestions, item])}
+                  />
+
+                  {/* Progress */}
+                  <ProgressBar
+                    current={items.filter(item => item.packed).length}
+                    total={items.length}
+                    percentage={items.length > 0 ? Math.round((items.filter(item => item.packed).length / items.length) * 100) : 0}
+                  />
+
+                  {/* Items List */}
+                  <div className="space-y-2">
+                    {filteredItems.map(item => (
+                      <PackingItem
+                        key={item.id}
+                        item={item}
+                        onToggle={() => toggleItem(item.id)}
+                        onDelete={() => removeItem(item.id)}
+                        onUpdate={(updates: Partial<Item>) => {
+                          setItems(items.map(i => i.id === item.id ? { ...i, ...updates } : i));
+                        }}
+                        textSize={accessibilitySettings.largeText ? 'large' : 'normal'}
+                      />
+                    ))}
+                    
+                    {filteredItems.length === 0 && (
+                      <div className="text-center py-8">
+                        <div className="text-4xl mb-3">🎒</div>
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                          Your packing list is empty
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          Add items manually or use our smart lists to get started
+                        </p>
+                        <Button
+                          onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
+                          className={hasSubscription('smart-lists') 
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" 
+                            : "bg-gray-400 hover:bg-gray-500 opacity-70 relative"
+                          }
+                          disabled={!hasSubscription('smart-lists')}
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Browse Smart Lists
+                          {!hasSubscription('smart-lists') && (
+                            <Lock className="h-3 w-3 absolute top-1 right-1" />
+                          )}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
+
+        {/* Additional Action Buttons */}
+        {activeTab === 'trips' && currentTrip && currentPackingListId && (
+          <div className="fixed bottom-20 right-4 flex flex-col gap-2">
+            <Button
+              onClick={() => setShowLuggageView(true)}
+              className="rounded-full h-10 w-10 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
+            >
+              <Move className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
         {/* Modals and Overlays */}
         <PremadeListsModal

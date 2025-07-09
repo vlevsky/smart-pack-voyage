@@ -21,6 +21,7 @@ export type Database = {
           id: string
           name: string
           packed: boolean
+          packing_list_id: string | null
           trip_id: string
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           id?: string
           name: string
           packed?: boolean
+          packing_list_id?: string | null
           trip_id: string
           updated_at?: string
           user_id: string
@@ -41,13 +43,59 @@ export type Database = {
           id?: string
           name?: string
           packed?: boolean
+          packing_list_id?: string | null
           trip_id?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
+            foreignKeyName: "packing_items_packing_list_id_fkey"
+            columns: ["packing_list_id"]
+            isOneToOne: false
+            referencedRelation: "packing_lists"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "packing_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      packing_lists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          person_name: string
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          person_name: string
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          person_name?: string
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packing_lists_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
