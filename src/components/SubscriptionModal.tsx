@@ -30,11 +30,12 @@ const subscriptionTiers = [
   },
   {
     id: 'silver',
-    name: 'Silver',
+    name: 'Silver+',
     monthlyPrice: '$3.99/month',
     yearlyPrice: '$39.99/year',
     savings: '17%',
     description: 'Essential premium features',
+    subDescription: 'Advanced settings',
     features: [
       'Multiple packing lists',
       'Smart packing lists',
@@ -47,13 +48,14 @@ const subscriptionTiers = [
   },
   {
     id: 'gold',
-    name: 'Gold',
+    name: 'Gold+',
     monthlyPrice: '$7.99/month',
     yearlyPrice: '$79.99/year',
     savings: '17%',
     description: 'Most premium features',
+    subDescription: 'Data sync',
     features: [
-      'All Silver features',
+      'All Silver+ features',
       'Game Mode',
       'AI packing assistant',
       'Advanced templates',
@@ -70,6 +72,7 @@ const subscriptionTiers = [
     yearlyPrice: '$179.99/year',
     savings: '25%',
     description: 'All premium features',
+    subDescription: 'Executive Travel Tools',
     features: [
       'Everything included',
       'Unlimited templates',
@@ -301,6 +304,11 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   {tier.description}
                 </p>
+                {tier.subDescription && (
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-4">
+                    {tier.subDescription}
+                  </p>
+                )}
 
                 <ul className="space-y-2">
                   {tier.features.map((feature, index) => (
