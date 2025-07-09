@@ -56,6 +56,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [showOptions, setShowOptions] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
 
   const handleOptionSelect = (option: any) => {
     setShowOptions(false);
@@ -69,6 +70,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
     setMessages([userMessage]);
     
     // Simulate AI response based on option
+    setIsTyping(true);
     setTimeout(() => {
       let botResponse = '';
       
@@ -97,6 +99,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
       };
       
       setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
     }, 1000);
   };
 
@@ -114,6 +117,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
     setInputText('');
 
     // Simulate AI response
+    setIsTyping(true);
     setTimeout(() => {
       let botResponse = "I understand you need help with that. Let me assist you step by step. Could you provide more specific details about what you're looking for?";
       
@@ -135,6 +139,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
       };
       
       setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
     }, 1000);
   };
 
@@ -154,7 +159,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
         className="bg-white dark:bg-gray-900 rounded-t-3xl w-full h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
               <Bot className="h-5 w-5 text-white" />
@@ -179,7 +184,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {showOptions ? (
-            <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="p-4 space-y-4 overflow-y-auto">
               <div className="text-center mb-6">
                 <h4 className="text-xl font-semibold mb-2">What do you need help with?</h4>
                 <p className="text-gray-600 dark:text-gray-400">Choose an option below or type your own question</p>
@@ -234,7 +239,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
               </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[60vh]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <AnimatePresence>
                 {messages.map((message) => (
                   <motion.div
@@ -261,43 +266,69 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
                     </div>
                   </motion.div>
                 ))}
+                
+                {/* Typing Indicator */}
+                {isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex gap-3"
+                  >
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-blue-500">
+                      <Bot className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-2xl">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </AnimatePresence>
             </div>
           )}
         </div>
 
-        {/* Input */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          <div className="flex gap-2">
-            <Input
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder={showOptions ? "Or type your question here..." : "Type your message..."}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (showOptions && inputText.trim()) {
-                    setShowOptions(false);
-                    handleSendMessage();
-                  } else if (!showOptions) {
-                    handleSendMessage();
+        {/* Input - CRITICAL FIX */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky bottom-0">
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <Input
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder={showOptions ? "Or type your question here..." : "Type your message..."}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (inputText.trim()) {
+                      if (showOptions) {
+                        setShowOptions(false);
+                      }
+                      handleSendMessage();
+                    }
                   }
-                }
-              }}
-              className="flex-1"
-              autoComplete="off"
-            />
+                }}
+                className="min-h-[44px] text-base"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="sentences"
+                disabled={isTyping}
+              />
+            </div>
             <Button 
               onClick={() => {
-                if (showOptions && inputText.trim()) {
-                  setShowOptions(false);
-                  handleSendMessage();
-                } else if (!showOptions) {
+                if (inputText.trim()) {
+                  if (showOptions) {
+                    setShowOptions(false);
+                  }
                   handleSendMessage();
                 }
               }}
-              disabled={!inputText.trim()}
-              className="bg-blue-500 hover:bg-blue-600 shrink-0"
+              disabled={!inputText.trim() || isTyping}
+              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 min-h-[44px] min-w-[44px] shrink-0"
+              size="sm"
             >
               <Send className="h-4 w-4" />
             </Button>
