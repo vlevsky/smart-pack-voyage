@@ -65,6 +65,9 @@ const plans = [
     features: [
       'Everything in Gold',
       'Tools tab with travel utilities',
+      'Currency converter & world clock',
+      'Weather forecasts & distance calculator',
+      'Tipping guide & translator',
       'Custom fonts',
       'Premium themes',
       'Advanced analytics',

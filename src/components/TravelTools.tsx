@@ -28,6 +28,32 @@ export const TravelTools: React.FC<TravelToolsProps> = ({ onClose }) => {
   // World clock states
   const [worldTimes, setWorldTimes] = useState<any[]>([]);
 
+  // Weather states
+  const [weatherCity, setWeatherCity] = useState('');
+  const [weatherData, setWeatherData] = useState<any>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+
+  // Translator states
+  const [translateText, setTranslateText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [fromLang, setFromLang] = useState('en');
+  const [toLang, setToLang] = useState('es');
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  // Tipping data
+  const tippingGuide = [
+    { country: 'United States', restaurant: '15-20%', taxi: '10-15%', hotel: '$1-2 per bag', general: 'Tipping is expected' },
+    { country: 'United Kingdom', restaurant: '10-15%', taxi: '10%', hotel: '£1-2 per bag', general: 'Optional but appreciated' },
+    { country: 'France', restaurant: 'Service included', taxi: '5-10%', hotel: '€1-2 per bag', general: 'Round up bills' },
+    { country: 'Germany', restaurant: '5-10%', taxi: '5-10%', hotel: '€1-2 per bag', general: 'Round to nearest euro' },
+    { country: 'Japan', restaurant: 'No tipping', taxi: 'No tipping', hotel: 'No tipping', general: 'Tipping can be offensive' },
+    { country: 'Australia', restaurant: '10%', taxi: '10%', hotel: '$2-5 per bag', general: 'Not mandatory' },
+    { country: 'Canada', restaurant: '15-20%', taxi: '10-15%', hotel: '$1-2 per bag', general: 'Similar to US' },
+    { country: 'Italy', restaurant: '10%', taxi: 'Round up', hotel: '€1-2 per bag', general: 'Small amounts appreciated' },
+    { country: 'Spain', restaurant: '5-10%', taxi: 'Round up', hotel: '€1-2 per bag', general: 'Small tips common' },
+    { country: 'India', restaurant: '10%', taxi: '10%', hotel: '₹20-50 per bag', general: 'Appreciated but negotiate' },
+  ];
+
   const tools = [
     {
       id: 'currency',
@@ -52,6 +78,18 @@ export const TravelTools: React.FC<TravelToolsProps> = ({ onClose }) => {
       name: 'Distance Calculator',
       icon: Map,
       description: 'Calculate travel distances',
+    },
+    {
+      id: 'tipping',
+      name: 'Tipping Guide',
+      icon: Wallet,
+      description: 'Local tipping customs',
+    },
+    {
+      id: 'translator',
+      name: 'Translator',
+      icon: Globe,
+      description: 'Translate text instantly',
     },
   ];
 
@@ -143,6 +181,48 @@ export const TravelTools: React.FC<TravelToolsProps> = ({ onClose }) => {
     }
   };
 
+  const handleWeatherSearch = async () => {
+    if (!weatherCity.trim()) return;
+    
+    setIsLoadingWeather(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-weather', {
+        body: { city: weatherCity.trim() }
+      });
+
+      if (error) throw error;
+      setWeatherData(data);
+    } catch (error) {
+      console.error('Weather search error:', error);
+      setWeatherData({ error: 'Failed to get weather data' });
+    } finally {
+      setIsLoadingWeather(false);
+    }
+  };
+
+  const handleTranslate = async () => {
+    if (!translateText.trim()) return;
+    
+    setIsTranslating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-text', {
+        body: {
+          text: translateText.trim(),
+          from: fromLang,
+          to: toLang
+        }
+      });
+
+      if (error) throw error;
+      setTranslatedText(data.translatedText);
+    } catch (error) {
+      console.error('Translation error:', error);
+      setTranslatedText('Translation failed');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -155,7 +235,7 @@ export const TravelTools: React.FC<TravelToolsProps> = ({ onClose }) => {
       </div>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {tools.map((tool) => {
           const Icon = tool.icon;
           const isSelected = selectedTool === tool.id;
@@ -280,19 +360,141 @@ export const TravelTools: React.FC<TravelToolsProps> = ({ onClose }) => {
         {selectedTool === 'weather' && (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Weather Forecast</h3>
-            <div className="text-center space-y-4">
-              <Input 
-                placeholder="Enter city name" 
-                className="rounded-xl"
-              />
-              <Button className="w-full rounded-xl">Get Weather</Button>
-              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 p-6 rounded-xl border border-orange-200 dark:border-orange-800">
-                <p className="font-semibold text-gray-900 dark:text-white">Paris, France</p>
-                <p className="text-4xl my-2">☀️</p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">22°C</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Sunny & Clear</p>
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Enter city name" 
+                  value={weatherCity}
+                  onChange={(e) => setWeatherCity(e.target.value)}
+                  className="rounded-xl flex-1"
+                />
+                <Button 
+                  onClick={handleWeatherSearch}
+                  disabled={isLoadingWeather || !weatherCity.trim()}
+                  className="rounded-xl bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700"
+                >
+                  {isLoadingWeather ? 'Loading...' : 'Get Weather'}
+                </Button>
+              </div>
+              
+              {weatherData && (
+                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 p-6 rounded-xl border border-orange-200 dark:border-orange-800">
+                  {weatherData.error ? (
+                    <p className="text-red-600 dark:text-red-400">{weatherData.error}</p>
+                  ) : (
+                    <>
+                      <p className="font-semibold text-gray-900 dark:text-white">{weatherData.name}, {weatherData.country}</p>
+                      <p className="text-4xl my-2">{weatherData.icon}</p>
+                      <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{weatherData.temperature}°C</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{weatherData.description}</p>
+                      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        <p>Feels like: {weatherData.feelsLike}°C</p>
+                        <p>Humidity: {weatherData.humidity}%</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {selectedTool === 'tipping' && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Tipping Guide</h3>
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {tippingGuide.map((tip, index) => (
+                <div key={index} className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{tip.country}</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="font-medium">Restaurant:</span> {tip.restaurant}
+                    </div>
+                    <div>
+                      <span className="font-medium">Taxi:</span> {tip.taxi}
+                    </div>
+                    <div>
+                      <span className="font-medium">Hotel:</span> {tip.hotel}
+                    </div>
+                    <div className="col-span-2">
+                      <span className="font-medium">General:</span> {tip.general}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {selectedTool === 'translator' && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Translator</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">From</label>
+                <select 
+                  value={fromLang}
+                  onChange={(e) => setFromLang(e.target.value)}
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ru">Russian</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="zh">Chinese</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">To</label>
+                <select 
+                  value={toLang}
+                  onChange={(e) => setToLang(e.target.value)}
+                  className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800"
+                >
+                  <option value="es">Spanish</option>
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ru">Russian</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="zh">Chinese</option>
+                </select>
               </div>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Text to translate</label>
+              <textarea
+                value={translateText}
+                onChange={(e) => setTranslateText(e.target.value)}
+                placeholder="Enter text to translate..."
+                className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 min-h-20"
+              />
+            </div>
+
+            <Button 
+              onClick={handleTranslate}
+              disabled={isTranslating || !translateText.trim()}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl py-3"
+            >
+              {isTranslating ? 'Translating...' : 'Translate'}
+            </Button>
+
+            {translatedText && (
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+                <label className="block text-sm font-medium mb-2">Translation</label>
+                <p className="text-gray-900 dark:text-white">{translatedText}</p>
+              </div>
+            )}
           </div>
         )}
 
