@@ -1963,25 +1963,25 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-900 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+        className="bg-white dark:bg-gray-900 rounded-2xl md:rounded-3xl w-full max-w-4xl h-[95vh] md:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
-              <Sparkles className="h-5 w-5 text-white" />
+        <div className="flex items-center justify-between p-3 md:p-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-1.5 md:p-2">
+              <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Smart Travel Assistant</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Packing lists and airline rules</p>
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Smart Travel Assistant</h2>
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Packing lists and airline rules</p>
             </div>
           </div>
-          <Button variant="ghost" onClick={onClose} className="rounded-full h-10 w-10 p-0">
-            <X className="h-4 w-4" />
+          <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 md:h-10 md:w-10 p-0">
+            <X className="h-3 w-3 md:h-4 md:w-4" />
           </Button>
         </div>
 
@@ -1989,7 +1989,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
         <div className="flex border-b border-gray-200 dark:border-gray-700 shrink-0">
           <button
             onClick={() => setActiveTab('lists')}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 md:px-6 md:py-3 text-xs md:text-sm font-medium transition-colors ${
               activeTab === 'lists'
                 ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
@@ -1999,7 +1999,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('airlines')}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 md:px-6 md:py-3 text-xs md:text-sm font-medium transition-colors ${
               activeTab === 'airlines'
                 ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
@@ -2010,26 +2010,26 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
         </div>
 
         {/* Search and Filters */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <div className="p-3 md:p-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <div className="relative mb-3 md:mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3 md:h-4 md:w-4" />
             <Input
               placeholder={activeTab === 'lists' ? "Search destinations and trips..." : "Search airlines..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-8 md:pl-10 text-sm md:text-base h-8 md:h-10"
             />
           </div>
 
           {activeTab === 'lists' && (
             <>
               {/* Filter Pills */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-4">
                 {filterOptions.map((filter) => (
                   <button
                     key={filter.id}
                     onClick={() => toggleFilter(filter.id)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium transition-colors ${
                       selectedFilters.has(filter.id)
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -2097,56 +2097,57 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
 
         {/* Content Area */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-6">
+          <div className="h-full overflow-y-auto">
+            <div className="p-3 md:p-6">
               {activeTab === 'lists' ? (
-                <div className="grid gap-4">
+                <div className="grid gap-3 md:gap-4">
                   {filteredLists.map((list) => (
                     <motion.div
                       key={list.id}
-                      whileHover={{ scale: 1.02 }}
-                      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-all"
+                      whileHover={{ scale: 1.01 }}
+                      className="bg-white dark:bg-gray-800 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700 p-3 md:p-4 shadow-sm hover:shadow-md transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-2xl">{list.icon}</span>
+                          <div className="flex items-center gap-2 md:gap-3 mb-2">
+                            <span className="text-lg md:text-2xl">{list.icon}</span>
                             <div>
-                              <h3 className="font-semibold text-gray-900 dark:text-white">{list.name}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">{list.description}</p>
+                              <h3 className="font-semibold text-sm md:text-base text-gray-900 dark:text-white">{list.name}</h3>
+                              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{list.description}</p>
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            <Badge variant="outline" className="text-xs">
+                          <div className="flex flex-wrap gap-1 md:gap-2 mb-2 md:mb-3">
+                            <Badge variant="outline" className="text-xs px-1 py-0.5">
                               {list.destinationType}
                             </Badge>
                             {list.season && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs px-1 py-0.5">
                                 {list.season}
                               </Badge>
                             )}
                             {list.duration && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs px-1 py-0.5">
                                 {list.duration}
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs px-1 py-0.5">
                               {getFilteredItems(list).length} items
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex gap-2 ml-4">
+                        <div className="flex gap-1 md:gap-2 ml-2 md:ml-4">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handlePreviewList(list)}
+                            className="text-xs md:text-sm px-2 py-1 h-7 md:h-8"
                           >
                             Preview
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleAddToTrip(list)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white"
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs md:text-sm px-2 py-1 h-7 md:h-8"
                           >
                             Add to Trip
                           </Button>
@@ -2168,41 +2169,41 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                   )}
                 </div>
               ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-3 md:gap-4">
                   {filteredAirlines.map((airline) => (
                     <motion.div
                       key={airline.id}
                       whileHover={{ scale: 1.01 }}
-                      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-all"
+                      className="bg-white dark:bg-gray-800 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700 p-3 md:p-4 shadow-sm hover:shadow-md transition-all"
                     >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2">
-                          <Plane className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                        <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-1.5 md:p-2">
+                          <Plane className="h-4 w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white">{airline.name}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Code: {airline.code}</p>
+                          <h3 className="font-semibold text-sm md:text-base text-gray-900 dark:text-white">{airline.name}</h3>
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Code: {airline.code}</p>
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Carry-On Baggage</h4>
-                          <div className="space-y-2 text-sm">
+                          <h4 className="font-medium text-xs md:text-sm text-gray-900 dark:text-white mb-2">Carry-On Baggage</h4>
+                          <div className="space-y-1 md:space-y-2 text-xs md:text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600 dark:text-gray-400">Domestic:</span>
-                              <span>{airline.baggage.carryOn.domestic.weight}, {airline.baggage.carryOn.domestic.dimensions}</span>
+                              <span className="text-right">{airline.baggage.carryOn.domestic.weight}, {airline.baggage.carryOn.domestic.dimensions}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600 dark:text-gray-400">International:</span>
-                              <span>{airline.baggage.carryOn.international.weight}, {airline.baggage.carryOn.international.dimensions}</span>
+                              <span className="text-right">{airline.baggage.carryOn.international.weight}, {airline.baggage.carryOn.international.dimensions}</span>
                             </div>
                           </div>
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Checked Baggage</h4>
-                          <div className="space-y-2 text-sm">
+                          <h4 className="font-medium text-xs md:text-sm text-gray-900 dark:text-white mb-2">Checked Baggage</h4>
+                          <div className="space-y-1 md:space-y-2 text-xs md:text-sm">
                             <div>
                               <div className="font-medium text-gray-700 dark:text-gray-300">Domestic Economy:</div>
                               <div className="text-gray-600 dark:text-gray-400">
@@ -2222,12 +2223,12 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                   ))}
 
                   {filteredAirlines.length === 0 && (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">✈️</div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <div className="text-center py-8 md:py-12">
+                      <div className="text-4xl md:text-6xl mb-3 md:mb-4">✈️</div>
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         No airlines found
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Try a different search term
                       </p>
                     </div>
@@ -2235,56 +2236,56 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                 </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         {/* Preview Modal */}
         {previewMode && selectedList && (
           <div className="absolute inset-0 bg-white dark:bg-gray-900 z-10 flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{selectedList.icon}</span>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{selectedList.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{selectedList.description}</p>
+            <div className="flex items-center justify-between p-3 md:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 md:gap-3">
+                <span className="text-lg md:text-2xl">{selectedList.icon}</span>
+                <div className="flex-1">
+                  <h3 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">{selectedList.name}</h3>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{selectedList.description}</p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1 md:gap-2">
                 <Button
                   onClick={() => handleAddToTrip(selectedList)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-xs md:text-sm px-2 py-1 h-7 md:h-9"
                 >
                   Add to Trip
                 </Button>
-                <Button variant="ghost" onClick={() => setPreviewMode(false)}>
-                  <X className="h-4 w-4" />
+                <Button variant="ghost" onClick={() => setPreviewMode(false)} className="h-7 w-7 md:h-9 md:w-9 p-0">
+                  <X className="h-3 w-3 md:h-4 md:w-4" />
                 </Button>
               </div>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="p-6">
-                <div className="grid gap-4">
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-3 md:p-6">
+                <div className="grid gap-2 md:gap-4">
                   {getFilteredItems(selectedList).map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                      className="flex items-center justify-between p-2 md:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                     >
-                      <div>
-                        <span className="font-medium text-gray-900 dark:text-white">{item.name}</span>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex-1">
+                        <span className="font-medium text-sm md:text-base text-gray-900 dark:text-white">{item.name}</span>
+                        <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                           Category: {item.category}
                           {item.thoroughnessLevel && ` • ${item.thoroughnessLevel}`}
                         </div>
                       </div>
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="text-xs px-1 py-0.5">
                         {item.quantity || 1}
                       </Badge>
                     </div>
                   ))}
                 </div>
               </div>
-            </ScrollArea>
+            </div>
           </div>
         )}
       </motion.div>
