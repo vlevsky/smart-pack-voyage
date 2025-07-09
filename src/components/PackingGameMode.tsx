@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Zap, Target, Award, Gift, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ interface PackingGameModeProps {
   onToggle: (enabled: boolean) => void;
   packedItems: number;
   totalItems: number;
-  onItemPacked: () => void;
+  onItemPacked?: () => void;
 }
 
 interface Achievement {
@@ -33,6 +33,45 @@ interface GameStats {
   achievements: Achievement[];
 }
 
+const initialAchievements: Achievement[] = [
+  {
+    id: 'first_pack',
+    name: 'First Steps',
+    description: 'Pack your first item',
+    icon: Star,
+    unlocked: false,
+    progress: 0,
+    maxProgress: 1,
+  },
+  {
+    id: 'streak_5',
+    name: 'On a Roll',
+    description: 'Pack 5 items in a row',
+    icon: Zap,
+    unlocked: false,
+    progress: 0,
+    maxProgress: 5,
+  },
+  {
+    id: 'completionist',
+    name: 'Completionist',
+    description: 'Complete your first trip',
+    icon: Trophy,
+    unlocked: false,
+    progress: 0,
+    maxProgress: 1,
+  },
+  {
+    id: 'efficiency_expert',
+    name: 'Efficiency Expert',
+    description: 'Pack 50 items total',
+    icon: Target,
+    unlocked: false,
+    progress: 0,
+    maxProgress: 50,
+  },
+];
+
 export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   isEnabled,
   onToggle,
@@ -46,62 +85,42 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
     xpToNextLevel: 100,
     totalXP: 0,
     streak: 0,
-    achievements: [
-      {
-        id: 'first_pack',
-        name: 'First Steps',
-        description: 'Pack your first item',
-        icon: Star,
-        unlocked: false,
-        progress: 0,
-        maxProgress: 1,
-      },
-      {
-        id: 'streak_5',
-        name: 'On a Roll',
-        description: 'Pack 5 items in a row',
-        icon: Zap,
-        unlocked: false,
-        progress: 0,
-        maxProgress: 5,
-      },
-      {
-        id: 'completionist',
-        name: 'Completionist',
-        description: 'Complete your first trip',
-        icon: Trophy,
-        unlocked: false,
-        progress: 0,
-        maxProgress: 1,
-      },
-      {
-        id: 'efficiency_expert',
-        name: 'Efficiency Expert',
-        description: 'Pack 50 items total',
-        icon: Target,
-        unlocked: false,
-        progress: 0,
-        maxProgress: 50,
-      },
-    ],
+    achievements: initialAchievements,
   });
 
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
-  const [confetti, setConfetti] = useState(false);
 
+  // Load saved stats on mount
   useEffect(() => {
-    const savedStats = localStorage.getItem('packingGameStats');
-    if (savedStats) {
-      setGameStats(JSON.parse(savedStats));
+    if (typeof window !== 'undefined') {
+      try {
+        const savedStats = localStorage.getItem('packingGameStats');
+        if (savedStats) {
+          const parsed = JSON.parse(savedStats);
+          setGameStats({
+            ...parsed,
+            achievements: parsed.achievements || initialAchievements,
+          });
+        }
+      } catch (error) {
+        console.warn('Failed to load game stats:', error);
+      }
     }
   }, []);
 
+  // Save stats when they change
   useEffect(() => {
-    localStorage.setItem('packingGameStats', JSON.stringify(gameStats));
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('packingGameStats', JSON.stringify(gameStats));
+      } catch (error) {
+        console.warn('Failed to save game stats:', error);
+      }
+    }
   }, [gameStats]);
 
-  const addXP = (amount: number) => {
+  const addXP = useCallback((amount: number) => {
     if (!isEnabled) return;
 
     setGameStats(prev => {
@@ -115,11 +134,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
         newLevel++;
         newXPToNextLevel = newLevel * 100;
         setShowLevelUp(true);
-        setConfetti(true);
-        setTimeout(() => {
-          setShowLevelUp(false);
-          setConfetti(false);
-        }, 3000);
+        setTimeout(() => setShowLevelUp(false), 3000);
       }
 
       return {
@@ -130,9 +145,9 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
         totalXP: newTotalXP,
       };
     });
-  };
+  }, [isEnabled]);
 
-  const updateAchievements = () => {
+  const updateAchievements = useCallback(() => {
     if (!isEnabled) return;
 
     setGameStats(prev => {
@@ -150,7 +165,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
             newProgress = totalItems > 0 && packedItems === totalItems ? 1 : 0;
             break;
           case 'efficiency_expert':
-            newProgress = Math.min(prev.totalXP / 10, achievement.maxProgress); // Assuming 10 XP per item
+            newProgress = Math.min(prev.totalXP / 10, achievement.maxProgress);
             break;
         }
 
@@ -174,15 +189,16 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
         achievements: updatedAchievements,
       };
     });
-  };
+  }, [isEnabled, packedItems, totalItems]);
 
+  // Update game stats when items are packed
   useEffect(() => {
     if (isEnabled && packedItems > 0) {
-      addXP(10); // 10 XP per packed item
+      addXP(10);
       setGameStats(prev => ({ ...prev, streak: packedItems }));
       updateAchievements();
     }
-  }, [packedItems, isEnabled]);
+  }, [packedItems, isEnabled, addXP, updateAchievements]);
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Packing Newbie';
@@ -192,12 +208,12 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
     return 'Packing Master';
   };
 
-  const progressPercentage = (gameStats.xp / gameStats.xpToNextLevel) * 100;
+  const progressPercentage = gameStats.xpToNextLevel > 0 ? (gameStats.xp / gameStats.xpToNextLevel) * 100 : 0;
   const completionPercentage = totalItems > 0 ? (packedItems / totalItems) * 100 : 0;
 
   if (!isEnabled) {
     return (
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl p-3 text-white mb-3 shadow-lg">
+      <div className="bg-gradient-to-r from-primary/90 to-primary/70 rounded-xl p-3 text-primary-foreground mb-3 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-white/20 rounded-full p-2">
@@ -227,7 +243,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-3 text-white mb-3 relative overflow-hidden shadow-lg"
+        className="bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-xl p-3 text-primary-foreground mb-3 relative overflow-hidden shadow-lg"
       >
         {/* Decorative background pattern */}
         <div className="absolute inset-0 opacity-10">

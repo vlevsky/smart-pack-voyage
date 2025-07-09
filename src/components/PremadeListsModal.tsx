@@ -1372,7 +1372,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                     </Collapsible>
                   </div>
 
-                  <ScrollArea className="flex-1">
+                  <ScrollArea className="flex-1 max-h-[60vh]">
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredLists.map((list) => (
