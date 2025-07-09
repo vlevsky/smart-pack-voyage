@@ -5,13 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 
 interface PackingList {
   id: string;
   name: string;
   person_name: string;
+  tripId: string;
   itemCount?: number;
 }
 
@@ -28,122 +27,66 @@ export function PackingListManager({ tripId, onListSelect, selectedListId }: Pac
   const [newPersonName, setNewPersonName] = useState('');
   const [editingList, setEditingList] = useState<string | null>(null);
   const [editData, setEditData] = useState({ name: '', person_name: '' });
-  const { user } = useAuth();
 
   useEffect(() => {
-    if (tripId && user) {
-      fetchPackingLists();
+    if (tripId) {
+      loadPackingLists();
     }
-  }, [tripId, user]);
+  }, [tripId]);
 
-  const fetchPackingLists = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('packing_lists')
-      .select(`
-        id,
-        name,
-        person_name,
-        packing_items!inner(id)
-      `)
-      .eq('trip_id', tripId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Error fetching packing lists:', error);
-      return;
-    }
-
-    const listsWithCounts = data.map(list => ({
-      id: list.id,
-      name: list.name,
-      person_name: list.person_name,
-      itemCount: list.packing_items?.length || 0
-    }));
-
-    setPackingLists(listsWithCounts);
-
-    // Auto-select first list if none selected
-    if (listsWithCounts.length > 0 && !selectedListId) {
-      onListSelect(listsWithCounts[0].id, listsWithCounts[0].name);
+  const loadPackingLists = () => {
+    const savedLists = localStorage.getItem(`packingLists_${tripId}`);
+    if (savedLists) {
+      const lists = JSON.parse(savedLists);
+      setPackingLists(lists);
+      
+      // Auto-select first list if none selected
+      if (lists.length > 0 && !selectedListId) {
+        onListSelect(lists[0].id, lists[0].name);
+      }
     }
   };
 
-  const createPackingList = async () => {
-    if (!user || !newListName.trim() || !newPersonName.trim()) return;
+  const savePackingLists = (lists: PackingList[]) => {
+    localStorage.setItem(`packingLists_${tripId}`, JSON.stringify(lists));
+    setPackingLists(lists);
+  };
 
-    const { data, error } = await supabase
-      .from('packing_lists')
-      .insert({
-        trip_id: tripId,
-        name: newListName.trim(),
-        person_name: newPersonName.trim(),
-        user_id: user.id
-      })
-      .select()
-      .single();
+  const createPackingList = () => {
+    if (!newListName.trim() || !newPersonName.trim()) return;
 
-    if (error) {
-      console.error('Error creating packing list:', error);
-      return;
-    }
-
-    const newList = {
-      id: data.id,
-      name: data.name,
-      person_name: data.person_name,
+    const newList: PackingList = {
+      id: Date.now().toString(),
+      name: newListName.trim(),
+      person_name: newPersonName.trim(),
+      tripId: tripId,
       itemCount: 0
     };
 
-    setPackingLists([...packingLists, newList]);
+    const updatedLists = [...packingLists, newList];
+    savePackingLists(updatedLists);
     setNewListName('');
     setNewPersonName('');
     setShowCreateForm(false);
     onListSelect(newList.id, newList.name);
   };
 
-  const updatePackingList = async (listId: string) => {
-    if (!user || !editData.name.trim() || !editData.person_name.trim()) return;
+  const updatePackingList = (listId: string) => {
+    if (!editData.name.trim() || !editData.person_name.trim()) return;
 
-    const { error } = await supabase
-      .from('packing_lists')
-      .update({
-        name: editData.name.trim(),
-        person_name: editData.person_name.trim()
-      })
-      .eq('id', listId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Error updating packing list:', error);
-      return;
-    }
-
-    setPackingLists(packingLists.map(list => 
+    const updatedLists = packingLists.map(list => 
       list.id === listId 
-        ? { ...list, name: editData.name, person_name: editData.person_name }
+        ? { ...list, name: editData.name.trim(), person_name: editData.person_name.trim() }
         : list
-    ));
+    );
+    
+    savePackingLists(updatedLists);
     setEditingList(null);
   };
 
-  const deletePackingList = async (listId: string) => {
-    if (!user) return;
-
-    const { error } = await supabase
-      .from('packing_lists')
-      .delete()
-      .eq('id', listId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Error deleting packing list:', error);
-      return;
-    }
-
+  const deletePackingList = (listId: string) => {
     const updatedLists = packingLists.filter(list => list.id !== listId);
-    setPackingLists(updatedLists);
+    savePackingLists(updatedLists);
 
     // Select another list if the deleted one was selected
     if (selectedListId === listId && updatedLists.length > 0) {
