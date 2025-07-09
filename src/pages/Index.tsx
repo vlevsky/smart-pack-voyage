@@ -346,9 +346,9 @@ export default function Index() {
 
     const tierFeatures = {
       'one-trip': ['all'], // All features for one trip
-      silver: ['smart-lists', 'game-mode', 'basic-templates', 'countdown'],
-      gold: ['smart-lists', 'game-mode', 'templates', 'countdown', 'ai-assistant', 'drag-drop'],
-      exclusive: ['all'] // All features
+      silver: ['smart-lists', 'templates', 'countdown', 'multiple-lists'],
+      gold: ['smart-lists', 'templates', 'countdown', 'multiple-lists', 'game-mode', 'ai-assistant', 'drag-drop'],
+      exclusive: ['all'] // All features including priority support
     };
 
     return subscriptionTier === 'exclusive' || subscriptionTier === 'one-trip' ||
@@ -514,6 +514,7 @@ export default function Index() {
                       setCurrentPackingListName(listName);
                     }}
                     selectedListId={currentPackingListId}
+                    subscriptionTier={subscriptionTier}
                   />
                 </div>
               )}

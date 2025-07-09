@@ -18,15 +18,18 @@ interface PackingListManagerProps {
   tripId: string;
   onListSelect: (listId: string, listName: string) => void;
   selectedListId: string | null;
+  subscriptionTier: string;
 }
 
-export function PackingListManager({ tripId, onListSelect, selectedListId }: PackingListManagerProps) {
+export function PackingListManager({ tripId, onListSelect, selectedListId, subscriptionTier }: PackingListManagerProps) {
   const [packingLists, setPackingLists] = useState<PackingList[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newPersonName, setNewPersonName] = useState('');
   const [editingList, setEditingList] = useState<string | null>(null);
   const [editData, setEditData] = useState({ name: '', person_name: '' });
+
+  const canCreateMultipleLists = ['silver', 'gold', 'exclusive'].includes(subscriptionTier);
 
   useEffect(() => {
     if (tripId) {
@@ -54,6 +57,12 @@ export function PackingListManager({ tripId, onListSelect, selectedListId }: Pac
 
   const createPackingList = () => {
     if (!newListName.trim() || !newPersonName.trim()) return;
+    
+    // Check if user can create multiple lists (requires silver+)
+    if (packingLists.length >= 1 && !canCreateMultipleLists) {
+      // Redirect to upgrade - this should be handled by the UI
+      return;
+    }
 
     const newList: PackingList = {
       id: Date.now().toString(),
@@ -118,14 +127,29 @@ export function PackingListManager({ tripId, onListSelect, selectedListId }: Pac
           </Badge>
         </div>
         
-        <Button
-          onClick={() => setShowCreateForm(true)}
-          size="sm"
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add List
-        </Button>
+        {packingLists.length === 0 || canCreateMultipleLists ? (
+          <Button
+            onClick={() => setShowCreateForm(true)}
+            size="sm"
+            className="bg-primary hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add List
+          </Button>
+        ) : (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground mb-1">
+              Multiple lists require Silver+
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+            >
+              Upgrade to Silver
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Create Form */}

@@ -36,11 +36,11 @@ const subscriptionTiers = [
     savings: '17%',
     description: 'Essential premium features',
     features: [
+      'Multiple packing lists',
       'Smart packing lists',
-      'Basic templates',
+      'Trip templates',
       'Countdown timer',
-      'Game mode',
-      'Priority support'
+      'Basic support'
     ],
     icon: Crown,
     color: 'bg-gray-500'
@@ -54,10 +54,10 @@ const subscriptionTiers = [
     description: 'Most premium features',
     features: [
       'All Silver features',
+      'Game Mode',
       'AI packing assistant',
       'Advanced templates',
-      'Airline integrations',
-      'Custom reminders'
+      'Airline integrations'
     ],
     icon: Star,
     color: 'bg-yellow-500',

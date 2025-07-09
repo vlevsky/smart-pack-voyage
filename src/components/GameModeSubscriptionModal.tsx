@@ -16,7 +16,7 @@ export function GameModeSubscriptionModal({ isOpen, onClose, onUpgrade }: GameMo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5 text-amber-500" />
-            Game Mode Locked
+            Game Mode Requires Gold
           </DialogTitle>
         </DialogHeader>
         
@@ -24,28 +24,28 @@ export function GameModeSubscriptionModal({ isOpen, onClose, onUpgrade }: GameMo
           <div className="text-center py-6">
             <div className="text-6xl mb-4">🎮</div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Game Mode is available with Silver subscription or higher
+              Game Mode is now available with Gold subscription or higher
             </p>
           </div>
 
           <div className="space-y-3">
             <div className="border rounded-lg p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
               <div className="flex items-center gap-2 mb-2">
-                <Star className="h-4 w-4 text-amber-500" />
+                <Star className="h-4 w-4 text-gray-500" />
                 <span className="font-medium text-sm">Silver Plan</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Includes Game Mode, Smart Lists, Templates, and more!
+                Multiple packing lists, Smart Lists, Templates
               </p>
             </div>
 
             <div className="border rounded-lg p-3 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="h-4 w-4 text-amber-600" />
-                <span className="font-medium text-sm">Gold & Exclusive</span>
+                <span className="font-medium text-sm">Gold Plan</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                All features including AI Assistant and advanced tools
+                All Silver features + Game Mode and AI Assistant
               </p>
             </div>
           </div>
