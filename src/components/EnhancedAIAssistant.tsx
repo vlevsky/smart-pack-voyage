@@ -291,8 +291,8 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
           )}
         </div>
 
-        {/* Input - CRITICAL FIX - Move above menu */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky bottom-0 z-20">
+        {/* Input Section - FIXED: Always visible and functional */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 z-30 relative">
           <div className="flex gap-2 items-end">
             <div className="flex-1">
               <Input
@@ -310,7 +310,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
                     }
                   }
                 }}
-                className="min-h-[44px] text-base border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="min-h-[44px] text-base border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800"
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="sentences"
@@ -328,7 +328,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
                 }
               }}
               disabled={!inputText.trim() || isTyping}
-              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 min-h-[44px] min-w-[44px] shrink-0 border-2 border-blue-500"
+              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 min-h-[44px] min-w-[44px] shrink-0 border-2 border-blue-500 text-white"
               size="sm"
             >
               <Send className="h-4 w-4" />
