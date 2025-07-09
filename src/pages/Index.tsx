@@ -583,8 +583,8 @@ export default function Index() {
                 item={item}
                 onToggle={() => toggleItem(item.id)}
                 onDelete={() => removeItem(item.id)}
-                onUpdate={(updatedItem: Item) => {
-                  setItems(items.map(i => i.id === updatedItem.id ? updatedItem : i));
+                onUpdate={(updates: Partial<Item>) => {
+                  setItems(items.map(i => i.id === item.id ? { ...i, ...updates } : i));
                 }}
                 textSize={accessibilitySettings.largeText ? 'large' : 'normal'}
               />

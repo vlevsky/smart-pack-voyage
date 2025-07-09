@@ -228,50 +228,50 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
   return (
     <div className="p-4 pb-20 space-y-4">
       {/* Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-1">
         <div className="flex items-center justify-center gap-2">
-          <Gamepad2 className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl font-bold text-primary">Game Mode</h1>
+          <Gamepad2 className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-bold text-primary">Game Mode</h1>
         </div>
-        <p className="text-muted-foreground">Turn packing into a fun challenge!</p>
+        <p className="text-sm text-muted-foreground">Turn packing into a fun challenge!</p>
       </div>
 
       {/* Level Card */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 rounded-full p-3">
-                <Trophy className="h-6 w-6 text-primary" />
+            <div className="flex items-center gap-2">
+              <div className="bg-primary/10 rounded-full p-2">
+                <Trophy className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Level {gameStats.level}</CardTitle>
-                <p className="text-sm text-muted-foreground">{getLevelTitle(gameStats.level)}</p>
+                <CardTitle className="text-lg">Level {gameStats.level}</CardTitle>
+                <p className="text-xs text-muted-foreground">{getLevelTitle(gameStats.level)}</p>
               </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div>
-            <div className="flex justify-between text-sm font-medium mb-2">
+            <div className="flex justify-between text-xs font-medium mb-1">
               <span>XP Progress</span>
               <span>{gameStats.xp}/{gameStats.xpToNextLevel}</span>
             </div>
-            <Progress value={progressPercentage} className="h-3" />
+            <Progress value={progressPercentage} className="h-2" />
           </div>
           
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="font-bold text-lg">{gameStats.totalXP}</div>
-              <div className="text-xs text-muted-foreground">Total XP</div>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="bg-muted/50 rounded-lg p-2">
+              <div className="font-bold text-sm">{gameStats.totalXP}</div>
+              <div className="text-[10px] text-muted-foreground">Total XP</div>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="font-bold text-lg">{gameStats.streak}</div>
-              <div className="text-xs text-muted-foreground">Items Packed</div>
+            <div className="bg-muted/50 rounded-lg p-2">
+              <div className="font-bold text-sm">{gameStats.streak}</div>
+              <div className="text-[10px] text-muted-foreground">Items Packed</div>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="font-bold text-lg">{Math.round(completionPercentage)}%</div>
-              <div className="text-xs text-muted-foreground">Complete</div>
+            <div className="bg-muted/50 rounded-lg p-2">
+              <div className="font-bold text-sm">{Math.round(completionPercentage)}%</div>
+              <div className="text-[10px] text-muted-foreground">Complete</div>
             </div>
           </div>
         </CardContent>
@@ -279,14 +279,14 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
 
       {/* Achievements */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Award className="h-4 w-4" />
             Achievements
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3">
+          <div className="grid gap-2">
             {gameStats.achievements.map((achievement) => {
               const Icon = getIcon(achievement.iconName);
               const progress = (achievement.progress / achievement.maxProgress) * 100;
@@ -294,34 +294,34 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
               return (
                 <div
                   key={achievement.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                  className={`flex items-center gap-2 p-2 rounded-lg border ${
                     achievement.unlocked 
                       ? 'bg-primary/5 border-primary/20' 
                       : 'bg-muted/30 border-muted'
                   }`}
                 >
-                  <div className={`rounded-full p-2 ${
+                  <div className={`rounded-full p-1.5 ${
                     achievement.unlocked ? 'bg-primary/20' : 'bg-muted'
                   }`}>
-                    <Icon className={`h-4 w-4 ${
+                    <Icon className={`h-3 w-3 ${
                       achievement.unlocked ? 'text-primary' : 'text-muted-foreground'
                     }`} />
                   </div>
                   <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className={`font-medium text-sm ${
+                    <div className="flex justify-between items-center mb-0.5">
+                      <span className={`font-medium text-xs ${
                         achievement.unlocked ? 'text-primary' : 'text-muted-foreground'
                       }`}>
                         {achievement.name}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[10px] text-muted-foreground">
                         {achievement.progress}/{achievement.maxProgress}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">
+                    <p className="text-[10px] text-muted-foreground mb-1">
                       {achievement.description}
                     </p>
-                    <Progress value={progress} className="h-1" />
+                    <Progress value={progress} className="h-0.5" />
                   </div>
                 </div>
               );

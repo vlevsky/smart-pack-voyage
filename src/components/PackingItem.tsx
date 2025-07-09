@@ -89,7 +89,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
         <Checkbox
           checked={item.packed}
           onCheckedChange={onToggle}
-          className="h-4 w-4 rounded-full border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+          className="h-3 w-3 rounded-full border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
         />
         
         <div className="flex-1 min-w-0">
@@ -146,7 +146,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
       <Checkbox
         checked={item.packed}
         onCheckedChange={onToggle}
-        className="rounded-full h-4 w-4 border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+        className="rounded-full h-3 w-3 border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
       />
 
       <div className="flex-1 min-w-0">
@@ -163,7 +163,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <span
                 className={`${getTextSizeClass()} font-medium transition-all duration-300 ${
                   item.packed
@@ -175,18 +175,18 @@ export const PackingItem: React.FC<PackingItemProps> = ({
               </span>
 
               {/* Quantity Controls */}
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-1.5 py-0.5">
+              <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-gray-700 rounded-lg px-1 py-0.5">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
-                  className="h-5 w-5 p-0 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="h-4 w-4 p-0 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
                 >
                   <Minus className="h-2 w-2" />
                 </Button>
                 
-                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[1.5ch] text-center">
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-[1ch] text-center px-1">
                   {quantity}
                 </span>
                 
@@ -195,7 +195,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
                   size="sm"
                   onClick={() => handleQuantityChange(quantity + 1)}
                   disabled={quantity >= 99}
-                  className="h-5 w-5 p-0 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="h-4 w-4 p-0 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
                 >
                   <Plus className="h-2 w-2" />
                 </Button>
