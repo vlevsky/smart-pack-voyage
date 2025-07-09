@@ -371,6 +371,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                           })}
                         />
                       </div>
+
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Zap className="h-4 w-4 text-green-500" />
+                          <span className="font-medium text-gray-900 dark:text-white">Simple Mode</span>
+                        </div>
+                        <Switch
+                          checked={settings.simpleMode}
+                          onCheckedChange={(checked) => onSettingsChange('simpleMode', checked)}
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 )}

@@ -177,12 +177,16 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   };
 
   useEffect(() => {
-    if (isEnabled && packedItems > 0) {
-      addXP(10); // 10 XP per packed item
-      setGameStats(prev => ({ ...prev, streak: prev.streak + 1 }));
-      updateAchievements();
+    try {
+      if (isEnabled && packedItems > 0 && totalItems > 0) {
+        addXP(10); // 10 XP per packed item
+        setGameStats(prev => ({ ...prev, streak: packedItems }));
+        updateAchievements();
+      }
+    } catch (error) {
+      console.error('Game mode error:', error);
     }
-  }, [packedItems, isEnabled]);
+  }, [packedItems, isEnabled, totalItems]);
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Packing Newbie';
@@ -197,22 +201,22 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
 
   if (!isEnabled) {
     return (
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl p-4 text-white mb-4 shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl p-3 text-white mb-3 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-white/20 rounded-full p-2">
-              <Trophy className="h-5 w-5" />
+              <Trophy className="h-4 w-4" />
             </div>
             <div>
-              <span className="font-semibold text-lg">Game Mode</span>
-              <p className="text-sm opacity-90 mt-1">
+              <span className="font-semibold text-base">Game Mode</span>
+              <p className="text-xs opacity-90 mt-1">
                 Turn packing into a fun challenge!
               </p>
             </div>
           </div>
           <Button
             onClick={() => onToggle(true)}
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 font-medium"
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30 font-medium text-sm h-8"
             size="sm"
           >
             Enable
@@ -227,7 +231,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-4 text-white mb-4 relative overflow-hidden shadow-lg"
+        className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-3 text-white mb-3 relative overflow-hidden shadow-lg"
       >
         {/* Decorative background pattern */}
         <div className="absolute inset-0 opacity-10">

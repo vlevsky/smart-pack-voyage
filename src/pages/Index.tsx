@@ -306,7 +306,7 @@ export default function Index() {
     if (hasSubscription(feature)) {
       action();
     } else {
-      setShowSubscriptionModal(true);
+      setActiveTab('upgrade');
     }
   };
 
@@ -358,11 +358,13 @@ export default function Index() {
 
           {/* Help Tab Content */}
           {activeTab === 'help' && (
-            <EnhancedAIAssistant
-              isOpen={true}
-              onClose={() => setActiveTab('trips')}
-              onAddItems={addMultipleItems}
-            />
+            <div className="h-[calc(100vh-140px)]">
+              <EnhancedAIAssistant
+                isOpen={true}
+                onClose={() => setActiveTab('trips')}
+                onAddItems={addMultipleItems}
+              />
+            </div>
           )}
 
           {/* Settings Tab Content */}
@@ -403,10 +405,10 @@ export default function Index() {
                 onToggle={setSimpleMode}
               />
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className={`font-bold ${
-                accessibilitySettings.largeText ? 'text-3xl' : 'text-2xl'
+                simpleMode || accessibilitySettings.largeText ? 'text-2xl' : 'text-xl'
               } ${
                 accessibilitySettings.highContrast ? 'text-yellow-400' : 'text-gray-900 dark:text-white'
               }`}>
@@ -414,7 +416,7 @@ export default function Index() {
               </h1>
               <p className={`${
                 accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-400'
-              } mt-1`}>
+              } mt-1 text-sm`}>
                 {currentTrip?.name || 'Create your first trip'}
               </p>
             </div>
@@ -422,7 +424,7 @@ export default function Index() {
             <Button
               variant="ghost"
               onClick={() => setActiveTab('settings')}
-              className={`rounded-full h-10 w-10 p-0 ${
+              className={`rounded-full h-8 w-8 p-0 ${
                 accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
               }`}
             >
@@ -450,50 +452,51 @@ export default function Index() {
           />
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-2 gap-2 mb-4">
             <Button
               onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
-              className="h-16 flex flex-col items-center justify-center gap-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                hasSubscription('smart-lists') 
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' 
+                  : 'bg-gray-400 hover:bg-gray-500 opacity-70'
+              }`}
+              disabled={!hasSubscription('smart-lists')}
             >
-              <Sparkles className="h-5 w-5" />
-              <span className="text-sm font-medium">Smart Lists</span>
+              <Sparkles className="h-4 w-4" />
+              <span className="text-xs font-medium">Smart Lists</span>
               {!hasSubscription('smart-lists') && (
-                <div className="absolute top-2 right-2">
-                  <div className="bg-yellow-500 rounded-full p-1">
-                    <Lock className="h-3 w-3 text-white" />
-                  </div>
-                </div>
+                <Lock className="h-3 w-3 absolute top-1 right-1 text-white" />
               )}
             </Button>
 
             <Button
               onClick={() => requiresSubscription('templates', () => setShowTemplates(true))}
-              variant="outline"
-              className="h-16 flex flex-col items-center justify-center gap-1 relative"
+              className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                hasSubscription('templates') 
+                  ? 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
+                  : 'bg-gray-400 hover:bg-gray-500 opacity-70 border border-gray-300'
+              }`}
+              disabled={!hasSubscription('templates')}
             >
-              <Bookmark className="h-5 w-5" />
-              <span className="text-sm font-medium">Templates</span>
+              <Bookmark className="h-4 w-4" />
+              <span className="text-xs font-medium">Templates</span>
               {!hasSubscription('templates') && (
-                <div className="absolute top-2 right-2">
-                  <div className="bg-yellow-500 rounded-full p-1">
-                    <Lock className="h-3 w-3 text-white" />
-                  </div>
-                </div>
+                <Lock className="h-3 w-3 absolute top-1 right-1 text-white" />
               )}
             </Button>
           </div>
 
           {/* Add Item Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-6 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-4 shadow-sm">
             <div className="flex gap-2">
               <Input
                 placeholder="Add new item..."
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                className="flex-1"
+                className="flex-1 h-9 text-sm"
               />
-              <Button onClick={addItem} className="px-4">
+              <Button onClick={addItem} className="px-3 h-9">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -501,11 +504,11 @@ export default function Index() {
 
           {/* Categories */}
           {!simpleMode && (
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-1 mb-3 overflow-x-auto pb-2">
               <Button
                 variant={selectedCategory === 'all' ? 'default' : 'outline'}
                 onClick={() => setSelectedCategory('all')}
-                className="whitespace-nowrap text-sm"
+                className="whitespace-nowrap text-xs h-8 px-3"
               >
                 All ({items.length})
               </Button>
@@ -516,7 +519,7 @@ export default function Index() {
                     key={category}
                     variant={selectedCategory === category ? 'default' : 'outline'}
                     onClick={() => setSelectedCategory(category)}
-                    className="whitespace-nowrap text-sm capitalize"
+                    className="whitespace-nowrap text-xs h-8 px-3 capitalize"
                   >
                     {category} ({count})
                   </Button>
@@ -547,20 +550,27 @@ export default function Index() {
             ))}
             
             {filteredItems.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🎒</div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="text-center py-8">
+                <div className="text-4xl mb-3">🎒</div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
                   Your packing list is empty
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   Add items manually or use our smart lists to get started
                 </p>
                 <Button
-                  onClick={() => setShowPremadeLists(true)}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
+                  className={hasSubscription('smart-lists') 
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" 
+                    : "bg-gray-400 hover:bg-gray-500 opacity-70 relative"
+                  }
+                  disabled={!hasSubscription('smart-lists')}
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Browse Smart Lists
+                  {!hasSubscription('smart-lists') && (
+                    <Lock className="h-3 w-3 absolute top-1 right-1" />
+                  )}
                 </Button>
               </div>
             )}
@@ -570,12 +580,12 @@ export default function Index() {
 
           {/* Additional Action Buttons */}
           {activeTab === 'trips' && currentTrip && (
-            <div className="fixed bottom-24 right-4 flex flex-col gap-2">
+            <div className="fixed bottom-20 right-4 flex flex-col gap-2">
               <Button
                 onClick={() => setShowLuggageView(true)}
-                className="rounded-full h-12 w-12 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
+                className="rounded-full h-10 w-10 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
               >
-                <Move className="h-5 w-5" />
+                <Move className="h-4 w-4" />
               </Button>
             </div>
           )}
