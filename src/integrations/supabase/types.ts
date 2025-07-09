@@ -128,6 +128,7 @@ export type Database = {
           end_date: string | null
           id: string
           name: string
+          notes: string | null
           start_date: string | null
           updated_at: string
           user_id: string
@@ -138,6 +139,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           name: string
+          notes?: string | null
           start_date?: string | null
           updated_at?: string
           user_id: string
@@ -148,6 +150,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           name?: string
+          notes?: string | null
           start_date?: string | null
           updated_at?: string
           user_id?: string
