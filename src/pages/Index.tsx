@@ -529,7 +529,7 @@ export default function Index() {
           <ProgressBar
             current={items.filter(item => item.packed).length}
             total={items.length}
-            className="mb-6"
+            percentage={items.length > 0 ? Math.round((items.filter(item => item.packed).length / items.length) * 100) : 0}
           />
 
           {/* Items List */}
@@ -538,9 +538,11 @@ export default function Index() {
               <PackingItem
                 key={item.id}
                 item={item}
-                onToggle={toggleItem}
-                onRemove={removeItem}
-                simpleMode={simpleMode}
+                onToggle={() => toggleItem(item.id)}
+                onDelete={() => removeItem(item.id)}
+                onUpdate={(updatedItem: Item) => {
+                  setItems(items.map(i => i.id === updatedItem.id ? updatedItem : i));
+                }}
               />
             ))}
             
@@ -597,6 +599,7 @@ export default function Index() {
           templates={templates}
           onLoadTemplate={loadTemplate}
           onSaveTemplate={(name) => saveTemplate(name, items)}
+          currentItems={items}
         />
 
         <HelpModal
@@ -608,20 +611,16 @@ export default function Index() {
           isOpen={showLuggageView}
           onClose={() => setShowLuggageView(false)}
           items={items}
-          onUpdateItem={(updatedItem) => {
-            setItems(items.map(item => 
-              item.id === updatedItem.id ? updatedItem : item
-            ));
-          }}
+          onToggleItem={toggleItem}
         />
 
         <BottomNavigation 
           activeTab={activeTab} 
           onTabChange={setActiveTab} 
           subscriptionTier={subscriptionTier}
+          hasSubscription={subscriptionTier !== 'free'}
         />
       </div>
     </GlobalThemeProvider>
-  );
   );
 }

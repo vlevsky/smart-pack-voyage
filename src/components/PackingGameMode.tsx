@@ -177,7 +177,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   };
 
   useEffect(() => {
-    if (isEnabled) {
+    if (isEnabled && packedItems > 0) {
       addXP(10); // 10 XP per packed item
       setGameStats(prev => ({ ...prev, streak: prev.streak + 1 }));
       updateAchievements();
