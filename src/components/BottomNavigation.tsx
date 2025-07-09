@@ -3,8 +3,8 @@ import { Map, HelpCircle, Settings, Crown, Gamepad2, Wrench } from 'lucide-react
 import { Button } from '@/components/ui/button';
 
 interface BottomNavigationProps {
-  activeTab: 'trips' | 'game' | 'help' | 'settings' | 'upgrade' | 'tools';
-  onTabChange: (tab: 'trips' | 'game' | 'help' | 'settings' | 'upgrade' | 'tools') => void;
+  activeTab: 'trips' | 'game' | 'settings' | 'upgrade' | 'tools';
+  onTabChange: (tab: 'trips' | 'game' | 'settings' | 'upgrade' | 'tools') => void;
   hasSubscription: boolean;
   subscriptionTier: string;
 }
@@ -25,11 +25,6 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       id: 'game' as const,
       icon: Gamepad2,
       label: 'Game',
-    },
-    {
-      id: 'help' as const,
-      icon: HelpCircle,
-      label: 'Help',
     },
     {
       id: 'settings' as const,

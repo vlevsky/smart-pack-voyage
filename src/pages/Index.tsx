@@ -106,13 +106,12 @@ export default function Index() {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'help' | 'settings' | 'upgrade' | 'tools'>('trips');
+  const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'settings' | 'upgrade' | 'tools'>('trips');
   const [showGameModeSubscription, setShowGameModeSubscription] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
 
   // Handle tab changes to show/hide modals
   useEffect(() => {
-    setShowHelp(activeTab === 'help');
     setShowSettings(activeTab === 'settings');
     if (activeTab === 'upgrade') {
       setShowSubscriptionModal(true);
@@ -413,16 +412,6 @@ export default function Index() {
             </div>
           )}
 
-          {/* Help Tab Content */}
-          {activeTab === 'help' && (
-            <div className="h-[calc(100vh-140px)]">
-              <EnhancedAIAssistant
-                isOpen={true}
-                onClose={() => setActiveTab('trips')}
-                onAddItems={addMultipleItems}
-              />
-            </div>
-          )}
 
           {/* Game Tab Content */}
           {activeTab === 'game' && (

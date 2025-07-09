@@ -4,7 +4,7 @@ import {
   X, Settings, Crown, Palette, Type, Volume2, 
   Accessibility, Shield, Download, RotateCcw, Bell, 
   Wifi, Database, Moon, Sun, Smartphone, 
-  ChevronDown, ChevronRight, User, CreditCard 
+  ChevronDown, ChevronRight, User, CreditCard, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SubscriptionModal } from '@/components/SubscriptionModal';
+import { HelpModal } from '@/components/HelpModal';
 
 interface EnhancedSettingsPanelProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
 }) => {
   const [expandedSections, setExpandedSections] = useState<string[]>(['subscription']);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   if (!isOpen) return null;
 
@@ -56,6 +58,8 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
   ];
 
   const isPro = subscriptionTier !== 'free';
+  const isSilverOrAbove = ['silver', 'gold', 'exclusive'].includes(subscriptionTier);
+  const isGoldOrAbove = ['gold', 'exclusive'].includes(subscriptionTier);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => 
@@ -147,6 +151,26 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                           className="h-7 text-xs"
                         >
                           Manage
+                        </Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg mt-2">
+                        <div className="flex items-center gap-2">
+                          <HelpCircle className="h-3 w-3 text-blue-500" />
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white text-xs">Help & Support</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              Step-by-step app guide
+                            </p>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowHelpModal(true)}
+                          className="h-7 text-xs"
+                        >
+                          Help
                         </Button>
                       </div>
                     </div>
@@ -341,6 +365,7 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                   <div className="flex items-center gap-2">
                     <Settings className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                     <span className="font-medium text-gray-900 dark:text-white text-sm">Advanced</span>
+                    {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                   </div>
                   {expandedSections.includes('advanced') ? 
                     <ChevronDown className="h-3 w-3" /> : 
@@ -357,17 +382,19 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <div className="p-3 space-y-2">
+                    <div className={`p-3 space-y-2 ${!isSilverOrAbove ? 'opacity-50' : ''}`}>
                       
                       {/* Auto-save */}
                       <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <div className="flex items-center gap-2">
                           <Shield className="h-3 w-3 text-green-500" />
                           <span className="font-medium text-gray-900 dark:text-white text-xs">Auto-save</span>
+                          {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={true}
+                          checked={isSilverOrAbove}
                           onCheckedChange={() => {}}
+                          disabled={!isSilverOrAbove}
                         />
                       </div>
 
@@ -376,10 +403,12 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                         <div className="flex items-center gap-2">
                           <Bell className="h-3 w-3 text-blue-500" />
                           <span className="font-medium text-gray-900 dark:text-white text-xs">Smart Notifications</span>
+                          {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={false}
+                          checked={isSilverOrAbove}
                           onCheckedChange={() => {}}
+                          disabled={!isSilverOrAbove}
                         />
                       </div>
 
@@ -388,23 +417,31 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                         <div className="flex items-center gap-2">
                           <Wifi className="h-3 w-3 text-purple-500" />
                           <span className="font-medium text-gray-900 dark:text-white text-xs">Offline Mode</span>
+                          {!isSilverOrAbove && <Badge variant="outline" className="text-xs">Silver+</Badge>}
                         </div>
                         <Switch
-                          checked={true}
+                          checked={isSilverOrAbove}
                           onCheckedChange={() => {}}
+                          disabled={!isSilverOrAbove}
                         />
                       </div>
 
                       {/* Data Sync */}
                       <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <RotateCcw className="h-3 w-3 text-orange-500" />
+                          <Database className="h-3 w-3 text-orange-500" />
                           <div>
                             <p className="font-medium text-gray-900 dark:text-white text-xs">Data Sync</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">Sync across devices</p>
                           </div>
+                          {!isGoldOrAbove && <Badge variant="outline" className="text-xs">Gold+</Badge>}
                         </div>
-                        <Button variant="outline" size="sm" className="h-6 text-xs">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-6 text-xs"
+                          disabled={!isGoldOrAbove}
+                        >
                           Sync Now
                         </Button>
                       </div>
@@ -426,6 +463,14 @@ const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
             onSettingsChange('subscriptionTier', tier);
             setShowSubscriptionModal(false);
           }}
+        />
+      )}
+
+      {/* Help Modal */}
+      {showHelpModal && (
+        <HelpModal
+          isOpen={showHelpModal}
+          onClose={() => setShowHelpModal(false)}
         />
       )}
     </div>
