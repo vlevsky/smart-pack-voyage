@@ -27,7 +27,7 @@ const plans = [
       'Smart packing lists',
       'Basic AI assistance',
       'Luggage organization',
-      'App Customizations'
+      'App Customizations',
       'Cloud sync',
     ],
     limitations: ['Limited themes', 'Basic support'],

@@ -41,6 +41,7 @@ import { SmartSuggestions } from '@/components/SmartSuggestions';
 import { GameModeSubscriptionModal } from '@/components/GameModeSubscriptionModal';
 import { QuickAddModal } from '@/components/QuickAddModal';
 import { PackingListManager } from '@/components/PackingListManager';
+import { TravelTools } from '@/components/TravelTools';
 
 interface Item {
   id: string;
@@ -105,7 +106,7 @@ export default function Index() {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'help' | 'settings' | 'upgrade'>('trips');
+  const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'help' | 'settings' | 'upgrade' | 'tools'>('trips');
   const [showGameModeSubscription, setShowGameModeSubscription] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
 
@@ -399,15 +400,17 @@ export default function Index() {
           
           {/* Trip Manager */}
           {activeTab === 'trips' && (
-            <TripManager
-              trips={trips}
-              currentTrip={currentTrip}
-              onTripSelect={handleTripSelect}
-              onTripCreate={handleTripCreate}
-              onTripDelete={handleTripDelete}
-              onTripUpdate={handleTripUpdate}
-              subscriptionTier={subscriptionTier}
-            />
+            <div className="space-y-6">
+              <TripManager
+                trips={trips}
+                currentTrip={currentTrip}
+                onTripSelect={handleTripSelect}
+                onTripCreate={handleTripCreate}
+                onTripDelete={handleTripDelete}
+                onTripUpdate={handleTripUpdate}
+                subscriptionTier={subscriptionTier}
+              />
+            </div>
           )}
 
           {/* Help Tab Content */}
@@ -457,9 +460,16 @@ export default function Index() {
             />
           )}
 
+          {/* Tools Tab Content */}
+          {activeTab === 'tools' && (
+            <div className="h-[calc(100vh-140px)] overflow-y-auto">
+              <TravelTools onClose={() => setActiveTab('trips')} />
+            </div>
+          )}
+
           {/* Main App Content - Only show when on trips tab */}
           {activeTab === 'trips' && currentTrip && (
-            <div>
+            <div className="space-y-6">
               {/* Simple Mode Toggle */}
               <SimpleModeToggle
                 simpleMode={simpleMode}
@@ -467,31 +477,33 @@ export default function Index() {
               />
 
               {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h1 className={`font-bold ${
-                    simpleMode || accessibilitySettings.largeText ? 'text-2xl' : 'text-xl'
-                  } ${
-                    accessibilitySettings.highContrast ? 'text-yellow-400' : 'text-gray-900 dark:text-white'
-                  }`}>
-                    Pack Smart
-                  </h1>
-                  <p className={`${
-                    accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-400'
-                  } mt-1 text-sm`}>
-                    {currentTrip?.name || 'Create your first trip'}
-                  </p>
-                </div>
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-6 mb-6 border border-blue-100 dark:border-blue-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className={`font-bold ${
+                      simpleMode || accessibilitySettings.largeText ? 'text-3xl' : 'text-2xl'
+                    } ${
+                      accessibilitySettings.highContrast ? 'text-yellow-400' : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
+                    }`}>
+                      Pack Smart
+                    </h1>
+                    <p className={`${
+                      accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-300'
+                    } mt-2 text-sm font-medium`}>
+                      {currentTrip?.name || 'Create your first trip'}
+                    </p>
+                  </div>
 
-                <Button
-                  variant="ghost"
-                  onClick={() => setActiveTab('settings')}
-                  className={`rounded-full h-8 w-8 p-0 ${
-                    accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
-                  }`}
-                >
-                  ⚙️
-                </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setActiveTab('settings')}
+                    className={`rounded-full h-12 w-12 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50 ${
+                      accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
+                    }`}
+                  >
+                    ⚙️
+                  </Button>
+                </div>
               </div>
 
               {/* Trip Countdown */}
@@ -523,69 +535,69 @@ export default function Index() {
               {currentPackingListId && (
                 <div>
                   {/* Current List Header */}
-                  <div className="bg-primary/10 rounded-lg p-3 mb-4 border border-primary/20">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 bg-primary rounded-full"></div>
-                      <span className="text-sm font-medium text-primary">
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 mb-6 border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-3">
+                      <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-semibold text-green-700 dark:text-green-300">
                         Currently editing: {currentPackingListName}
                       </span>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="grid grid-cols-3 gap-3 mb-6">
                     <Button
                       onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
-                      className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                      className={`h-16 flex flex-col items-center justify-center gap-2 relative rounded-2xl transition-all duration-200 hover:scale-105 ${
                         hasSubscription('smart-lists') 
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' 
+                          ? 'bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg' 
                           : 'bg-gray-400 hover:bg-gray-500 opacity-70'
                       }`}
                       disabled={!hasSubscription('smart-lists')}
                     >
-                      <Sparkles className="h-3 w-3" />
+                      <Sparkles className="h-4 w-4" />
                       <span className="text-xs font-medium">Smart Lists</span>
                       {!hasSubscription('smart-lists') && (
-                        <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
+                        <Lock className="h-3 w-3 absolute top-2 right-2 text-white" />
                       )}
                     </Button>
 
                     <Button
                       onClick={() => requiresSubscription('templates', () => setShowTemplates(true))}
-                      className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
+                      className={`h-16 flex flex-col items-center justify-center gap-2 relative rounded-2xl transition-all duration-200 hover:scale-105 ${
                         hasSubscription('templates') 
-                          ? 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' 
-                          : 'bg-gray-400 hover:bg-gray-500 opacity-70 border border-gray-300'
+                          ? 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 shadow-lg hover:shadow-xl' 
+                          : 'bg-gray-400 hover:bg-gray-500 opacity-70 border-2 border-gray-300'
                       }`}
                       disabled={!hasSubscription('templates')}
                     >
-                      <Bookmark className="h-3 w-3" />
+                      <Bookmark className="h-4 w-4" />
                       <span className="text-xs font-medium">Templates</span>
                       {!hasSubscription('templates') && (
-                        <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
+                        <Lock className="h-3 w-3 absolute top-2 right-2 text-white" />
                       )}
                     </Button>
 
                     <Button
                       onClick={() => setShowQuickAdd(true)}
-                      className="h-12 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white"
+                      className="h-16 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-2xl transition-all duration-200 hover:scale-105 shadow-lg"
                     >
-                      <Plus className="h-3 w-3" />
+                      <Plus className="h-4 w-4" />
                       <span className="text-xs font-medium">Quick Add</span>
                     </Button>
                   </div>
 
                   {/* Add Item Section */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-4 shadow-sm">
-                    <div className="flex gap-2">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-6 shadow-lg border border-gray-100 dark:border-gray-700">
+                    <div className="flex gap-3">
                       <Input
                         placeholder="Add new item..."
                         value={newItem}
                         onChange={(e) => setNewItem(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                        className="flex-1 h-9 text-sm"
+                        className="flex-1 h-10 text-sm rounded-xl border-gray-200 dark:border-gray-600"
                       />
-                      <Button onClick={addItem} className="px-3 h-9">
+                      <Button onClick={addItem} className="px-4 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -593,11 +605,11 @@ export default function Index() {
 
                   {/* Categories */}
                   {!simpleMode && (
-                    <div className="flex gap-1 mb-3 overflow-x-auto pb-2">
+                    <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                       <Button
                         variant={selectedCategory === 'all' ? 'default' : 'outline'}
                         onClick={() => setSelectedCategory('all')}
-                        className="whitespace-nowrap text-xs h-7 px-2"
+                        className="whitespace-nowrap text-xs h-8 px-3 rounded-full"
                       >
                         All ({items.length})
                       </Button>
@@ -608,7 +620,7 @@ export default function Index() {
                             key={category}
                             variant={selectedCategory === category ? 'default' : 'outline'}
                             onClick={() => setSelectedCategory(category)}
-                            className="whitespace-nowrap text-xs h-7 px-2 capitalize"
+                            className="whitespace-nowrap text-xs h-8 px-3 capitalize rounded-full"
                           >
                             {category} ({count})
                           </Button>
@@ -648,26 +660,26 @@ export default function Index() {
                     ))}
                     
                     {filteredItems.length === 0 && (
-                      <div className="text-center py-8">
-                        <div className="text-4xl mb-3">🎒</div>
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                      <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900/20 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                        <div className="text-6xl mb-4">🎒</div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                           Your packing list is empty
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          Add items manually or use our smart lists to get started
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-xs mx-auto">
+                          Add items manually or use our smart lists to get started on your perfect packing list
                         </p>
                         <Button
                           onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
-                          className={hasSubscription('smart-lists') 
-                            ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700" 
-                            : "bg-gray-400 hover:bg-gray-500 opacity-70 relative"
-                          }
+                          className={`relative rounded-2xl transition-all duration-200 hover:scale-105 ${hasSubscription('smart-lists') 
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg" 
+                            : "bg-gray-400 hover:bg-gray-500 opacity-70"
+                          }`}
                           disabled={!hasSubscription('smart-lists')}
                         >
                           <Sparkles className="h-4 w-4 mr-2" />
                           Browse Smart Lists
                           {!hasSubscription('smart-lists') && (
-                            <Lock className="h-3 w-3 absolute top-1 right-1" />
+                            <Lock className="h-4 w-4 absolute top-2 right-2" />
                           )}
                         </Button>
                       </div>
@@ -681,12 +693,12 @@ export default function Index() {
 
         {/* Additional Action Buttons */}
         {activeTab === 'trips' && currentTrip && currentPackingListId && (
-          <div className="fixed bottom-20 right-4 flex flex-col gap-2">
+          <div className="fixed bottom-20 right-4 flex flex-col gap-3">
             <Button
               onClick={() => setShowLuggageView(true)}
-              className="rounded-full h-10 w-10 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
+              className="rounded-2xl h-12 w-12 p-0 bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-110"
             >
-              <Move className="h-4 w-4" />
+              <Move className="h-5 w-5" />
             </Button>
           </div>
         )}
