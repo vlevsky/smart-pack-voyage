@@ -1,24 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, Zap, Target, Award, Gift, Gamepad2 } from 'lucide-react';
+import { Trophy, Star, Zap, Target, Award, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface PackingGameModeProps {
-  isEnabled: boolean;
-  onToggle: (enabled: boolean) => void;
+interface GameModeTabProps {
   packedItems: number;
   totalItems: number;
-  onItemPacked?: () => void;
 }
 
 interface Achievement {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: typeof Star;
   unlocked: boolean;
   progress: number;
   maxProgress: number;
@@ -72,12 +68,9 @@ const initialAchievements: Achievement[] = [
   },
 ];
 
-export const PackingGameMode: React.FC<PackingGameModeProps> = ({
-  isEnabled,
-  onToggle,
+export const GameModeTab: React.FC<GameModeTabProps> = ({
   packedItems,
   totalItems,
-  onItemPacked,
 }) => {
   const [gameStats, setGameStats] = useState<GameStats>({
     level: 1,
@@ -91,38 +84,42 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
 
-  // Load saved stats on mount
+  // Load saved stats
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedStats = localStorage.getItem('packingGameStats');
-        if (savedStats) {
-          const parsed = JSON.parse(savedStats);
-          setGameStats({
-            ...parsed,
-            achievements: parsed.achievements || initialAchievements,
-          });
-        }
-      } catch (error) {
-        console.warn('Failed to load game stats:', error);
+    try {
+      const savedStats = localStorage.getItem('packingGameStats');
+      if (savedStats) {
+        const parsed = JSON.parse(savedStats);
+        setGameStats({
+          ...parsed,
+          achievements: parsed.achievements || initialAchievements,
+        });
       }
+    } catch (error) {
+      console.warn('Failed to load game stats:', error);
     }
   }, []);
 
-  // Save stats when they change
+  // Save stats
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('packingGameStats', JSON.stringify(gameStats));
-      } catch (error) {
-        console.warn('Failed to save game stats:', error);
-      }
+    try {
+      localStorage.setItem('packingGameStats', JSON.stringify(gameStats));
+    } catch (error) {
+      console.warn('Failed to save game stats:', error);
     }
   }, [gameStats]);
 
-  const addXP = useCallback((amount: number) => {
-    if (!isEnabled) return;
+  // Add XP when items are packed
+  useEffect(() => {
+    const prevPackedItems = parseInt(localStorage.getItem('prevPackedItems') || '0');
+    if (packedItems > prevPackedItems) {
+      const xpGained = (packedItems - prevPackedItems) * 10;
+      addXP(xpGained);
+      localStorage.setItem('prevPackedItems', packedItems.toString());
+    }
+  }, [packedItems]);
 
+  const addXP = (amount: number) => {
     setGameStats(prev => {
       const newXP = prev.xp + amount;
       const newTotalXP = prev.totalXP + amount;
@@ -137,20 +134,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
         setTimeout(() => setShowLevelUp(false), 3000);
       }
 
-      return {
-        ...prev,
-        xp: newXP >= prev.xpToNextLevel ? newXP - prev.xpToNextLevel : newXP,
-        level: newLevel,
-        xpToNextLevel: newXPToNextLevel,
-        totalXP: newTotalXP,
-      };
-    });
-  }, [isEnabled]);
-
-  const updateAchievements = useCallback(() => {
-    if (!isEnabled) return;
-
-    setGameStats(prev => {
+      // Update achievements
       const updatedAchievements = prev.achievements.map(achievement => {
         let newProgress = achievement.progress;
 
@@ -159,13 +143,13 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
             newProgress = Math.min(packedItems, achievement.maxProgress);
             break;
           case 'streak_5':
-            newProgress = Math.min(prev.streak, achievement.maxProgress);
+            newProgress = Math.min(packedItems, achievement.maxProgress);
             break;
           case 'completionist':
             newProgress = totalItems > 0 && packedItems === totalItems ? 1 : 0;
             break;
           case 'efficiency_expert':
-            newProgress = Math.min(prev.totalXP / 10, achievement.maxProgress);
+            newProgress = Math.min(Math.floor(newTotalXP / 10), achievement.maxProgress);
             break;
         }
 
@@ -186,19 +170,15 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
 
       return {
         ...prev,
+        xp: newXP >= prev.xpToNextLevel ? newXP - prev.xpToNextLevel : newXP,
+        level: newLevel,
+        xpToNextLevel: newXPToNextLevel,
+        totalXP: newTotalXP,
+        streak: packedItems,
         achievements: updatedAchievements,
       };
     });
-  }, [isEnabled, packedItems, totalItems]);
-
-  // Update game stats when items are packed
-  useEffect(() => {
-    if (isEnabled && packedItems > 0) {
-      addXP(10);
-      setGameStats(prev => ({ ...prev, streak: packedItems }));
-      updateAchievements();
-    }
-  }, [packedItems, isEnabled, addXP, updateAchievements]);
+  };
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Packing Newbie';
@@ -211,115 +191,112 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   const progressPercentage = gameStats.xpToNextLevel > 0 ? (gameStats.xp / gameStats.xpToNextLevel) * 100 : 0;
   const completionPercentage = totalItems > 0 ? (packedItems / totalItems) * 100 : 0;
 
-  if (!isEnabled) {
-    return (
-      <div className="bg-gradient-to-r from-primary/90 to-primary/70 rounded-xl p-3 text-primary-foreground mb-3 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-white/20 rounded-full p-2">
-              <Trophy className="h-4 w-4" />
-            </div>
-            <div>
-              <span className="font-semibold text-base">Game Mode</span>
-              <p className="text-xs opacity-90 mt-1">
-                Turn packing into a fun challenge!
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={() => onToggle(true)}
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 font-medium text-sm h-8"
-            size="sm"
-          >
-            Enable
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-xl p-3 text-primary-foreground mb-3 relative overflow-hidden shadow-lg"
-      >
-        {/* Decorative background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-2 right-2 w-12 h-12 bg-white rounded-full"></div>
-          <div className="absolute bottom-2 left-2 w-8 h-8 bg-white rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-white rounded-full"></div>
+    <div className="p-4 pb-20 space-y-4">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-2">
+          <Gamepad2 className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl font-bold text-primary">Game Mode</h1>
         </div>
+        <p className="text-muted-foreground">Turn packing into a fun challenge!</p>
+      </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
+      {/* Level Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-white/20 rounded-full p-2 backdrop-blur-sm">
-                <Trophy className="h-6 w-6" />
+              <div className="bg-primary/10 rounded-full p-3">
+                <Trophy className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <div className="font-bold text-xl">Level {gameStats.level}</div>
-                <div className="text-sm opacity-90">{getLevelTitle(gameStats.level)}</div>
+                <CardTitle className="text-xl">Level {gameStats.level}</CardTitle>
+                <p className="text-sm text-muted-foreground">{getLevelTitle(gameStats.level)}</p>
               </div>
             </div>
-            <Button
-              onClick={() => onToggle(false)}
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 h-8 w-8 p-0 rounded-full"
-            >
-              ×
-            </Button>
           </div>
-
-          <div className="space-y-3 mb-4">
-            <div className="flex justify-between text-sm font-medium">
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between text-sm font-medium mb-2">
               <span>XP Progress</span>
               <span>{gameStats.xp}/{gameStats.xpToNextLevel}</span>
             </div>
-            <div className="bg-white/20 rounded-full h-3 overflow-hidden backdrop-blur-sm">
-              <div 
-                className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-500"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
+            <Progress value={progressPercentage} className="h-3" />
           </div>
-
-          <div className="grid grid-cols-3 gap-4 text-center mb-4">
-            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+          
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="bg-muted/50 rounded-lg p-3">
               <div className="font-bold text-lg">{gameStats.totalXP}</div>
-              <div className="text-xs opacity-75">Total XP</div>
+              <div className="text-xs text-muted-foreground">Total XP</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+            <div className="bg-muted/50 rounded-lg p-3">
               <div className="font-bold text-lg">{gameStats.streak}</div>
-              <div className="text-xs opacity-75">Streak</div>
+              <div className="text-xs text-muted-foreground">Items Packed</div>
             </div>
-            <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+            <div className="bg-muted/50 rounded-lg p-3">
               <div className="font-bold text-lg">{Math.round(completionPercentage)}%</div>
-              <div className="text-xs opacity-75">Complete</div>
+              <div className="text-xs text-muted-foreground">Complete</div>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {gameStats.achievements.filter(a => a.unlocked).length > 0 && (
-            <div className="flex gap-2 flex-wrap">
-              {gameStats.achievements.filter(a => a.unlocked).slice(0, 3).map((achievement) => {
-                const Icon = achievement.icon;
-                return (
-                  <div
-                    key={achievement.id}
-                    className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1"
-                  >
-                    <Icon className="h-3 w-3" />
-                    <span className="text-xs font-medium">{achievement.name}</span>
+      {/* Achievements */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="h-5 w-5" />
+            Achievements
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3">
+            {gameStats.achievements.map((achievement) => {
+              const Icon = achievement.icon;
+              const progress = (achievement.progress / achievement.maxProgress) * 100;
+              
+              return (
+                <div
+                  key={achievement.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                    achievement.unlocked 
+                      ? 'bg-primary/5 border-primary/20' 
+                      : 'bg-muted/30 border-muted'
+                  }`}
+                >
+                  <div className={`rounded-full p-2 ${
+                    achievement.unlocked ? 'bg-primary/20' : 'bg-muted'
+                  }`}>
+                    <Icon className={`h-4 w-4 ${
+                      achievement.unlocked ? 'text-primary' : 'text-muted-foreground'
+                    }`} />
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </motion.div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className={`font-medium text-sm ${
+                        achievement.unlocked ? 'text-primary' : 'text-muted-foreground'
+                      }`}>
+                        {achievement.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {achievement.progress}/{achievement.maxProgress}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {achievement.description}
+                    </p>
+                    <Progress value={progress} className="h-1" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Level Up Animation */}
       <AnimatePresence>
         {showLevelUp && (
           <motion.div
@@ -351,7 +328,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
-                {React.createElement(showAchievement.icon, { className: "h-5 w-5" })}
+                <showAchievement.icon className="h-5 w-5" />
               </div>
               <div>
                 <div className="font-semibold">Achievement Unlocked!</div>
@@ -362,6 +339,6 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };

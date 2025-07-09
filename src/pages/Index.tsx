@@ -36,9 +36,7 @@ import {
 import {
   TripCountdown
 } from '@/components/TripCountdown';
-import {
-  PackingGameMode
-} from '@/components/PackingGameMode';
+import { GameModeTab } from '@/components/GameModeTab';
 import { SmartSuggestions } from '@/components/SmartSuggestions';
 
 interface Item {
@@ -101,7 +99,7 @@ export default function Index() {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<'trips' | 'help' | 'settings' | 'upgrade'>('trips');
+  const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'help' | 'settings' | 'upgrade'>('trips');
 
   // Handle tab changes to show/hide modals
   useEffect(() => {
@@ -401,6 +399,14 @@ export default function Index() {
             </div>
           )}
 
+          {/* Game Tab Content */}
+          {activeTab === 'game' && (
+            <GameModeTab
+              packedItems={items.filter(item => item.packed).length}
+              totalItems={items.length}
+            />
+          )}
+
           {/* Settings Tab Content */}
           {activeTab === 'settings' && (
             <div className="space-y-6">
@@ -476,14 +482,6 @@ export default function Index() {
             />
           )}
 
-          {/* Game Mode */}
-          <PackingGameMode
-            isEnabled={gameMode}
-            onToggle={setGameMode}
-            packedItems={items.filter(item => item.packed).length}
-            totalItems={items.length}
-            onItemPacked={() => {}}
-          />
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-2 mb-4">
