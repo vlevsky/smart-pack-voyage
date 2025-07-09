@@ -2097,7 +2097,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
 
         {/* Content Area */}
         <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto">
+          <ScrollArea className="h-full">
             <div className="p-3 md:p-6">
               {activeTab === 'lists' ? (
                 <div className="grid gap-3 md:gap-4">
@@ -2236,7 +2236,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                 </div>
               )}
             </div>
-          </div>
+          </ScrollArea>
         </div>
 
         {/* Preview Modal */}

@@ -101,6 +101,15 @@ export default function Index() {
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [activeTab, setActiveTab] = useState<'trips' | 'help' | 'settings' | 'upgrade'>('trips');
+
+  // Handle tab changes to show/hide modals
+  useEffect(() => {
+    setShowHelp(activeTab === 'help');
+    setShowSettings(activeTab === 'settings');
+    if (activeTab === 'upgrade') {
+      setShowSubscriptionModal(true);
+    }
+  }, [activeTab]);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -546,6 +555,7 @@ export default function Index() {
                 onUpdate={(updatedItem: Item) => {
                   setItems(items.map(i => i.id === updatedItem.id ? updatedItem : i));
                 }}
+                textSize={accessibilitySettings.largeText ? 'large' : 'normal'}
               />
             ))}
             
@@ -612,9 +622,12 @@ export default function Index() {
           currentItems={items}
         />
 
-        <HelpModal
+        <EnhancedHelpModal
           isOpen={showHelp}
-          onClose={() => setShowHelp(false)}
+          onClose={() => {
+            setShowHelp(false);
+            setActiveTab('trips');
+          }}
         />
 
         <LuggageView
