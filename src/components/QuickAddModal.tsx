@@ -8,38 +8,87 @@ interface QuickAddModalProps {
   onClose: () => void;
   onAddItem: (item: { name: string; category: string }) => void;
   existingItems: string[];
+  tripType?: 'business' | 'evening' | 'casual';
+  numberOfPeople?: number;
 }
 
-const QUICK_SUGGESTIONS = [
+const BASE_SUGGESTIONS = [
   { name: 'Toothbrush', category: 'toiletries' },
   { name: 'Toothpaste', category: 'toiletries' },
   { name: 'Hairbrush', category: 'toiletries' },
   { name: 'Deodorant', category: 'toiletries' },
   { name: 'Shampoo', category: 'toiletries' },
   { name: 'Phone Charger', category: 'electronics' },
-  { name: 'Power Bank', category: 'electronics' },
-  { name: 'Headphones', category: 'electronics' },
-  { name: 'Camera', category: 'electronics' },
   { name: 'Underwear', category: 'clothes' },
   { name: 'Socks', category: 'clothes' },
   { name: 'Pajamas', category: 'clothes' },
-  { name: 'Jacket', category: 'clothes' },
-  { name: 'Sneakers', category: 'clothes' },
-  { name: 'Sunglasses', category: 'miscellaneous' },
-  { name: 'Sunscreen', category: 'miscellaneous' },
-  { name: 'Umbrella', category: 'miscellaneous' },
-  { name: 'Travel Pillow', category: 'miscellaneous' },
-  { name: 'First Aid Kit', category: 'miscellaneous' },
   { name: 'Passport', category: 'documents' },
-  { name: 'Tickets', category: 'documents' },
   { name: 'ID Card', category: 'documents' },
-  { name: 'Travel Insurance', category: 'documents' },
 ];
 
-export function QuickAddModal({ isOpen, onClose, onAddItem, existingItems }: QuickAddModalProps) {
+const CASUAL_SUGGESTIONS = [
+  { name: 'T-shirt', category: 'clothes' },
+  { name: 'Jeans', category: 'clothes' },
+  { name: 'Sneakers', category: 'clothes' },
+  { name: 'Hoodie', category: 'clothes' },
+  { name: 'Shorts', category: 'clothes' },
+  { name: 'Flip Flops', category: 'clothes' },
+  { name: 'Backpack', category: 'miscellaneous' },
+  { name: 'Water Bottle', category: 'miscellaneous' },
+  { name: 'Sunglasses', category: 'miscellaneous' },
+  { name: 'Sunscreen', category: 'miscellaneous' },
+  { name: 'Camera', category: 'electronics' },
+];
+
+const BUSINESS_SUGGESTIONS = [
+  { name: 'Dress Shirt', category: 'clothes' },
+  { name: 'Suit', category: 'clothes' },
+  { name: 'Dress Shoes', category: 'clothes' },
+  { name: 'Tie', category: 'clothes' },
+  { name: 'Belt', category: 'clothes' },
+  { name: 'Laptop', category: 'electronics' },
+  { name: 'Business Cards', category: 'documents' },
+  { name: 'Portfolio', category: 'miscellaneous' },
+  { name: 'Power Bank', category: 'electronics' },
+  { name: 'Dress Watch', category: 'miscellaneous' },
+];
+
+const EVENING_SUGGESTIONS = [
+  { name: 'Dress', category: 'clothes' },
+  { name: 'Heels', category: 'clothes' },
+  { name: 'Makeup', category: 'toiletries' },
+  { name: 'Jewelry', category: 'miscellaneous' },
+  { name: 'Perfume', category: 'toiletries' },
+  { name: 'Clutch', category: 'miscellaneous' },
+  { name: 'Hair Styling Tools', category: 'electronics' },
+  { name: 'Formal Shoes', category: 'clothes' },
+  { name: 'Evening Gown', category: 'clothes' },
+  { name: 'Dress Shirt', category: 'clothes' },
+];
+
+export function QuickAddModal({ isOpen, onClose, onAddItem, existingItems, tripType = 'casual', numberOfPeople = 1 }: QuickAddModalProps) {
   const [addedItems, setAddedItems] = useState<string[]>([]);
 
-  const availableSuggestions = QUICK_SUGGESTIONS.filter(
+  const getSmartSuggestions = () => {
+    let suggestions = [...BASE_SUGGESTIONS];
+    
+    switch (tripType) {
+      case 'business':
+        suggestions = [...suggestions, ...BUSINESS_SUGGESTIONS];
+        break;
+      case 'evening':
+        suggestions = [...suggestions, ...EVENING_SUGGESTIONS];
+        break;
+      case 'casual':
+      default:
+        suggestions = [...suggestions, ...CASUAL_SUGGESTIONS];
+        break;
+    }
+    
+    return suggestions;
+  };
+
+  const availableSuggestions = getSmartSuggestions().filter(
     suggestion => !existingItems.includes(suggestion.name.toLowerCase()) && 
                   !addedItems.includes(suggestion.name)
   );
@@ -61,13 +110,25 @@ export function QuickAddModal({ isOpen, onClose, onAddItem, existingItems }: Qui
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Zap className="h-5 w-5 text-blue-500" />
             Quick Add Items
+            {tripType && (
+              <span className="text-sm font-normal text-muted-foreground capitalize">
+                ({tripType} trip)
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Add common items to your packing list with one click
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Add common items to your packing list with one click
+            </p>
+            {numberOfPeople > 1 && (
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                Items will be multiplied by {numberOfPeople} people
+              </p>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
             {availableSuggestions.length === 0 ? (

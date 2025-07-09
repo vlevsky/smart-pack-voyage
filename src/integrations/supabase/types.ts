@@ -129,7 +129,9 @@ export type Database = {
           id: string
           name: string
           notes: string | null
+          number_of_people: number | null
           start_date: string | null
+          trip_type: string | null
           updated_at: string
           user_id: string
         }
@@ -140,7 +142,9 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
+          number_of_people?: number | null
           start_date?: string | null
+          trip_type?: string | null
           updated_at?: string
           user_id: string
         }
@@ -151,7 +155,9 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
+          number_of_people?: number | null
           start_date?: string | null
+          trip_type?: string | null
           updated_at?: string
           user_id?: string
         }

@@ -55,6 +55,9 @@ interface Trip {
   destination?: string;
   startDate?: string;
   endDate?: string;
+  numberOfPeople?: number;
+  tripType?: 'business' | 'evening' | 'casual';
+  notes?: string;
 }
 
 interface Template {
@@ -212,12 +215,16 @@ export default function Index() {
   };
 
   const addSuggestedItem = (item: { name: string; category: string; quantity?: number }) => {
+    const numberOfPeople = currentTrip?.numberOfPeople || 1;
+    const baseQuantity = item.quantity || 1;
+    const finalQuantity = baseQuantity * numberOfPeople;
+    
     const newItemObject: Item = {
       id: Date.now().toString(),
       name: item.name,
       category: item.category,
       packed: false,
-      quantity: item.quantity,
+      quantity: finalQuantity,
     };
     setItems([...items, newItemObject]);
     setLastAddedItem(item.name);
@@ -702,6 +709,8 @@ export default function Index() {
           onClose={() => setShowQuickAdd(false)}
           onAddItem={addSuggestedItem}
           existingItems={items.map(item => item.name.toLowerCase())}
+          tripType={currentTrip?.tripType}
+          numberOfPeople={currentTrip?.numberOfPeople}
         />
 
         <BottomNavigation 

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Trip {
   id: string;
@@ -18,6 +19,8 @@ interface Trip {
   isComplete?: boolean;
   itemCount?: number;
   notes?: string;
+  numberOfPeople?: number;
+  tripType?: 'business' | 'evening' | 'casual';
 }
 
 interface TripManagerProps {
@@ -45,7 +48,9 @@ const TripCard: React.FC<{
     destination: trip.destination || '',
     startDate: trip.startDate || '',
     endDate: trip.endDate || '',
-    notes: trip.notes || ''
+    notes: trip.notes || '',
+    numberOfPeople: trip.numberOfPeople || 1,
+    tripType: trip.tripType || 'casual'
   });
 
   const formatDate = (dateString?: string) => {
@@ -77,7 +82,9 @@ const TripCard: React.FC<{
       destination: trip.destination || '',
       startDate: trip.startDate || '',
       endDate: trip.endDate || '',
-      notes: trip.notes || ''
+      notes: trip.notes || '',
+      numberOfPeople: trip.numberOfPeople || 1,
+      tripType: trip.tripType || 'casual'
     });
     setIsEditing(false);
   };
@@ -294,6 +301,61 @@ const TripCard: React.FC<{
                         </p>
                       )}
                     </div>
+                  </div>
+                </div>
+
+                {/* Trip Configuration */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      Number of People
+                    </label>
+                    {isEditing ? (
+                      <Select 
+                        value={editData.numberOfPeople.toString()} 
+                        onValueChange={(value) => setEditData(prev => ({ ...prev, numberOfPeople: parseInt(value) }))}
+                      >
+                        <SelectTrigger className="text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num} {num === 1 ? 'person' : 'people'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-sm text-foreground">
+                        {trip.numberOfPeople || 1} {(trip.numberOfPeople || 1) === 1 ? 'person' : 'people'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                      Trip Type
+                    </label>
+                    {isEditing ? (
+                      <Select 
+                        value={editData.tripType} 
+                        onValueChange={(value: 'business' | 'evening' | 'casual') => setEditData(prev => ({ ...prev, tripType: value }))}
+                      >
+                        <SelectTrigger className="text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="casual">Casual</SelectItem>
+                          <SelectItem value="business">Business</SelectItem>
+                          <SelectItem value="evening">Evening</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-sm text-foreground capitalize">
+                        {trip.tripType || 'casual'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
