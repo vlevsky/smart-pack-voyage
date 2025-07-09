@@ -39,6 +39,7 @@ import {
 import {
   PackingGameMode
 } from '@/components/PackingGameMode';
+import { SmartSuggestions } from '@/components/SmartSuggestions';
 
 interface Item {
   id: string;
@@ -121,6 +122,8 @@ export default function Index() {
   const [settingsExpanded, setSettingsExpanded] = useState(false);
   const [customTheme, setCustomTheme] = useState<string>('default');
   const [customFont, setCustomFont] = useState<string>('inter');
+  const [lastAddedItem, setLastAddedItem] = useState<string>('');
+  const [blockedSuggestions, setBlockedSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingListItems');
@@ -187,6 +190,7 @@ export default function Index() {
         packed: false,
       };
       setItems([...items, newItemObject]);
+      setLastAddedItem(newItem);
       setNewItem('');
     }
   };
@@ -200,6 +204,21 @@ export default function Index() {
       quantity: item.quantity,
     }));
     setItems([...items, ...newItemObjects]);
+    if (newItems.length > 0) {
+      setLastAddedItem(newItems[newItems.length - 1].name);
+    }
+  };
+
+  const addSuggestedItem = (item: { name: string; category: string; quantity?: number }) => {
+    const newItemObject: Item = {
+      id: Date.now().toString(),
+      name: item.name,
+      category: item.category,
+      packed: false,
+      quantity: item.quantity,
+    };
+    setItems([...items, newItemObject]);
+    setLastAddedItem(item.name);
   };
 
   const removeItem = (id: string) => {
@@ -291,7 +310,13 @@ export default function Index() {
     }
   };
 
-  const filteredItems = selectedCategory === 'all' ? items : items.filter(item => item.category === selectedCategory);
+  // Auto-sort items: unpacked first, then packed at bottom
+  const sortedItems = [...items].sort((a, b) => {
+    if (a.packed === b.packed) return 0;
+    return a.packed ? 1 : -1;
+  });
+  
+  const filteredItems = selectedCategory === 'all' ? sortedItems : sortedItems.filter(item => item.category === selectedCategory);
 
   const hasSubscription = (feature: string) => {
     if (subscriptionTier === 'free') {
@@ -536,6 +561,14 @@ export default function Index() {
               })}
             </div>
           )}
+
+          {/* Smart Suggestions */}
+          <SmartSuggestions
+            lastAddedItem={lastAddedItem}
+            onAddItem={addSuggestedItem}
+            blockedItems={blockedSuggestions}
+            onBlockItem={(item) => setBlockedSuggestions([...blockedSuggestions, item])}
+          />
 
           {/* Progress */}
           <ProgressBar

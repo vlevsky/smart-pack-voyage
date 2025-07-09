@@ -89,12 +89,32 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 }) => {
   const [selectedTier, setSelectedTier] = useState<string>('gold');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [showManagement, setShowManagement] = useState(false);
+
+  // Mock current subscription data
+  const currentSubscription = {
+    tier: 'gold',
+    status: 'active',
+    nextBilling: '2024-08-15',
+    amount: '$79.99',
+    period: 'yearly'
+  };
 
   if (!isOpen) return null;
 
   const handleSubscribe = () => {
     onSubscribe(selectedTier);
     onClose();
+  };
+
+  const handleManageSubscription = () => {
+    setShowManagement(true);
+  };
+
+  const handleCancelSubscription = () => {
+    // Mock cancellation
+    alert('Subscription cancelled. You will retain access until your next billing date.');
+    setShowManagement(false);
   };
 
   return (
@@ -108,41 +128,126 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold gradient-text">Upgrade to Pro</h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Choose the perfect plan for your travels</p>
+              <h2 className="text-2xl font-bold gradient-text">
+                {showManagement ? 'Manage Subscription' : 'Upgrade to Pro'}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                {showManagement ? 'View and manage your subscription details' : 'Choose the perfect plan for your travels'}
+              </p>
             </div>
             <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 p-0">
               <X className="h-5 w-5" />
             </Button>
           </div>
 
-          <div className="flex justify-center mb-6">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 flex">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-3 rounded-full font-medium transition-all ${
-                  billingPeriod === 'monthly'
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingPeriod('yearly')}
-                className={`px-6 py-3 rounded-full font-medium transition-all relative ${
-                  billingPeriod === 'yearly'
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}
-              >
-                Yearly
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                  Save
-                </span>
-              </button>
+          {showManagement ? (
+            // Subscription Management View
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold">Current Plan: Gold</h3>
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Active</Badge>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Next billing</p>
+                    <p className="font-semibold">{currentSubscription.nextBilling}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Amount</p>
+                    <p className="font-semibold">{currentSubscription.amount}/year</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Your Benefits:</h4>
+                  <ul className="space-y-1 text-sm">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-green-500" />
+                      AI packing assistant
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-green-500" />
+                      Advanced templates
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-green-500" />
+                      Airline integrations
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-green-500" />
+                      Priority support
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl"
+                  onClick={() => setShowManagement(false)}
+                >
+                  Upgrade Plan
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full py-3 rounded-xl"
+                  onClick={() => alert('Billing details updated!')}
+                >
+                  Update Payment Method
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full py-3 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  onClick={handleCancelSubscription}
+                >
+                  Cancel Subscription
+                </Button>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setShowManagement(false)} className="flex-1 py-3 rounded-xl">
+                  Back to Plans
+                </Button>
+                <Button variant="ghost" onClick={onClose} className="flex-1 py-3 rounded-xl">
+                  Close
+                </Button>
+              </div>
             </div>
-          </div>
+          ) : (
+            // Original subscription plans view
+            <div>
+              <div className="flex justify-center mb-6">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 flex">
+                  <button
+                    onClick={() => setBillingPeriod('monthly')}
+                    className={`px-6 py-3 rounded-full font-medium transition-all ${
+                      billingPeriod === 'monthly'
+                        ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setBillingPeriod('yearly')}
+                    className={`px-6 py-3 rounded-full font-medium transition-all relative ${
+                      billingPeriod === 'yearly'
+                        ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    Yearly
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      Save
+                    </span>
+                  </button>
+                </div>
+               </div>
 
         <div className="grid gap-4 mb-6">
           {subscriptionTiers.map((tier) => {
@@ -210,29 +315,31 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           })}
         </div>
 
-          <div className="space-y-4">
-            <Button
-              onClick={handleSubscribe}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold rounded-xl shadow-lg"
-            >
-              🚀 Start Your Journey
-            </Button>
-            
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose} className="flex-1 py-3 rounded-xl">
-                Maybe Later
-              </Button>
-              <Button variant="ghost" className="flex-1 py-3 rounded-xl text-blue-600 dark:text-blue-400">
-                Restore Purchases
-              </Button>
+              <div className="space-y-4">
+                <Button
+                  onClick={handleSubscribe}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold rounded-xl shadow-lg"
+                >
+                  🚀 Start Your Journey
+                </Button>
+                
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={onClose} className="flex-1 py-3 rounded-xl">
+                    Maybe Later
+                  </Button>
+                  <Button variant="ghost" className="flex-1 py-3 rounded-xl text-blue-600 dark:text-blue-400" onClick={handleManageSubscription}>
+                    Manage Subscription
+                  </Button>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Cancel anytime • 30-day money-back guarantee
+                  </p>
+                </div>
+              </div>
             </div>
-            
-            <div className="text-center">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Cancel anytime • 30-day money-back guarantee
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </motion.div>
     </div>
