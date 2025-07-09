@@ -148,8 +148,6 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
     setShowOptions(true);
   };
 
-  if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center">
       <motion.div
@@ -159,7 +157,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
         className="bg-white dark:bg-gray-900 rounded-t-3xl w-full h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-10">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
               <Bot className="h-5 w-5 text-white" />
@@ -178,11 +176,55 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
             <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
+        </div>
+
+        {/* CRITICAL FIX: Input Section FIRST - Above all content */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <Input
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder={showOptions ? "Type your question here..." : "Type your message..."}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (inputText.trim()) {
+                      if (showOptions) {
+                        setShowOptions(false);
+                      }
+                      handleSendMessage();
+                    }
+                  }
+                }}
+                className="min-h-[48px] text-base border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="sentences"
+                disabled={isTyping}
+                autoFocus
+              />
+            </div>
+            <Button 
+              onClick={() => {
+                if (inputText.trim()) {
+                  if (showOptions) {
+                    setShowOptions(false);
+                  }
+                  handleSendMessage();
+                }
+              }}
+              disabled={!inputText.trim() || isTyping}
+              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 min-h-[48px] min-w-[48px] shrink-0 text-white"
+              size="sm"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Content Area - Now scrollable below input */}
+        <div className="flex-1 overflow-hidden flex flex-col bg-gray-50 dark:bg-gray-800">
           {showOptions ? (
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               <div className="text-center mb-6">
@@ -291,49 +333,6 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
           )}
         </div>
 
-        {/* Input Section - FIXED: Always visible and functional */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 z-30 relative">
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Input
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={showOptions ? "Or type your question here..." : "Type your message..."}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (inputText.trim()) {
-                      if (showOptions) {
-                        setShowOptions(false);
-                      }
-                      handleSendMessage();
-                    }
-                  }
-                }}
-                className="min-h-[44px] text-base border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-white dark:bg-gray-800"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="sentences"
-                disabled={isTyping}
-                autoFocus={!showOptions}
-              />
-            </div>
-            <Button 
-              onClick={() => {
-                if (inputText.trim()) {
-                  if (showOptions) {
-                    setShowOptions(false);
-                  }
-                  handleSendMessage();
-                }
-              }}
-              disabled={!inputText.trim() || isTyping}
-              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 min-h-[44px] min-w-[44px] shrink-0 border-2 border-blue-500 text-white"
-              size="sm"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </motion.div>
     </div>

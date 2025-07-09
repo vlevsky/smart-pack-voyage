@@ -2004,7 +2004,7 @@ export const PremadeListsModal: React.FC<PremadeListsModalProps> = ({
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
             }`}
           >
-            Airline Rules ({airlines.length})
+            Baggage Rules ({airlines.length})
           </button>
         </div>
 

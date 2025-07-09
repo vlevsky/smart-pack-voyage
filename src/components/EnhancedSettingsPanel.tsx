@@ -376,6 +376,89 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                 )}
               </AnimatePresence>
             </Card>
+
+            {/* Advanced Settings */}
+            <Card className="overflow-hidden">
+              <div 
+                className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                onClick={() => toggleSection('advanced')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Zap className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                    <span className="font-semibold text-gray-900 dark:text-white">Advanced Settings</span>
+                  </div>
+                  {expandedSections.includes('advanced') ? 
+                    <ChevronDown className="h-4 w-4" /> : 
+                    <ChevronRight className="h-4 w-4" />
+                  }
+                </div>
+              </div>
+              
+              <AnimatePresence>
+                {expandedSections.includes('advanced') && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="p-4 space-y-3">
+                      
+                      {/* Auto-save */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Shield className="h-4 w-4 text-green-500" />
+                          <span className="font-medium text-gray-900 dark:text-white">Auto-save</span>
+                        </div>
+                        <Switch
+                          checked={true}
+                          onCheckedChange={() => {}}
+                        />
+                      </div>
+
+                      {/* Smart Notifications */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Bell className="h-4 w-4 text-blue-500" />
+                          <span className="font-medium text-gray-900 dark:text-white">Smart Notifications</span>
+                        </div>
+                        <Switch
+                          checked={false}
+                          onCheckedChange={() => {}}
+                        />
+                      </div>
+
+                      {/* Offline Mode */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Volume2 className="h-4 w-4 text-purple-500" />
+                          <span className="font-medium text-gray-900 dark:text-white">Offline Mode</span>
+                        </div>
+                        <Switch
+                          checked={true}
+                          onCheckedChange={() => {}}
+                        />
+                      </div>
+
+                      {/* Data Sync */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Zap className="h-4 w-4 text-orange-500" />
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Data Sync</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Sync across devices</p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          Sync Now
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Card>
           </div>
         </div>
       </motion.div>
