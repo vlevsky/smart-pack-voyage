@@ -33,9 +33,19 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+
+  /* Custom theme variables */
+  --theme-ocean-primary: 204 84% 46%;
+  --theme-ocean-secondary: 204 94% 36%;
+  --theme-sunset-primary: 24 95% 53%;
+  --theme-sunset-secondary: 16 85% 53%;
+  --theme-forest-primary: 142 76% 36%;
+  --theme-forest-secondary: 142 86% 26%;
+  --theme-purple-primary: 271 81% 56%;
+  --theme-purple-secondary: 271 91% 65%;
 
     --radius: 0.5rem;
 

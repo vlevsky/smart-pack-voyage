@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { BottomNavigation } from '@/components/BottomNavigation';
+import { TripManager } from '@/components/TripManager';
+import { SettingsPanel } from '@/components/SettingsPanel';
+import { SimpleModeToggle } from '@/components/SimpleModeToggle';
 import { EnhancedAIAssistant } from '@/components/EnhancedAIAssistant';
 import { LuggageView } from '@/components/LuggageView';
 import { EnhancedHelpModal } from '@/components/EnhancedHelpModal';
@@ -67,6 +70,8 @@ interface AccessibilitySettings {
   highContrast: boolean;
   largeText: boolean;
   dyslexiaFont: boolean;
+  reducedMotion: boolean;
+  screenReader: boolean;
 }
 
 export default function Index() {
@@ -89,13 +94,21 @@ export default function Index() {
     highContrast: false,
     largeText: false,
     dyslexiaFont: false,
+    reducedMotion: false,
+    screenReader: false,
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<'trips' | 'ai' | 'settings' | 'pro'>('trips');
-  const [darkMode, setDarkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<'trips' | 'help' | 'settings' | 'upgrade'>('trips');
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   const [showLuggageView, setShowLuggageView] = useState(false);
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingListItems');
@@ -134,6 +147,24 @@ export default function Index() {
   useEffect(() => {
     localStorage.setItem('accessibilitySettings', JSON.stringify(accessibilitySettings));
   }, [accessibilitySettings]);
+
+  // Dark mode effect
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  // Initialize trips
+  useEffect(() => {
+    const savedTrips = localStorage.getItem('trips');
+    if (savedTrips) {
+      setTrips(JSON.parse(savedTrips));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('trips', JSON.stringify(trips));
+  }, [trips]);
 
   const addItem = () => {
     if (newItem.trim() !== '') {
@@ -198,6 +229,50 @@ export default function Index() {
     localStorage.setItem('subscriptionTier', tier);
   };
 
+  const handleTripCreate = (tripData: Omit<Trip, 'id'>) => {
+    const newTrip: Trip = {
+      ...tripData,
+      id: Date.now().toString(),
+    };
+    
+    // Set as current trip if no current trip exists
+    if (!currentTrip) {
+      setCurrentTrip(newTrip);
+    }
+    
+    setTrips([...trips, newTrip]);
+  };
+
+  const handleTripSelect = (trip: Trip) => {
+    setCurrentTrip(trip);
+    setActiveTab('trips');
+  };
+
+  const handleTripDelete = (tripId: string) => {
+    setTrips(trips.filter(t => t.id !== tripId));
+    if (currentTrip?.id === tripId) {
+      const remainingTrips = trips.filter(t => t.id !== tripId);
+      setCurrentTrip(remainingTrips.length > 0 ? remainingTrips[0] : null);
+    }
+  };
+
+  const handleTripUpdate = (tripId: string, updates: Partial<Trip>) => {
+    setTrips(trips.map(t => t.id === tripId ? { ...t, ...updates } : t));
+    if (currentTrip?.id === tripId) {
+      setCurrentTrip({ ...currentTrip, ...updates });
+    }
+  };
+
+  const handleSettingsChange = (key: string, value: any) => {
+    if (key === 'darkMode') {
+      setDarkMode(value);
+    } else if (key === 'simpleMode') {
+      setSimpleMode(value);
+    } else if (key === 'accessibilitySettings') {
+      setAccessibilitySettings(value);
+    }
+  };
+
   const filteredItems = selectedCategory === 'all' ? items : items.filter(item => item.category === selectedCategory);
 
   const hasSubscription = (feature: string) => {
@@ -240,74 +315,78 @@ export default function Index() {
     }`}>
 
       {/* Settings Panel */}
-      <motion.div
-        initial={false}
-        animate={{
-          height: showSettings ? 'auto' : 0
-        }}
-        className="overflow-hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-      >
-        <div className="p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant={simpleMode ? "default" : "outline"}
-              onClick={() => setSimpleMode(!simpleMode)}
-              className="text-sm"
-            >
-              Simple Mode
-            </Button>
-            <Button
-              variant={accessibilitySettings.highContrast ? "default" : "outline"}
-              onClick={() => setAccessibilitySettings(prev => ({
-                ...prev,
-                highContrast: !prev.highContrast
-              }))}
-              className="text-sm"
-            >
-              High Contrast
-            </Button>
-            <Button
-              variant={accessibilitySettings.largeText ? "default" : "outline"}
-              onClick={() => setAccessibilitySettings(prev => ({
-                ...prev,
-                largeText: !prev.largeText
-              }))}
-              className="text-sm"
-            >
-              Large Text
-            </Button>
-            <Button
-              variant={accessibilitySettings.dyslexiaFont ? "default" : "outline"}
-              onClick={() => setAccessibilitySettings(prev => ({
-                ...prev,
-                dyslexiaFont: !prev.dyslexiaFont
-              }))}
-              className="text-sm"
-            >
-              Dyslexia Font
-            </Button>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowHelp(true)}
-              className="flex-1 text-sm"
-            >
-              Help & Guide
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => requiresSubscription('ai-assistant', () => setShowAIAssistant(true))}
-              className="flex-1 text-sm"
-            >
-              AI Assistant
-            </Button>
-          </div>
-        </div>
-      </motion.div>
+      {activeTab === 'settings' && (
+        <SettingsPanel
+          isOpen={activeTab === 'settings'}
+          settings={{
+            darkMode,
+            simpleMode,
+            accessibilitySettings,
+          }}
+          onSettingsChange={handleSettingsChange}
+          subscriptionTier={subscriptionTier}
+        />
+      )}
 
       <div className="container mx-auto px-4 py-6 max-w-md">
+        
+        {/* Trip Manager */}
+        {activeTab === 'trips' && (
+          <TripManager
+            trips={trips}
+            currentTrip={currentTrip}
+            onTripSelect={handleTripSelect}
+            onTripCreate={handleTripCreate}
+            onTripDelete={handleTripDelete}
+            onTripUpdate={handleTripUpdate}
+            subscriptionTier={subscriptionTier}
+          />
+        )}
+
+        {/* Help Tab Content */}
+        {activeTab === 'help' && (
+          <EnhancedAIAssistant
+            isOpen={true}
+            onClose={() => setActiveTab('trips')}
+            onAddItems={addMultipleItems}
+          />
+        )}
+
+        {/* Settings Tab Content */}
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
+            <SettingsPanel
+              isOpen={true}
+              settings={{
+                darkMode,
+                simpleMode,
+                accessibilitySettings,
+              }}
+              onSettingsChange={handleSettingsChange}
+              subscriptionTier={subscriptionTier}
+            />
+          </div>
+        )}
+
+        {/* Upgrade Tab Content */}
+        {activeTab === 'upgrade' && (
+          <SubscriptionModal
+            isOpen={true}
+            onClose={() => setActiveTab('trips')}
+            onSubscribe={handleSubscribe}
+          />
+        )}
+
+        {/* Main App Content - Only show when on trips tab */}
+        {activeTab === 'trips' && currentTrip && (
+          <div>
+            
+            {/* Simple Mode Toggle */}
+            <SimpleModeToggle
+              simpleMode={simpleMode}
+              onToggle={setSimpleMode}
+            />
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -327,7 +406,7 @@ export default function Index() {
 
           <Button
             variant="ghost"
-            onClick={() => setShowSettings(!showSettings)}
+            onClick={() => setActiveTab('settings')}
             className={`rounded-full h-10 w-10 p-0 ${
               accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
             }`}
@@ -515,6 +594,8 @@ export default function Index() {
             </Button>
           </div>
         )}
+          </div>
+        )}
       </div>
 
       {/* Modals */}
@@ -562,7 +643,7 @@ export default function Index() {
       />
 
       <EnhancedAIAssistant
-        isOpen={activeTab === 'ai'}
+        isOpen={activeTab === 'help'}
         onClose={() => setActiveTab('trips')}
         onAddItems={addMultipleItems}
       />
@@ -571,21 +652,20 @@ export default function Index() {
         isOpen={showLuggageView}
         onClose={() => setShowLuggageView(false)}
         items={items}
-        onUpdateItem={(id, updates) => {
-          setItems(items.map(item => item.id === id ? { ...item, ...updates } : item));
-        }}
+        onToggleItem={toggleItem}
       />
 
       <BottomNavigation
         activeTab={activeTab}
         onTabChange={(tab) => {
-          if (tab === 'pro') {
-            setShowSubscriptionModal(true);
-          } else {
-            setActiveTab(tab);
+          if (tab === 'upgrade' && subscriptionTier === 'exclusive') {
+            // Don't show upgrade tab for Exclusive users
+            return;
           }
+          setActiveTab(tab);
         }}
         hasSubscription={subscriptionTier !== 'free'}
+        subscriptionTier={subscriptionTier}
       />
     </div>
   );

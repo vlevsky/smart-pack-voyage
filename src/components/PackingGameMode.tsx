@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, Zap, Target, Award, Gift } from 'lucide-react';
+import { Trophy, Star, Zap, Target, Award, Gift, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card';
 
 interface PackingGameModeProps {
   isEnabled: boolean;

@@ -1,17 +1,19 @@
 import React from 'react';
-import { Map, Bot, Settings, Crown } from 'lucide-react';
+import { Map, HelpCircle, Settings, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface BottomNavigationProps {
-  activeTab: 'trips' | 'ai' | 'settings' | 'pro';
-  onTabChange: (tab: 'trips' | 'ai' | 'settings' | 'pro') => void;
+  activeTab: 'trips' | 'help' | 'settings' | 'upgrade';
+  onTabChange: (tab: 'trips' | 'help' | 'settings' | 'upgrade') => void;
   hasSubscription: boolean;
+  subscriptionTier: string;
 }
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   activeTab,
   onTabChange,
   hasSubscription,
+  subscriptionTier,
 }) => {
   const tabs = [
     {
@@ -20,20 +22,20 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       label: 'Trips',
     },
     {
-      id: 'ai' as const,
-      icon: Bot,
-      label: 'AI Assistant',
+      id: 'help' as const,
+      icon: HelpCircle,
+      label: 'Help',
     },
     {
       id: 'settings' as const,
       icon: Settings,
       label: 'Settings',
     },
-    {
-      id: 'pro' as const,
+    ...(subscriptionTier !== 'exclusive' ? [{
+      id: 'upgrade' as const,
       icon: Crown,
-      label: hasSubscription ? 'Pro' : 'Upgrade',
-    },
+      label: hasSubscription ? 'Manage' : 'Upgrade',
+    }] : []),
   ];
 
   return (
@@ -58,7 +60,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
               <span className={`text-xs font-medium ${isActive ? 'text-blue-600 dark:text-blue-400' : ''}`}>
                 {tab.label}
               </span>
-              {tab.id === 'pro' && !hasSubscription && (
+              {tab.id === 'upgrade' && !hasSubscription && (
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
               )}
             </Button>
