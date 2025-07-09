@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, Zap, Target, Award, Gamepad2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Trophy, Star, Zap, Target, Award, Gamepad2, Circle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -14,7 +13,7 @@ interface Achievement {
   id: string;
   name: string;
   description: string;
-  icon: typeof Star;
+  iconName: string;
   unlocked: boolean;
   progress: number;
   maxProgress: number;
@@ -29,12 +28,22 @@ interface GameStats {
   achievements: Achievement[];
 }
 
+const getIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'star': return Star;
+    case 'zap': return Zap;
+    case 'trophy': return Trophy;
+    case 'target': return Target;
+    default: return Circle;
+  }
+};
+
 const initialAchievements: Achievement[] = [
   {
     id: 'first_pack',
     name: 'First Steps',
     description: 'Pack your first item',
-    icon: Star,
+    iconName: 'star',
     unlocked: false,
     progress: 0,
     maxProgress: 1,
@@ -43,7 +52,7 @@ const initialAchievements: Achievement[] = [
     id: 'streak_5',
     name: 'On a Roll',
     description: 'Pack 5 items in a row',
-    icon: Zap,
+    iconName: 'zap',
     unlocked: false,
     progress: 0,
     maxProgress: 5,
@@ -52,7 +61,7 @@ const initialAchievements: Achievement[] = [
     id: 'completionist',
     name: 'Completionist',
     description: 'Complete your first trip',
-    icon: Trophy,
+    iconName: 'trophy',
     unlocked: false,
     progress: 0,
     maxProgress: 1,
@@ -61,7 +70,7 @@ const initialAchievements: Achievement[] = [
     id: 'efficiency_expert',
     name: 'Efficiency Expert',
     description: 'Pack 50 items total',
-    icon: Target,
+    iconName: 'target',
     unlocked: false,
     progress: 0,
     maxProgress: 50,
@@ -254,7 +263,7 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
         <CardContent>
           <div className="grid gap-3">
             {gameStats.achievements.map((achievement) => {
-              const Icon = achievement.icon;
+              const Icon = getIcon(achievement.iconName);
               const progress = (achievement.progress / achievement.maxProgress) * 100;
               
               return (
@@ -328,7 +337,7 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
-                <showAchievement.icon className="h-5 w-5" />
+                {React.createElement(getIcon(showAchievement.iconName), { className: "h-5 w-5" })}
               </div>
               <div>
                 <div className="font-semibold">Achievement Unlocked!</div>
