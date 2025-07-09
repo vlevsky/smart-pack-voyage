@@ -64,6 +64,7 @@ const plans = [
     savings: '25%',
     features: [
       'Everything in Gold',
+      'Tools tab with travel utilities',
       'Custom fonts',
       'Premium themes',
       'Advanced analytics',

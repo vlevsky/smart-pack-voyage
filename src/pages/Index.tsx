@@ -476,44 +476,17 @@ export default function Index() {
                 onToggle={setSimpleMode}
               />
 
-              {/* Header */}
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-6 mb-6 border border-blue-100 dark:border-blue-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className={`font-bold ${
-                      simpleMode || accessibilitySettings.largeText ? 'text-3xl' : 'text-2xl'
-                    } ${
-                      accessibilitySettings.highContrast ? 'text-yellow-400' : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
-                    }`}>
-                      Pack Smart
-                    </h1>
-                    <p className={`${
-                      accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-300'
-                    } mt-2 text-sm font-medium`}>
-                      {currentTrip?.name || 'Create your first trip'}
-                    </p>
-                  </div>
 
-                  <Button
-                    variant="ghost"
-                    onClick={() => setActiveTab('settings')}
-                    className={`rounded-full h-12 w-12 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50 ${
-                      accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
-                    }`}
-                  >
-                    ⚙️
-                  </Button>
-                </div>
-              </div>
-
-              {/* Trip Countdown */}
+              {/* Trip Countdown - now in a rounded container */}
               {currentTrip && currentTrip.startDate && (
-                <TripCountdown
-                  tripName={currentTrip.name}
-                  destination={currentTrip.destination}
-                  startDate={new Date(currentTrip.startDate)}
-                  endDate={currentTrip.endDate ? new Date(currentTrip.endDate) : undefined}
-                />
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-6 mb-6 border border-blue-100 dark:border-blue-800">
+                  <TripCountdown
+                    tripName={currentTrip.name}
+                    destination={currentTrip.destination}
+                    startDate={new Date(currentTrip.startDate)}
+                    endDate={currentTrip.endDate ? new Date(currentTrip.endDate) : undefined}
+                  />
+                </div>
               )}
 
               {/* Packing Lists Management */}
