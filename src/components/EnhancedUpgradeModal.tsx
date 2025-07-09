@@ -22,14 +22,13 @@ const plans = [
     monthly: 3.99,
     yearly: 39.99,
     savings: '17%',
-    description: 'Essential premium features',
-    subDescription: 'Advanced settings',
     features: [
       'Up to 5 trips',
       'Smart packing lists',
       'Basic AI assistance',
       'Luggage organization',
       'App Customizations',
+      'Advanced settings',
       'Auto save & smart notifications',
       'Offline mode',
     ],
@@ -45,8 +44,6 @@ const plans = [
     yearly: 79.99,
     savings: '17%',
     popular: true,
-    description: 'Most premium features',
-    subDescription: 'Data sync',
     features: [
       'Everything in Silver+',
       'Unlimited trips',
@@ -68,8 +65,6 @@ const plans = [
     monthly: 19.99,
     yearly: 179.99,
     savings: '25%',
-    description: 'All premium features',
-    subDescription: 'Executive Travel Tools',
     features: [
       'Everything in Gold+',
       'Executive Travel Tools',
@@ -192,14 +187,6 @@ export const EnhancedUpgradeModal: React.FC<EnhancedUpgradeModalProps> = ({
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                         {plan.name}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        {plan.description}
-                      </p>
-                      {plan.subDescription && (
-                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2">
-                          {plan.subDescription}
-                        </p>
-                      )}
                       <div className="space-y-1">
                         <div className="text-4xl font-bold text-gray-900 dark:text-white">
                           ${price}
