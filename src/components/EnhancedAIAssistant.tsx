@@ -179,7 +179,7 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {showOptions ? (
-            <div className="p-4 space-y-4">
+            <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="text-center mb-6">
                 <h4 className="text-xl font-semibold mb-2">What do you need help with?</h4>
                 <p className="text-gray-600 dark:text-gray-400">Choose an option below or type your own question</p>
@@ -209,9 +209,32 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
                   );
                 })}
               </div>
+
+              {/* Help Guide Section */}
+              <div className="mt-6 space-y-3">
+                <h5 className="font-semibold text-gray-900 dark:text-white">Quick Help Guide</h5>
+                <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  <details className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <summary className="font-medium cursor-pointer">How to create trips</summary>
+                    <p className="mt-2 text-xs">Tap the "+" button in the Trips tab to create a new trip. Add your destination, dates, and start packing!</p>
+                  </details>
+                  <details className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <summary className="font-medium cursor-pointer">How to use smart lists</summary>
+                    <p className="mt-2 text-xs">Access pre-made packing lists tailored to different destinations and trip types. Customize them to your needs.</p>
+                  </details>
+                  <details className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <summary className="font-medium cursor-pointer">How to assign items to luggage</summary>
+                    <p className="mt-2 text-xs">Long-press any item in your list and select which luggage bag it should go in (carry-on, checked, etc.).</p>
+                  </details>
+                  <details className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <summary className="font-medium cursor-pointer">How to upgrade your plan</summary>
+                    <p className="mt-2 text-xs">Visit the Upgrade tab to see all available plans and unlock premium features like custom themes.</p>
+                  </details>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[60vh]">
               <AnimatePresence>
                 {messages.map((message) => (
                   <motion.div

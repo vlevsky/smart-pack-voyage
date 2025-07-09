@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Moon, Sun, Eye, Type, Palette, Zap, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onSettingsChange,
   subscriptionTier,
 }) => {
+  const [showDisplaySettings, setShowDisplaySettings] = useState(false);
+
   if (!isOpen) return null;
 
   const isPro = ['gold', 'exclusive'].includes(subscriptionTier);
@@ -68,51 +70,88 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     >
       <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
         
-        {/* Basic Settings */}
+        {/* Display Settings */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-            Display Settings
-          </h3>
-          
-          <div className="space-y-4">
-            {/* Dark Mode */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-              <div className="flex items-center gap-3">
-                {settings.darkMode ? (
-                  <Moon className="h-5 w-5 text-blue-500" />
-                ) : (
-                  <Sun className="h-5 w-5 text-orange-500" />
-                )}
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Dark Mode</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Switch between light and dark themes
-                  </p>
-                </div>
-              </div>
-              <Switch
-                checked={settings.darkMode}
-                onCheckedChange={(checked) => onSettingsChange('darkMode', checked)}
-              />
-            </div>
-
-            {/* Simple Mode */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-              <div className="flex items-center gap-3">
-                <Zap className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Simple Mode</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Simplified interface with larger buttons
-                  </p>
-                </div>
-              </div>
-              <Switch
-                checked={settings.simpleMode}
-                onCheckedChange={(checked) => onSettingsChange('simpleMode', checked)}
-              />
-            </div>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+              Display Settings
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDisplaySettings(!showDisplaySettings)}
+              className="text-blue-600 dark:text-blue-400"
+            >
+              {showDisplaySettings ? 'Hide' : 'Customize'}
+            </Button>
           </div>
+
+          {showDisplaySettings && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-4"
+            >
+              {/* Dark Mode */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                <div className="flex items-center gap-3">
+                  {settings.darkMode ? (
+                    <Moon className="h-5 w-5 text-blue-500" />
+                  ) : (
+                    <Sun className="h-5 w-5 text-orange-500" />
+                  )}
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Dark Mode</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Switch between light and dark themes
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.darkMode}
+                  onCheckedChange={(checked) => onSettingsChange('darkMode', checked)}
+                />
+              </div>
+
+              {/* Simple Mode */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Zap className="h-5 w-5 text-green-500" />
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">Simple Mode</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Simplified interface with larger buttons
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.simpleMode}
+                  onCheckedChange={(checked) => onSettingsChange('simpleMode', checked)}
+                />
+              </div>
+
+              {/* High Contrast */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Eye className="h-5 w-5 text-purple-500" />
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">High Contrast</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Increased contrast for better visibility
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={settings.accessibilitySettings.highContrast}
+                  onCheckedChange={(checked) => onSettingsChange('accessibilitySettings', {
+                    ...settings.accessibilitySettings,
+                    highContrast: checked
+                  })}
+                />
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Accessibility Settings */}
@@ -194,84 +233,103 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           </div>
         </div>
 
-        {/* Pro Settings */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-              Premium Features
-            </h3>
+          {/* Pro Customization Features */}
+        {showDisplaySettings && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                Premium Customization
+              </h3>
+              {!isPro && (
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">
+                  Pro
+                </Badge>
+              )}
+            </div>
+
+            {/* Custom Themes */}
+            <div className={`space-y-3 ${!isPro ? 'opacity-50 pointer-events-none' : ''}`}>
+              <div className="flex items-center gap-2">
+                <Palette className="h-4 w-4 text-pink-500" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Color Themes
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {customThemes.map((theme) => (
+                  <Button
+                    key={theme.id}
+                    variant={settings.customTheme === theme.id ? "default" : "outline"}
+                    size="sm"
+                    className="justify-start"
+                    onClick={() => {
+                      if (isPro) {
+                        onSettingsChange('customTheme', theme.id);
+                        // Apply theme immediately to root element
+                        const root = document.documentElement;
+                        root.style.setProperty('--primary', theme.colors[0]);
+                        root.style.setProperty('--primary-variant', theme.colors[1]);
+                      }
+                    }}
+                    disabled={!isPro}
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full mr-2"
+                      style={{
+                        background: `linear-gradient(45deg, ${theme.colors[0]}, ${theme.colors[1]})`
+                      }}
+                    />
+                    {theme.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Fonts */}
+            <div className={`space-y-3 ${!isPro ? 'opacity-50 pointer-events-none' : ''}`}>
+              <div className="flex items-center gap-2">
+                <Type className="h-4 w-4 text-indigo-500" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Font Styles
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {customFonts.map((font) => (
+                  <Button
+                    key={font.id}
+                    variant={settings.customFont === font.id ? "default" : "outline"}
+                    size="sm"
+                    className="justify-start text-xs"
+                    onClick={() => {
+                      if (isPro) {
+                        onSettingsChange('customFont', font.id);
+                        // Apply font immediately to body
+                        document.body.style.fontFamily = font.id === 'inter' ? 'Inter, sans-serif' : 
+                          font.id === 'roboto' ? 'Roboto, sans-serif' :
+                          font.id === 'poppins' ? 'Poppins, sans-serif' :
+                          font.id === 'playfair' ? 'Playfair Display, serif' : 'Inter, sans-serif';
+                      }
+                    }}
+                    disabled={!isPro}
+                  >
+                    {font.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             {!isPro && (
-              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">
-                Pro
-              </Badge>
+              <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                  Unlock custom themes and fonts with Pro
+                </p>
+                <Button size="sm" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
+                  Upgrade Now
+                </Button>
+              </div>
             )}
           </div>
-
-          {/* Custom Themes */}
-          <div className={`space-y-3 ${!isPro ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Palette className="h-4 w-4 text-pink-500" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Custom Themes
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {customThemes.map((theme) => (
-                <Button
-                  key={theme.id}
-                  variant={settings.customTheme === theme.id ? "default" : "outline"}
-                  size="sm"
-                  className="justify-start"
-                  onClick={() => isPro && onSettingsChange('customTheme', theme.id)}
-                  disabled={!isPro}
-                >
-                  <div
-                    className="w-3 h-3 rounded-full mr-2"
-                    style={{
-                      background: `linear-gradient(45deg, ${theme.colors[0]}, ${theme.colors[1]})`
-                    }}
-                  />
-                  {theme.name}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Custom Fonts */}
-          <div className={`space-y-3 ${!isPro ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="flex items-center gap-2">
-              <Type className="h-4 w-4 text-indigo-500" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Custom Fonts
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {customFonts.map((font) => (
-                <Button
-                  key={font.id}
-                  variant={settings.customFont === font.id ? "default" : "outline"}
-                  size="sm"
-                  className="justify-start text-xs"
-                  onClick={() => isPro && onSettingsChange('customFont', font.id)}
-                  disabled={!isPro}
-                >
-                  {font.name}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {!isPro && (
-            <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                Unlock custom themes and fonts with Pro
-              </p>
-              <Button size="sm" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
-                Upgrade Now
-              </Button>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </motion.div>
   );

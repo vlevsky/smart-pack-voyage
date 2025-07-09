@@ -121,6 +121,47 @@ All colors MUST be HSL.
   }
 }
 
+/* Dark mode theme adjustments */
+.dark {
+  /* Apply dark mode specific color adjustments */
+  --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
+  --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+}
+
+/* Simple Mode Styles */
+.simple-mode {
+  font-size: 1.125rem; /* Larger base font size */
+}
+
+.simple-mode button {
+  padding: 1rem 1.5rem; /* Larger buttons */
+  font-size: 1.125rem;
+  min-height: 3rem;
+}
+
+.simple-mode .text-sm {
+  font-size: 1rem; /* Make small text larger in simple mode */
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --foreground: 0 0% 0%;
+  --background: 0 0% 100%;
+  --primary: 220 100% 50%;
+  --secondary: 0 0% 20%;
+  --muted: 0 0% 85%;
+  --border: 0 0% 30%;
+}
+
+.dark.high-contrast {
+  --foreground: 0 0% 100%;
+  --background: 0 0% 0%;
+  --primary: 220 100% 70%;
+  --secondary: 0 0% 80%;
+  --muted: 0 0% 15%;
+  --border: 0 0% 70%;
+}
+
 @layer base {
   * {
     @apply border-border;
