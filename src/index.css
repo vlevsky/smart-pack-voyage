@@ -178,6 +178,14 @@ All colors MUST be HSL.
     border: 2px solid currentColor !important;
   }
 
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   /* Large text mode */
   .text-lg {
     font-size: 1.125rem !important;

@@ -4,6 +4,13 @@ import { Plus, Check, Trash2, Sparkles, Plane, Move, Bookmark, Lock } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { BottomNavigation } from '@/components/BottomNavigation';
+import { EnhancedAIAssistant } from '@/components/EnhancedAIAssistant';
+import { LuggageView } from '@/components/LuggageView';
+import { EnhancedHelpModal } from '@/components/EnhancedHelpModal';
+import { TripSelector } from '@/components/TripSelector';
+import { PackingItem } from '@/components/PackingItem';
+import { ProgressBar } from '@/components/ProgressBar';
 import {
   PremadeListsModal
 } from '@/components/PremadeListsModal';
@@ -85,6 +92,10 @@ export default function Index() {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [activeTab, setActiveTab] = useState<'trips' | 'ai' | 'settings' | 'pro'>('trips');
+  const [darkMode, setDarkMode] = useState(false);
+  const [showLuggageView, setShowLuggageView] = useState(false);
+  const [trips, setTrips] = useState<Trip[]>([]);
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingListItems');
@@ -216,9 +227,11 @@ export default function Index() {
   };
 
   return (
-    <div className={`min-h-screen transition-all duration-300 ${
+    <div className={`min-h-screen pb-20 transition-all duration-300 ${
+      darkMode ? 'dark' : ''
+    } ${
       accessibilitySettings.highContrast
-        ? 'bg-black text-yellow-400'
+        ? 'contrast-more bg-black text-yellow-400'
         : 'bg-gray-50 dark:bg-gray-900'
     } ${
       accessibilitySettings.largeText ? 'text-lg' : ''
@@ -543,9 +556,36 @@ export default function Index() {
         currentItems={items}
       />
 
-      <HelpModal
+      <EnhancedHelpModal
         isOpen={showHelp}
         onClose={() => setShowHelp(false)}
+      />
+
+      <EnhancedAIAssistant
+        isOpen={activeTab === 'ai'}
+        onClose={() => setActiveTab('trips')}
+        onAddItems={addMultipleItems}
+      />
+
+      <LuggageView
+        isOpen={showLuggageView}
+        onClose={() => setShowLuggageView(false)}
+        items={items}
+        onUpdateItem={(id, updates) => {
+          setItems(items.map(item => item.id === id ? { ...item, ...updates } : item));
+        }}
+      />
+
+      <BottomNavigation
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          if (tab === 'pro') {
+            setShowSubscriptionModal(true);
+          } else {
+            setActiveTab(tab);
+          }
+        }}
+        hasSubscription={subscriptionTier !== 'free'}
       />
     </div>
   );

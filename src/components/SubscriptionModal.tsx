@@ -98,45 +98,53 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 100 }}
+        className="bg-white dark:bg-gray-900 rounded-t-3xl w-full h-[90vh] overflow-y-auto"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Choose Your Plan</h2>
-          <Button variant="ghost" onClick={onClose} className="rounded-full">
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <div className="flex justify-center mb-6">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 flex">
-            <button
-              onClick={() => setBillingPeriod('monthly')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                billingPeriod === 'monthly'
-                  ? 'bg-white dark:bg-gray-700 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingPeriod('yearly')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                billingPeriod === 'yearly'
-                  ? 'bg-white dark:bg-gray-700 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400'
-              }`}
-            >
-              Yearly
-            </button>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold gradient-text">Upgrade to Pro</h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Choose the perfect plan for your travels</p>
+            </div>
+            <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+              <X className="h-5 w-5" />
+            </Button>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="flex justify-center mb-6">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 flex">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-6 py-3 rounded-full font-medium transition-all ${
+                  billingPeriod === 'monthly'
+                    ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingPeriod('yearly')}
+                className={`px-6 py-3 rounded-full font-medium transition-all relative ${
+                  billingPeriod === 'yearly'
+                    ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                Yearly
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  Save
+                </span>
+              </button>
+            </div>
+          </div>
+
+        <div className="grid gap-4 mb-6">
           {subscriptionTiers.map((tier) => {
             const Icon = tier.icon;
             const isSelected = selectedTier === tier.id;
@@ -144,19 +152,21 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             return (
               <motion.div
                 key={tier.id}
-                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700'
-                } ${tier.popular ? 'ring-2 ring-blue-500' : ''}`}
+                    ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 shadow-lg'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                } ${tier.popular ? 'ring-2 ring-blue-500 scale-105' : ''}`}
                 onClick={() => setSelectedTier(tier.id)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: tier.popular ? 1.05 : 1.02 }}
+                whileTap={{ scale: tier.popular ? 1.03 : 0.98 }}
               >
                 {tier.popular && (
-                  <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-blue-500">
-                    Most Popular
-                  </Badge>
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-1 text-sm font-semibold">
+                      ⭐ Most Popular
+                    </Badge>
+                  </div>
                 )}
                 
                 <div className="flex items-center gap-2 mb-3">
@@ -200,22 +210,29 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           })}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button
-            onClick={handleSubscribe}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-          >
-            Subscribe Now
-          </Button>
-          <Button variant="outline" onClick={onClose} className="px-8 py-3">
-            Maybe Later
-          </Button>
-        </div>
-
-        <div className="mt-4 text-center">
-          <Button variant="ghost" className="text-sm text-gray-600">
-            Restore Purchases
-          </Button>
+          <div className="space-y-4">
+            <Button
+              onClick={handleSubscribe}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold rounded-xl shadow-lg"
+            >
+              🚀 Start Your Journey
+            </Button>
+            
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={onClose} className="flex-1 py-3 rounded-xl">
+                Maybe Later
+              </Button>
+              <Button variant="ghost" className="flex-1 py-3 rounded-xl text-blue-600 dark:text-blue-400">
+                Restore Purchases
+              </Button>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Cancel anytime • 30-day money-back guarantee
+              </p>
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>
