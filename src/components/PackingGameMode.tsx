@@ -177,16 +177,12 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
   };
 
   useEffect(() => {
-    try {
-      if (isEnabled && packedItems > 0 && totalItems > 0) {
-        addXP(10); // 10 XP per packed item
-        setGameStats(prev => ({ ...prev, streak: packedItems }));
-        updateAchievements();
-      }
-    } catch (error) {
-      console.error('Game mode error:', error);
+    if (isEnabled && packedItems > 0) {
+      addXP(10); // 10 XP per packed item
+      setGameStats(prev => ({ ...prev, streak: packedItems }));
+      updateAchievements();
     }
-  }, [packedItems, isEnabled, totalItems]);
+  }, [packedItems, isEnabled]);
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Packing Newbie';
