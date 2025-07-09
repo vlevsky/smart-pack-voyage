@@ -339,7 +339,7 @@ export const PackingGameMode: React.FC<PackingGameModeProps> = ({
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
-                {React.createElement(showAchievement.icon, { className: "h-5 w-5" })}
+                <showAchievement.icon className="h-5 w-5" />
               </div>
               <div>
                 <div className="font-semibold">Achievement Unlocked!</div>

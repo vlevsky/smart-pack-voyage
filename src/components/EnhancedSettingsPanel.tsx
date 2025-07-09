@@ -1,100 +1,61 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Moon, Sun, Eye, Type, Palette, Zap, Volume2, 
-  ChevronDown, ChevronRight, User, CreditCard, 
-  HelpCircle, Info, Bell, Shield, Smartphone
+  X, Settings, Crown, Palette, Type, Volume2, 
+  Accessibility, Shield, Download, RotateCcw, Bell, 
+  Wifi, Database, Moon, Sun, Smartphone, 
+  ChevronDown, ChevronRight, User, CreditCard 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-
-interface AccessibilitySettings {
-  highContrast: boolean;
-  largeText: boolean;
-  dyslexiaFont: boolean;
-  reducedMotion: boolean;
-  screenReader: boolean;
-}
-
-interface SettingsData {
-  darkMode: boolean;
-  simpleMode: boolean;
-  accessibilitySettings: AccessibilitySettings;
-  customTheme?: string;
-  customFont?: string;
-}
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { SubscriptionModal } from '@/components/SubscriptionModal';
 
 interface EnhancedSettingsPanelProps {
   isOpen: boolean;
-  settings: SettingsData;
+  settings: {
+    darkMode: boolean;
+    simpleMode: boolean;
+    accessibilitySettings: any;
+    customTheme: string;
+    customFont: string;
+  };
   onSettingsChange: (key: string, value: any) => void;
   subscriptionTier: string;
   onClose: () => void;
 }
 
-const settingSections = [
-  {
-    id: 'account',
-    title: 'Account & Subscription',
-    icon: User,
-    items: ['subscription', 'billing', 'account']
-  },
-  {
-    id: 'display',
-    title: 'Display Settings',
-    icon: Smartphone,
-    items: ['theme', 'font', 'darkMode']
-  },
-  {
-    id: 'accessibility',
-    title: 'Accessibility',
-    icon: Eye,
-    items: ['contrast', 'text', 'motion']
-  },
-  {
-    id: 'help',
-    title: 'Help & Support',
-    icon: HelpCircle,
-    items: ['faq', 'contact', 'feedback']
-  },
-  {
-    id: 'info',
-    title: 'App Info',
-    icon: Info,
-    items: ['version', 'privacy', 'terms']
-  }
-];
-
-const customThemes = [
-  { id: 'default', name: 'Default Blue', colors: ['#3b82f6', '#1d4ed8'] },
-  { id: 'ocean', name: 'Ocean Blue', colors: ['#0ea5e9', '#0284c7'] },
-  { id: 'sunset', name: 'Sunset Orange', colors: ['#f97316', '#ea580c'] },
-  { id: 'forest', name: 'Forest Green', colors: ['#16a34a', '#15803d'] },
-  { id: 'purple', name: 'Royal Purple', colors: ['#9333ea', '#7c3aed'] },
-  { id: 'rose', name: 'Rose Pink', colors: ['#e11d48', '#be185d'] },
-];
-
-const customFonts = [
-  { id: 'inter', name: 'Inter (Default)', preview: 'Aa' },
-  { id: 'roboto', name: 'Roboto', preview: 'Aa' },
-  { id: 'poppins', name: 'Poppins', preview: 'Aa' },
-  { id: 'playfair', name: 'Playfair Display', preview: 'Aa' },
-];
-
-export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
+const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
   isOpen,
   settings,
   onSettingsChange,
   subscriptionTier,
   onClose,
 }) => {
-  const [expandedSections, setExpandedSections] = useState<string[]>(['account']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['subscription']);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   if (!isOpen) return null;
 
-  const isPro = ['silver', 'gold', 'exclusive'].includes(subscriptionTier.toLowerCase());
+  const customThemes = [
+    { id: 'default', name: 'Default', colors: ['#3b82f6', '#1d4ed8'] },
+    { id: 'ocean', name: 'Ocean', colors: ['#0ea5e9', '#0284c7'] },
+    { id: 'sunset', name: 'Sunset', colors: ['#f97316', '#ea580c'] },
+    { id: 'forest', name: 'Forest', colors: ['#16a34a', '#15803d'] },
+    { id: 'purple', name: 'Purple', colors: ['#9333ea', '#7c3aed'] },
+    { id: 'rose', name: 'Rose', colors: ['#e11d48', '#be185d'] },
+  ];
+
+  const customFonts = [
+    { id: 'inter', name: 'Inter' },
+    { id: 'roboto', name: 'Roboto' },
+    { id: 'poppins', name: 'Poppins' },
+    { id: 'playfair', name: 'Playfair' },
+  ];
+
+  const isPro = subscriptionTier !== 'free';
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => 
@@ -105,30 +66,14 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
   };
 
   const applyTheme = (themeId: string) => {
-    const theme = customThemes.find(t => t.id === themeId);
-    if (theme) {
+    if (isPro) {
       onSettingsChange('customTheme', themeId);
-      const root = document.documentElement;
-      root.style.setProperty('--primary', theme.colors[0]);
-      root.style.setProperty('--primary-variant', theme.colors[1]);
     }
   };
 
   const applyFont = (fontId: string) => {
-    onSettingsChange('customFont', fontId);
-    const fontFamily = fontId === 'inter' ? 'Inter, sans-serif' : 
-      fontId === 'roboto' ? 'Roboto, sans-serif' :
-      fontId === 'poppins' ? 'Poppins, sans-serif' :
-      fontId === 'playfair' ? 'Playfair Display, serif' : 'Inter, sans-serif';
-    document.body.style.fontFamily = fontFamily;
-  };
-
-  const getSubscriptionBadge = () => {
-    switch (subscriptionTier.toLowerCase()) {
-      case 'silver': return { label: 'Silver', color: 'bg-gray-400' };
-      case 'gold': return { label: 'Gold', color: 'bg-yellow-500' };
-      case 'exclusive': return { label: 'Exclusive', color: 'bg-purple-600' };
-      default: return { label: 'Free', color: 'bg-gray-300' };
+    if (isPro) {
+      onSettingsChange('customFont', fontId);
     }
   };
 
@@ -138,70 +83,69 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-gray-900 rounded-2xl md:rounded-3xl w-full max-w-2xl h-[95vh] md:max-h-[85vh] overflow-hidden shadow-2xl flex flex-col"
+        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl h-[90vh] overflow-hidden shadow-2xl flex flex-col"
       >
         {/* Header */}
-        <div className="p-3 md:p-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
-            <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 md:h-10 md:w-10 p-0">
-              ×
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Settings</h2>
+            <Button variant="ghost" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-3 md:p-6 space-y-3 md:space-y-4">
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-4">
             
-            {/* Account & Subscription */}
+            {/* Subscription */}
             <Card className="overflow-hidden">
               <div 
-                className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                onClick={() => toggleSection('account')}
+                className="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                onClick={() => toggleSection('subscription')}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="font-semibold text-gray-900 dark:text-white">Account & Subscription</span>
+                  <div className="flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-yellow-500" />
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">Subscription</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {(() => {
-                      const badge = getSubscriptionBadge();
-                      return (
-                        <Badge className={`${badge.color} text-white text-xs`}>
-                          {badge.label}
-                        </Badge>
-                      );
-                    })()}
-                    {expandedSections.includes('account') ? 
-                      <ChevronDown className="h-4 w-4" /> : 
-                      <ChevronRight className="h-4 w-4" />
+                    <Badge className="text-xs">
+                      {subscriptionTier === 'free' ? 'Free' : subscriptionTier}
+                    </Badge>
+                    {expandedSections.includes('subscription') ? 
+                      <ChevronDown className="h-3 w-3" /> : 
+                      <ChevronRight className="h-3 w-3" />
                     }
                   </div>
                 </div>
               </div>
               
               <AnimatePresence>
-                {expandedSections.includes('account') && (
+                {expandedSections.includes('subscription') && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <div className="p-4 space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="h-4 w-4 text-blue-500" />
+                    <div className="p-3">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-3 w-3 text-blue-500" />
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">Manage Subscription</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Cancel, renew, or change your plan
+                            <p className="font-medium text-gray-900 dark:text-white text-xs">Manage Subscription</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              View billing and subscription details
                             </p>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowSubscriptionModal(true)}
+                          className="h-7 text-xs"
+                        >
                           Manage
                         </Button>
                       </div>
@@ -214,17 +158,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
             {/* Display Settings */}
             <Card className="overflow-hidden">
               <div 
-                className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 onClick={() => toggleSection('display')}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="font-semibold text-gray-900 dark:text-white">Display Settings</span>
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">Display</span>
                   </div>
                   {expandedSections.includes('display') ? 
-                    <ChevronDown className="h-4 w-4" /> : 
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronDown className="h-3 w-3" /> : 
+                    <ChevronRight className="h-3 w-3" />
                   }
                 </div>
               </div>
@@ -237,17 +181,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <div className="p-4 space-y-4">
+                    <div className="p-3 space-y-3">
                       
                       {/* Dark Mode */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
                           {settings.darkMode ? (
-                            <Moon className="h-4 w-4 text-blue-500" />
+                            <Moon className="h-3 w-3 text-blue-500" />
                           ) : (
-                            <Sun className="h-4 w-4 text-orange-500" />
+                            <Sun className="h-3 w-3 text-orange-500" />
                           )}
-                          <span className="font-medium text-gray-900 dark:text-white">Dark Mode</span>
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Dark Mode</span>
                         </div>
                         <Switch
                           checked={settings.darkMode}
@@ -256,17 +200,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                       </div>
 
                       {/* Theme Colors */}
-                      <div className={`space-y-3 ${!isPro ? 'opacity-50' : ''}`}>
+                      <div className={`space-y-2 ${!isPro ? 'opacity-50' : ''}`}>
                         <div className="flex items-center gap-2">
-                          <Palette className="h-4 w-4 text-pink-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Theme Colors</span>
+                          <Palette className="h-3 w-3 text-pink-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Theme Colors</span>
                           {!isPro && <Badge variant="outline" className="text-xs">Pro</Badge>}
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           {customThemes.map((theme) => (
                             <button
                               key={theme.id}
-                              onClick={() => isPro && applyTheme(theme.id)}
+                              onClick={() => applyTheme(theme.id)}
                               disabled={!isPro}
                               className={`p-2 rounded-lg border transition-all ${
                                 settings.customTheme === theme.id 
@@ -275,7 +219,7 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                               }`}
                             >
                               <div
-                                className="w-8 h-8 rounded-full mx-auto mb-1"
+                                className="w-6 h-6 rounded-full mx-auto mb-1"
                                 style={{
                                   background: `linear-gradient(45deg, ${theme.colors[0]}, ${theme.colors[1]})`
                                 }}
@@ -287,25 +231,24 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                       </div>
 
                       {/* Fonts */}
-                      <div className={`space-y-3 ${!isPro ? 'opacity-50' : ''}`}>
+                      <div className={`space-y-2 ${!isPro ? 'opacity-50' : ''}`}>
                         <div className="flex items-center gap-2">
-                          <Type className="h-4 w-4 text-indigo-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Font Style</span>
+                          <Type className="h-3 w-3 text-indigo-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Font Style</span>
                           {!isPro && <Badge variant="outline" className="text-xs">Pro</Badge>}
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           {customFonts.map((font) => (
                             <button
                               key={font.id}
-                              onClick={() => isPro && applyFont(font.id)}
+                              onClick={() => applyFont(font.id)}
                               disabled={!isPro}
-                              className={`p-3 rounded-lg border transition-all text-left ${
+                              className={`p-2 rounded-lg border transition-all text-left ${
                                 settings.customFont === font.id 
                                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
                                   : 'border-gray-200 dark:border-gray-700'
                               }`}
                             >
-                              <div className="font-bold text-lg mb-1">{font.preview}</div>
                               <span className="text-xs text-gray-700 dark:text-gray-300">{font.name}</span>
                             </button>
                           ))}
@@ -320,17 +263,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
             {/* Accessibility */}
             <Card className="overflow-hidden">
               <div 
-                className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 onClick={() => toggleSection('accessibility')}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Eye className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="font-semibold text-gray-900 dark:text-white">Accessibility</span>
+                  <div className="flex items-center gap-2">
+                    <Accessibility className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">Accessibility</span>
                   </div>
                   {expandedSections.includes('accessibility') ? 
-                    <ChevronDown className="h-4 w-4" /> : 
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronDown className="h-3 w-3" /> : 
+                    <ChevronRight className="h-3 w-3" />
                   }
                 </div>
               </div>
@@ -343,11 +286,11 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <div className="p-4 space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Eye className="h-4 w-4 text-purple-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">High Contrast</span>
+                    <div className="p-3 space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Accessibility className="h-3 w-3 text-purple-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">High Contrast</span>
                         </div>
                         <Switch
                           checked={settings.accessibilitySettings.highContrast}
@@ -358,10 +301,10 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                         />
                       </div>
                       
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Type className="h-4 w-4 text-blue-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Large Text</span>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Type className="h-3 w-3 text-blue-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Large Text</span>
                         </div>
                         <Switch
                           checked={settings.accessibilitySettings.largeText}
@@ -372,10 +315,10 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                         />
                       </div>
 
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Zap className="h-4 w-4 text-green-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Simple Mode</span>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Settings className="h-3 w-3 text-green-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Simple Mode</span>
                         </div>
                         <Switch
                           checked={settings.simpleMode}
@@ -391,17 +334,17 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
             {/* Advanced Settings */}
             <Card className="overflow-hidden">
               <div 
-                className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 onClick={() => toggleSection('advanced')}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Zap className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    <span className="font-semibold text-gray-900 dark:text-white">Advanced Settings</span>
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">Advanced</span>
                   </div>
                   {expandedSections.includes('advanced') ? 
-                    <ChevronDown className="h-4 w-4" /> : 
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronDown className="h-3 w-3" /> : 
+                    <ChevronRight className="h-3 w-3" />
                   }
                 </div>
               </div>
@@ -414,13 +357,13 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <div className="p-4 space-y-3">
+                    <div className="p-3 space-y-2">
                       
                       {/* Auto-save */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Shield className="h-4 w-4 text-green-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Auto-save</span>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-3 w-3 text-green-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Auto-save</span>
                         </div>
                         <Switch
                           checked={true}
@@ -429,10 +372,10 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                       </div>
 
                       {/* Smart Notifications */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Bell className="h-4 w-4 text-blue-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Smart Notifications</span>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Bell className="h-3 w-3 text-blue-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Smart Notifications</span>
                         </div>
                         <Switch
                           checked={false}
@@ -441,10 +384,10 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                       </div>
 
                       {/* Offline Mode */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Volume2 className="h-4 w-4 text-purple-500" />
-                          <span className="font-medium text-gray-900 dark:text-white">Offline Mode</span>
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Wifi className="h-3 w-3 text-purple-500" />
+                          <span className="font-medium text-gray-900 dark:text-white text-xs">Offline Mode</span>
                         </div>
                         <Switch
                           checked={true}
@@ -453,15 +396,15 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
                       </div>
 
                       {/* Data Sync */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Zap className="h-4 w-4 text-orange-500" />
+                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <RotateCcw className="h-3 w-3 text-orange-500" />
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">Data Sync</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Sync across devices</p>
+                            <p className="font-medium text-gray-900 dark:text-white text-xs">Data Sync</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Sync across devices</p>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="h-6 text-xs">
                           Sync Now
                         </Button>
                       </div>
@@ -471,8 +414,22 @@ export const EnhancedSettingsPanel: React.FC<EnhancedSettingsPanelProps> = ({
               </AnimatePresence>
             </Card>
           </div>
-        </div>
+        </ScrollArea>
       </motion.div>
+
+      {/* Subscription Modal */}
+      {showSubscriptionModal && (
+        <SubscriptionModal
+          isOpen={showSubscriptionModal}
+          onClose={() => setShowSubscriptionModal(false)}
+          onSubscribe={(tier) => {
+            onSettingsChange('subscriptionTier', tier);
+            setShowSubscriptionModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };
+
+export { EnhancedSettingsPanel };
