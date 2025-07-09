@@ -89,7 +89,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
         <Checkbox
           checked={item.packed}
           onCheckedChange={onToggle}
-          className="h-5 w-5 rounded-full border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+          className="h-4 w-4 rounded-full border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
         />
         
         <div className="flex-1 min-w-0">
@@ -146,7 +146,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
       <Checkbox
         checked={item.packed}
         onCheckedChange={onToggle}
-        className="rounded-full h-5 w-5 border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+        className="rounded-full h-4 w-4 border-2 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
       />
 
       <div className="flex-1 min-w-0">

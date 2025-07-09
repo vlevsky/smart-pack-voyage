@@ -75,6 +75,24 @@ const initialAchievements: Achievement[] = [
     progress: 0,
     maxProgress: 50,
   },
+  {
+    id: 'speed_packer',
+    name: 'Speed Packer',
+    description: 'Pack 10 items in one session',
+    iconName: 'zap',
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
+  },
+  {
+    id: 'organization_master',
+    name: 'Organization Master',
+    description: 'Complete 3 trips',
+    iconName: 'trophy',
+    unlocked: false,
+    progress: 0,
+    maxProgress: 3,
+  },
 ];
 
 export const GameModeTab: React.FC<GameModeTabProps> = ({
@@ -159,6 +177,13 @@ export const GameModeTab: React.FC<GameModeTabProps> = ({
             break;
           case 'efficiency_expert':
             newProgress = Math.min(Math.floor(newTotalXP / 10), achievement.maxProgress);
+            break;
+          case 'speed_packer':
+            newProgress = Math.min(packedItems, achievement.maxProgress);
+            break;
+          case 'organization_master':
+            const completedTrips = parseInt(localStorage.getItem('completedTrips') || '0');
+            newProgress = Math.min(completedTrips, achievement.maxProgress);
             break;
         }
 
