@@ -267,22 +267,36 @@ export const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <div className="flex gap-2">
             <Input
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={showOptions ? "Or type your question here..." : "Type your message..."}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (showOptions && inputText.trim()) {
+                    setShowOptions(false);
+                    handleSendMessage();
+                  } else if (!showOptions) {
+                    handleSendMessage();
+                  }
+                }
+              }}
               className="flex-1"
+              autoComplete="off"
             />
             <Button 
-              onClick={showOptions ? () => {
-                if (inputText.trim()) {
+              onClick={() => {
+                if (showOptions && inputText.trim()) {
                   setShowOptions(false);
                   handleSendMessage();
+                } else if (!showOptions) {
+                  handleSendMessage();
                 }
-              } : handleSendMessage}
+              }}
+              disabled={!inputText.trim()}
               className="bg-blue-500 hover:bg-blue-600 shrink-0"
             >
               <Send className="h-4 w-4" />
