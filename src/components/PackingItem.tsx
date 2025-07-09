@@ -95,7 +95,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <span
-              className={`${getTextSizeClass()} font-medium transition-all duration-300 ${
+              className={`text-xs font-medium transition-all duration-300 ${
                 item.packed
                   ? 'text-green-700 dark:text-green-300 line-through opacity-75'
                   : 'text-gray-900 dark:text-gray-100'
@@ -165,7 +165,7 @@ export const PackingItem: React.FC<PackingItemProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
-                className={`${getTextSizeClass()} font-medium transition-all duration-300 ${
+                className={`text-xs font-medium transition-all duration-300 ${
                   item.packed
                     ? 'text-green-700 dark:text-green-300 line-through opacity-75'
                     : 'text-gray-900 dark:text-gray-100'

@@ -38,6 +38,8 @@ import {
 } from '@/components/TripCountdown';
 import { GameModeTab } from '@/components/GameModeTab';
 import { SmartSuggestions } from '@/components/SmartSuggestions';
+import { GameModeSubscriptionModal } from '@/components/GameModeSubscriptionModal';
+import { QuickAddModal } from '@/components/QuickAddModal';
 
 interface Item {
   id: string;
@@ -100,6 +102,8 @@ export default function Index() {
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [activeTab, setActiveTab] = useState<'trips' | 'game' | 'help' | 'settings' | 'upgrade'>('trips');
+  const [showGameModeSubscription, setShowGameModeSubscription] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
 
   // Handle tab changes to show/hide modals
   useEffect(() => {
@@ -275,6 +279,14 @@ export default function Index() {
   const handleTripSelect = (trip: Trip) => {
     setCurrentTrip(trip);
     setActiveTab('trips');
+  };
+
+  const handleGameModeAccess = () => {
+    if (hasSubscription('game-mode')) {
+      setActiveTab('game');
+    } else {
+      setShowGameModeSubscription(true);
+    }
   };
 
   const handleTripDelete = (tripId: string) => {
@@ -484,7 +496,7 @@ export default function Index() {
 
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-4">
             <Button
               onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
               className={`h-12 flex flex-col items-center justify-center gap-1 relative ${
@@ -494,10 +506,10 @@ export default function Index() {
               }`}
               disabled={!hasSubscription('smart-lists')}
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-3 w-3" />
               <span className="text-xs font-medium">Smart Lists</span>
               {!hasSubscription('smart-lists') && (
-                <Lock className="h-3 w-3 absolute top-1 right-1 text-white" />
+                <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
               )}
             </Button>
 
@@ -510,11 +522,19 @@ export default function Index() {
               }`}
               disabled={!hasSubscription('templates')}
             >
-              <Bookmark className="h-4 w-4" />
+              <Bookmark className="h-3 w-3" />
               <span className="text-xs font-medium">Templates</span>
               {!hasSubscription('templates') && (
-                <Lock className="h-3 w-3 absolute top-1 right-1 text-white" />
+                <Lock className="h-2 w-2 absolute top-1 right-1 text-white" />
               )}
+            </Button>
+
+            <Button
+              onClick={() => setShowQuickAdd(true)}
+              className="h-12 flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white"
+            >
+              <Plus className="h-3 w-3" />
+              <span className="text-xs font-medium">Quick Add</span>
             </Button>
           </div>
 
@@ -540,7 +560,7 @@ export default function Index() {
               <Button
                 variant={selectedCategory === 'all' ? 'default' : 'outline'}
                 onClick={() => setSelectedCategory('all')}
-                className="whitespace-nowrap text-xs h-8 px-3"
+                className="whitespace-nowrap text-xs h-7 px-2 text-xs"
               >
                 All ({items.length})
               </Button>
@@ -551,7 +571,7 @@ export default function Index() {
                     key={category}
                     variant={selectedCategory === category ? 'default' : 'outline'}
                     onClick={() => setSelectedCategory(category)}
-                    className="whitespace-nowrap text-xs h-8 px-3 capitalize"
+                    className="whitespace-nowrap text-xs h-7 px-2 text-xs capitalize"
                   >
                     {category} ({count})
                   </Button>
@@ -668,9 +688,31 @@ export default function Index() {
           onToggleItem={toggleItem}
         />
 
+        <GameModeSubscriptionModal
+          isOpen={showGameModeSubscription}
+          onClose={() => setShowGameModeSubscription(false)}
+          onUpgrade={() => {
+            setShowGameModeSubscription(false);
+            setActiveTab('upgrade');
+          }}
+        />
+
+        <QuickAddModal
+          isOpen={showQuickAdd}
+          onClose={() => setShowQuickAdd(false)}
+          onAddItem={addSuggestedItem}
+          existingItems={items.map(item => item.name.toLowerCase())}
+        />
+
         <BottomNavigation 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+          onTabChange={(tab) => {
+            if (tab === 'game') {
+              handleGameModeAccess();
+            } else {
+              setActiveTab(tab);
+            }
+          }} 
           subscriptionTier={subscriptionTier}
           hasSubscription={subscriptionTier !== 'free'}
         />
