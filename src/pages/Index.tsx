@@ -324,6 +324,305 @@ export default function Index() {
         accessibilitySettings.dyslexiaFont ? 'font-mono' : ''
       }`}>
 
+        {/* Settings Panel */}
+        {activeTab === 'settings' && (
+          <EnhancedSettingsPanel
+            isOpen={activeTab === 'settings'}
+            settings={{
+              darkMode,
+              simpleMode,
+              accessibilitySettings,
+              customTheme,
+              customFont,
+            }}
+            onSettingsChange={handleSettingsChange}
+            subscriptionTier={subscriptionTier}
+            onClose={() => setActiveTab('trips')}
+          />
+        )}
+
+        <div className="container mx-auto px-4 py-6 max-w-md">
+          
+          {/* Trip Manager */}
+          {activeTab === 'trips' && (
+            <TripManager
+              trips={trips}
+              currentTrip={currentTrip}
+              onTripSelect={handleTripSelect}
+              onTripCreate={handleTripCreate}
+              onTripDelete={handleTripDelete}
+              onTripUpdate={handleTripUpdate}
+              subscriptionTier={subscriptionTier}
+            />
+          )}
+
+          {/* Help Tab Content */}
+          {activeTab === 'help' && (
+            <EnhancedAIAssistant
+              isOpen={true}
+              onClose={() => setActiveTab('trips')}
+              onAddItems={addMultipleItems}
+            />
+          )}
+
+          {/* Settings Tab Content */}
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <EnhancedSettingsPanel
+                isOpen={true}
+                settings={{
+                  darkMode,
+                  simpleMode,
+                  accessibilitySettings,
+                  customTheme,
+                  customFont,
+                }}
+                onSettingsChange={handleSettingsChange}
+                subscriptionTier={subscriptionTier}
+                onClose={() => setActiveTab('trips')}
+              />
+            </div>
+          )}
+
+          {/* Upgrade Tab Content */}
+          {activeTab === 'upgrade' && (
+            <SubscriptionModal
+              isOpen={true}
+              onClose={() => setActiveTab('trips')}
+              onSubscribe={handleSubscribe}
+            />
+          )}
+
+          {/* Main App Content - Only show when on trips tab */}
+          {activeTab === 'trips' && currentTrip && (
+            <div>
+              
+              {/* Simple Mode Toggle */}
+              <SimpleModeToggle
+                simpleMode={simpleMode}
+                onToggle={setSimpleMode}
+              />
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className={`font-bold ${
+                accessibilitySettings.largeText ? 'text-3xl' : 'text-2xl'
+              } ${
+                accessibilitySettings.highContrast ? 'text-yellow-400' : 'text-gray-900 dark:text-white'
+              }`}>
+                Pack Smart
+              </h1>
+              <p className={`${
+                accessibilitySettings.highContrast ? 'text-yellow-200' : 'text-gray-600 dark:text-gray-400'
+              } mt-1`}>
+                {currentTrip?.name || 'Create your first trip'}
+              </p>
+            </div>
+
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('settings')}
+              className={`rounded-full h-10 w-10 p-0 ${
+                accessibilitySettings.highContrast ? 'text-yellow-400 hover:bg-yellow-400/10' : ''
+              }`}
+            >
+              ⚙️
+            </Button>
+          </div>
+
+          {/* Trip Countdown */}
+          {currentTrip && currentTrip.startDate && (
+            <TripCountdown
+              tripName={currentTrip.name}
+              destination={currentTrip.destination}
+              startDate={new Date(currentTrip.startDate)}
+              endDate={currentTrip.endDate ? new Date(currentTrip.endDate) : undefined}
+            />
+          )}
+
+          {/* Game Mode */}
+          <PackingGameMode
+            isEnabled={gameMode}
+            onToggle={setGameMode}
+            packedItems={items.filter(item => item.packed).length}
+            totalItems={items.length}
+            onItemPacked={() => {}}
+          />
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <Button
+              onClick={() => requiresSubscription('smart-lists', () => setShowPremadeLists(true))}
+              className="h-16 flex flex-col items-center justify-center gap-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            >
+              <Sparkles className="h-5 w-5" />
+              <span className="text-sm font-medium">Smart Lists</span>
+              {!hasSubscription('smart-lists') && (
+                <div className="absolute top-2 right-2">
+                  <div className="bg-yellow-500 rounded-full p-1">
+                    <Lock className="h-3 w-3 text-white" />
+                  </div>
+                </div>
+              )}
+            </Button>
+
+            <Button
+              onClick={() => requiresSubscription('templates', () => setShowTemplates(true))}
+              variant="outline"
+              className="h-16 flex flex-col items-center justify-center gap-1 relative"
+            >
+              <Bookmark className="h-5 w-5" />
+              <span className="text-sm font-medium">Templates</span>
+              {!hasSubscription('templates') && (
+                <div className="absolute top-2 right-2">
+                  <div className="bg-yellow-500 rounded-full p-1">
+                    <Lock className="h-3 w-3 text-white" />
+                  </div>
+                </div>
+              )}
+            </Button>
+          </div>
+
+          {/* Add Item Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-6 shadow-sm">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add new item..."
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                className="flex-1"
+              />
+              <Button onClick={addItem} className="px-4">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Categories */}
+          {!simpleMode && (
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+              <Button
+                variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('all')}
+                className="whitespace-nowrap text-sm"
+              >
+                All ({items.length})
+              </Button>
+              {categories.map(category => {
+                const count = items.filter(item => item.category === category).length;
+                return (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    onClick={() => setSelectedCategory(category)}
+                    className="whitespace-nowrap text-sm capitalize"
+                  >
+                    {category} ({count})
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Progress */}
+          <ProgressBar
+            current={items.filter(item => item.packed).length}
+            total={items.length}
+            className="mb-6"
+          />
+
+          {/* Items List */}
+          <div className="space-y-2">
+            {filteredItems.map(item => (
+              <PackingItem
+                key={item.id}
+                item={item}
+                onToggle={toggleItem}
+                onRemove={removeItem}
+                simpleMode={simpleMode}
+              />
+            ))}
+            
+            {filteredItems.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🎒</div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Your packing list is empty
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Add items manually or use our smart lists to get started
+                </p>
+                <Button
+                  onClick={() => setShowPremadeLists(true)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Browse Smart Lists
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+        )}
+
+          {/* Additional Action Buttons */}
+          {activeTab === 'trips' && currentTrip && (
+            <div className="fixed bottom-24 right-4 flex flex-col gap-2">
+              <Button
+                onClick={() => setShowLuggageView(true)}
+                className="rounded-full h-12 w-12 p-0 bg-green-500 hover:bg-green-600 shadow-lg"
+              >
+                <Move className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Modals and Overlays */}
+        <PremadeListsModal
+          isOpen={showPremadeLists}
+          onClose={() => setShowPremadeLists(false)}
+          onAddItems={addMultipleItems}
+        />
+
+        <LuggageLimitsModal
+          isOpen={showLuggageLimits}
+          onClose={() => setShowLuggageLimits(false)}
+        />
+
+        <TripTemplates
+          isOpen={showTemplates}
+          onClose={() => setShowTemplates(false)}
+          templates={templates}
+          onLoadTemplate={loadTemplate}
+          onSaveTemplate={(name) => saveTemplate(name, items)}
+        />
+
+        <HelpModal
+          isOpen={showHelp}
+          onClose={() => setShowHelp(false)}
+        />
+
+        <LuggageView
+          isOpen={showLuggageView}
+          onClose={() => setShowLuggageView(false)}
+          items={items}
+          onUpdateItem={(updatedItem) => {
+            setItems(items.map(item => 
+              item.id === updatedItem.id ? updatedItem : item
+            ));
+          }}
+        />
+
+        <BottomNavigation 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+          subscriptionTier={subscriptionTier}
+        />
+      </div>
+    </GlobalThemeProvider>
+
       {/* Settings Panel */}
       {activeTab === 'settings' && (
         <EnhancedSettingsPanel
