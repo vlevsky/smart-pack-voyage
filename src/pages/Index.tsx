@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { TripManager } from '@/components/TripManager';
-import { SettingsPanel } from '@/components/SettingsPanel';
+import { EnhancedSettingsPanel } from '@/components/EnhancedSettingsPanel';
 import { SimpleModeToggle } from '@/components/SimpleModeToggle';
 import { EnhancedAIAssistant } from '@/components/EnhancedAIAssistant';
 import { LuggageView } from '@/components/LuggageView';
@@ -14,6 +14,7 @@ import { EnhancedHelpModal } from '@/components/EnhancedHelpModal';
 import { TripSelector } from '@/components/TripSelector';
 import { PackingItem } from '@/components/PackingItem';
 import { ProgressBar } from '@/components/ProgressBar';
+import { GlobalThemeProvider } from '@/components/GlobalThemeProvider';
 import {
   PremadeListsModal
 } from '@/components/PremadeListsModal';
@@ -109,6 +110,8 @@ export default function Index() {
   const [showLuggageView, setShowLuggageView] = useState(false);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
+  const [customTheme, setCustomTheme] = useState<string>('default');
+  const [customFont, setCustomFont] = useState<string>('inter');
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingListItems');
@@ -270,6 +273,12 @@ export default function Index() {
       setSimpleMode(value);
     } else if (key === 'accessibilitySettings') {
       setAccessibilitySettings(value);
+    } else if (key === 'customTheme') {
+      setCustomTheme(value);
+      localStorage.setItem('customTheme', value);
+    } else if (key === 'customFont') {
+      setCustomFont(value);
+      localStorage.setItem('customFont', value);
     }
   };
 
@@ -302,29 +311,33 @@ export default function Index() {
   };
 
   return (
-    <div className={`min-h-screen pb-20 transition-all duration-300 ${
-      darkMode ? 'dark' : ''
-    } ${
-      accessibilitySettings.highContrast
-        ? 'contrast-more bg-black text-yellow-400'
-        : 'bg-gray-50 dark:bg-gray-900'
-    } ${
-      accessibilitySettings.largeText ? 'text-lg' : ''
-    } ${
-      accessibilitySettings.dyslexiaFont ? 'font-mono' : ''
-    }`}>
+    <GlobalThemeProvider theme={customTheme} font={customFont}>
+      <div className={`min-h-screen pb-20 transition-all duration-300 ${
+        darkMode ? 'dark' : ''
+      } ${
+        accessibilitySettings.highContrast
+          ? 'contrast-more bg-black text-yellow-400'
+          : 'bg-gray-50 dark:bg-gray-900'
+      } ${
+        accessibilitySettings.largeText ? 'text-lg' : ''
+      } ${
+        accessibilitySettings.dyslexiaFont ? 'font-mono' : ''
+      }`}>
 
       {/* Settings Panel */}
       {activeTab === 'settings' && (
-        <SettingsPanel
+        <EnhancedSettingsPanel
           isOpen={activeTab === 'settings'}
           settings={{
             darkMode,
             simpleMode,
             accessibilitySettings,
+            customTheme,
+            customFont,
           }}
           onSettingsChange={handleSettingsChange}
           subscriptionTier={subscriptionTier}
+          onClose={() => setActiveTab('trips')}
         />
       )}
 
@@ -355,16 +368,18 @@ export default function Index() {
         {/* Settings Tab Content */}
         {activeTab === 'settings' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
-            <SettingsPanel
+            <EnhancedSettingsPanel
               isOpen={true}
               settings={{
                 darkMode,
                 simpleMode,
                 accessibilitySettings,
+                customTheme,
+                customFont,
               }}
               onSettingsChange={handleSettingsChange}
               subscriptionTier={subscriptionTier}
+              onClose={() => setActiveTab('trips')}
             />
           </div>
         )}

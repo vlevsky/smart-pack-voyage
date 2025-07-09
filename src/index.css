@@ -46,6 +46,8 @@ All colors MUST be HSL.
   --theme-forest-secondary: 142 86% 26%;
   --theme-purple-primary: 271 81% 56%;
   --theme-purple-secondary: 271 91% 65%;
+  --theme-rose-primary: 343 84% 62%;
+  --theme-rose-secondary: 343 94% 72%;
 
     --radius: 0.5rem;
 
